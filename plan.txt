@@ -1,0 +1,68 @@
+roll buttons show rarity
+faves
+
+Rarities:
+◆🞚🞜❖
+❤💛💚💙💜
+🌿🌸💎👑
+Common rest
+Rare 3% 30/1000
+Epic 1% 10/1000
+Legendary 0.3% 3/1000
+for each roll card, decide rarity, then pick randomly from corresponding pool
+
+Starcandies:
+- Auctions
+
+Rolling:
+- Cooldown at 30min per player
+- Roll expires after 15min, or when all cards claimed, whichever earlier
+- Rolling will be delayed if any gallery is loading
+
+Gallery-based commands:
+- Cooldown at 1 command per minute per player
+
+naming cards?
+convert last taken pc without going to collection
+
+Minimum Viable Product plan for IUFI
+
+-- OBJECTS --
+Photocard (PC):
+- ID
+- Photo (stored as image link in DB)
+- Border (generated at runtime)
+- Rarity tiers (may be associated with border/fade? or photo?)
+
+Player:
+- Discord user ID
+- Collection (List of PCs, limit? 10? 50? 100?)
+- Some sort of a rank system (level)
+- Currency? (may be tied to rank system)
+
+Pool:
+- The available PCs that are unclaimed
+
+-- GAMEPLAY ACTIONS --
+Roll: 
+- Summons 3 random PCs from the pool
+- One player can claim at most one PC
+- Roll has a cooldown (15 min)
+
+Release:
+- Releases a PC back into the pool to free collection space
+- Gives player currency? Perhaps more depending on rarity of PC released
+
+Gift:
+- Gift a PC to another player
+- Gift currency to another player
+- Inherently supports trade, no need for trade feature
+
+Main:
+- Choose a PC to be player's "main", that others can see when queried
+
+-- MISC ACTIONS --
+Info:
+- Show info of player, PRIVATE AND PUBLIC
+- Show info of PC
+- Show leaderboard

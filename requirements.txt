@@ -1,0 +1,8 @@
+git+https://github.com/mccoderpy/discord.py-message-components@developer#egg=discord.py-message-components
+python-dotenv==0.20.0
+aiohttp==3.7.4.post0
+pymongo==4.1.1
+dnspython==2.2.1
+Pillow==9.1.0
+colorthief==0.2.1
+numpy==1.22.3

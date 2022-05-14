@@ -8,7 +8,7 @@
 `qboard [qb]` `qcooldowns [qcd]` `qhelp [qh]` `qprofile [qp]`
 
 **🎴 Card**
-`qcardinfo x [qi x]` `qconvert x [qc x]` `qconvertlast [qcl]` `qgiftpc x @m [qgpc x @m]` `qgiftpclast @m [gpcl @m]` `qmain x [qm x]` `qmainlast [qml]` `qremovetag x [qrt x]` `qsettag x t [qst x t]` `qview x [qv x]`
+`qcardinfo x [qi x]` `qconvert x [qc x]` `qconvertlast [qcl]` `qgiftpc x @m [qgpc x @m]` `qgiftpclast @m [qgpcl @m]` `qmain x [qm x]` `qmainlast [qml]` `qremovetag x [qrt x]` `qsettag x t [qst x t]` `qview x [qv x]`
 
 **🍬 Starcandy**
 `qgiftsc a @m [qgsc a @m]`

@@ -9,9 +9,15 @@ class ProfileCog(commands.Cog):
 
     @commands.command(name = 'profile', aliases = ['p'])
     @commands.check(db_utils.does_user_exist)
-    async def profile(self, ctx):
-        id            = ctx.author.id
-        user          = await self.bot.GUILD.fetch_member(id)
+    async def profile(self, ctx, user: discord.Member=None):
+        if user == None:
+            id   = ctx.author.id
+            user = await self.bot.GUILD.fetch_member(id)
+        else:
+            if not await db_utils.does_user_exist(user.id):
+                await ctx.send(f"**{ctx.author.mention} The user provided is not registered.**")
+                return
+            id = user.id
         user_doc      = await db_utils.get_user(id)
         user_cards    = user_doc['collection']
         user_main     = user_doc['main']
@@ -20,11 +26,11 @@ class ProfileCog(commands.Cog):
         if user_main in user_cards:
             main_card_doc = await db_utils.get_card(user_main)
 
-        title = f"**{user.display_name}'s Profile**"
+        title = f"**👤   {user.display_name}'s Profile**"
         embed = discord.Embed(title=title, color=discord.Color.gold())
         s     = f"📙   Photocards: `{len(user_doc['collection'])}`\n"
-        s    += f"⚔️   Level: `{user_doc['level']}`\n"
-        s    += f"🍬   Starcandies: `{user_doc['currency']}`\n\n"
+        s    += f"⚔️   Level: `{user_doc['level']}`\n\n"
+        #s    += f"🍬   Starcandies: `{user_doc['currency']}`\n\n"
         s    += "🌸"*11
         embed.add_field(name=s, value='\u200b', inline=False)
         embed.set_thumbnail(url=user.avatar_url)

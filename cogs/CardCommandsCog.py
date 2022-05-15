@@ -25,12 +25,12 @@ class CardCommandsCog(commands.Cog):
         title  = "**ℹ️   Card Info**"
         id     = f"**🆔   `{card_doc['id']:04}`**\n"
         tag    = f"**🏷️   `{card_doc['tag']}`**\n"
-        rarity = f"**{self.bot.RARITY[card_doc['rarity']]}    `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n\n"
+        rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n\n"
         try:
             owner  = await self.bot.GUILD.fetch_member(card_doc['owned_by'])
-            owned  = f"*Owned by: `{owner.display_name}`*"
+            owned  = f"Owned by:   `{owner.display_name}`"
         except:
-            owned  = "*Owned by: nobody*"
+            owned  = "Owned by:   nobody"
         desc   = id + tag + rarity + owned + '\n\n'
         desc  += "🌸"*10 + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
@@ -61,11 +61,35 @@ class CardCommandsCog(commands.Cog):
         if len(tag) > self.tag_limit:
             await ctx.send(f"**{ctx.author.mention} The tag name cannot be longer than {self.tag_limit} characters.**")
             return
+        if tag.isdigit():
+            await ctx.send(f"**{ctx.author.mention} The tag name cannot be fully numbers.**")
+            return
         if await db_utils.get_card(tag) != None:
             await ctx.send(f"**{ctx.author.mention} There is already a card with this tag.**")
             return
 
         await db_utils.set_card_tag(id_tag, tag)
+        await ctx.send(f"**{ctx.author.mention} You have set the tag successfully.**")
+        
+    @commands.command(name = 'settaglast', aliases = ['stl'])
+    @commands.check(db_utils.does_user_exist)
+    async def settaglast(self, ctx, tag):
+        if len(tag) > self.tag_limit:
+            await ctx.send(f"**{ctx.author.mention} The tag name cannot be longer than {self.tag_limit} characters.**")
+            return
+        if tag.isdigit():
+            await ctx.send(f"**{ctx.author.mention} The tag name cannot be fully numbers.**")
+            return
+        if await db_utils.get_card(tag) != None:
+            await ctx.send(f"**{ctx.author.mention} There is already a card with this tag.**")
+            return
+
+        last_card = await self.get_last_card_id(ctx.author.id)
+        if last_card == None:
+            ctx.send(f'**{ctx.author.mention} you have no photocards.**')
+            return
+
+        await db_utils.set_card_tag(last_card, tag)
         await ctx.send(f"**{ctx.author.mention} You have set the tag successfully.**")
 
     @commands.command(name = 'removetag', aliases = ['rt'])
@@ -150,6 +174,7 @@ class CardCommandsCog(commands.Cog):
     async def gift_card(self, ctx, giver, rec, card_id):
         await db_utils.remove_card_from_user(giver.id, card_id)
         await db_utils.add_card_to_user(rec.id, card_id)
+        await db_utils.set_card_owner(card_id, rec.id)
         await ctx.send(f'**{giver.mention} you have successfully gifted a photocard.**')
         await ctx.send(f'**{rec.mention} you have received a photocard gift from {giver.mention}!**')
 

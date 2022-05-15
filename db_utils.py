@@ -1,4 +1,5 @@
 import os
+import random
 import pymongo
 from   dotenv import load_dotenv
 from   datetime import datetime, timedelta
@@ -13,7 +14,8 @@ players_col  = iufi_db['Players']
 
 # ----------------------------------------------------------------------------------------------------------
 
-CARDS_PATH = 'data/test_cards.txt'
+#CARDS_PATH = 'data/test_cards.txt'
+DATA_PATH = 'data/'
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -21,13 +23,18 @@ async def setup_cards():
     if cards_col.count_documents({}) > 0:
         cards_col.drop()
     
-    card_docs = [{'id'       : id + 1,
-                  'tag'      : None,
-                  'url'      : url.strip(),
-                  'available': True,
-                  'owned_by' : None,
-                  'rarity'   : 0} 
-                for id, url in enumerate(open(CARDS_PATH, 'r'))]
+    card_docs = []
+    id = 1
+    for x in range(4):
+        for url in open(os.path.join(DATA_PATH, f"{x}.txt"), 'r'):
+            doc = {'id'       : id,
+                   'tag'      : None,
+                   'url'      : url.strip(),
+                   'available': True,
+                   'owned_by' : None,
+                   'rarity'   : x} 
+            card_docs.append(doc)
+            id += 1
     cards_col.insert_many(card_docs)
 
 async def setup_players():
@@ -46,18 +53,21 @@ async def does_user_exist(q):
 async def register_user(id):
     if await does_user_exist(id):
         return False
-    players_col.insert_one({'discord_id' : id,
-                            'collection' : [],
-                            'level'      : 1, 
-                            'exp'        : 0,
-                            'currency'   : 0,
-                            'main'       : 0,
-                            'next_claim' : datetime.now(),
-                            'next_roll'  : datetime.now(),
-                            'next_daily' : datetime.now(),
-                            'streak_ends': datetime.now(),
-                            'streak'     : 1,
-                            'faves'      : []})
+    players_col.insert_one({'discord_id'   : id,
+                            'collection'   : [],
+                            'level'        : 1, 
+                            'exp'          : 0,
+                            'currency'     : 0,
+                            'main'         : 0,
+                            'next_claim'   : datetime.now(),
+                            'next_roll'    : datetime.now(),
+                            'next_daily'   : datetime.now(),
+                            'streak_ends'  : datetime.now(),
+                            'streak'       : 1,
+                            'faves'        : [],
+                            'rare_rolls'   : 0,
+                            'epic_rolls'   : 0,
+                            'legend_rolls' : 0})
     return True
 
 async def add_card_to_user(user_id, card_id):
@@ -120,10 +130,35 @@ async def check_within_streak(user_id):
 async def set_user_streak(id, streak):
     players_col.update_one({'discord_id': id}, {'$set': {'streak': streak}})
 
+async def update_user_roll(id, roll, delta):
+    user            = await get_user(id)
+    roll_amount     = user[roll]
+    new_roll_amount = roll_amount + delta
+    if new_roll_amount < 0:
+        new_roll_amount = 0
+    players_col.update_one({'discord_id': id}, {'$set': {roll: new_roll_amount}})
+
 # ----------------------------------------------------------------------------------------------------------
 
-async def get_random_cards(num):
-    return cards_col.aggregate([{'$match': {'available': True}}, {'$sample': {'size': num}}])
+async def get_random_cards(num, probs, bias):
+    cards   = []
+    settled = False
+    for i in range(num):
+        roll = random.randint(1, 1000)
+        if not settled and bias > 0:
+            settled = True
+            rarity  = bias
+        else:
+            for r, p in enumerate(probs):
+                if roll <= p:
+                    rarity = r
+                    break
+        card = list(cards_col.aggregate([{'$match': {'available': True, 'rarity': rarity}}, {'$sample': {'size': 1}}]))[0]
+        cards.append(card)
+        cards_col.update_one({'id': card['id']}, {'$set': {'available': False}})
+    card_ids = [card['id'] for card in cards]
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True}})
+    return cards
 
 async def set_card_availability(card_id, val):
     cards_col.update_one({'id': card_id}, {'$set': {'available': val}})

@@ -13,25 +13,87 @@ class RollCog(commands.Cog):
                  roll_claim_time,
                  roll_headstart_time,
                  roll_cooldown,
-                 roll_claim_cooldown):
+                 roll_claim_cooldown,
+                 roll_common_cooldown):
         self.bot                 = bot
         self.roll_pc_count       = roll_pc_count
         self.roll_claim_time     = roll_claim_time
         self.roll_headstart_time = roll_headstart_time
         self.roll_cooldown       = roll_cooldown
         self.roll_claim_cooldown = roll_claim_cooldown
+        self._cd = commands.CooldownMapping.from_cooldown(1, roll_common_cooldown, commands.BucketType.channel)
+
+    async def cog_check(self, ctx):
+        bucket = self._cd.get_bucket(ctx.message)
+        retry_after = bucket.update_rate_limit()
+        if retry_after:
+            await ctx.send(f"**{ctx.author.mention} you rolled a little too close to someone else, try again.**")
+            return False
+        return True
 
     @commands.command(name = 'roll', aliases = ['r'])
-    @commands.check(db_utils.does_user_exist)
-    @commands.cooldown(1, 1, commands.BucketType.channel)
     async def roll(self, ctx):
-        await self.start_roll(ctx)
+        if not await db_utils.does_user_exist(ctx.author.id):
+            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
+            return
+        ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_roll')
+        if not ok:
+            await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**')
+            return
 
-    async def start_roll(self, ctx):
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+
+        await self.start_roll(ctx, 0)
+
+    @commands.command(name = 'rareroll', aliases = ['rr'])
+    async def rareroll(self, ctx):
+        if not await db_utils.does_user_exist(ctx.author.id):
+            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
+            return
+        user_doc = await db_utils.get_user(ctx.author.id)
+        roll_amount = user_doc['rare_rolls']
+        if roll_amount <= 0:
+            await ctx.send(f"**{ctx.author.mention} you do not have any rare rolls to use.**")
+            return
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', -1)
+        await self.start_roll(ctx, 1)
+
+    @commands.command(name = 'epicroll', aliases = ['er'])
+    async def epicroll(self, ctx):
+        if not await db_utils.does_user_exist(ctx.author.id):
+            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
+            return
+        user_doc = await db_utils.get_user(ctx.author.id)
+        roll_amount = user_doc['epic_rolls']
+        if roll_amount <= 0:
+            await ctx.send(f"**{ctx.author.mention} you do not have any epic rolls to use.**")
+            return
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', -1)
+        await self.start_roll(ctx, 2)
+
+    @commands.command(name = 'legendroll', aliases = ['lr'])
+    async def legendroll(self, ctx):
+        if not await db_utils.does_user_exist(ctx.author.id):
+            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
+            return
+        user_doc = await db_utils.get_user(ctx.author.id)
+        roll_amount = user_doc['legend_rolls']
+        if roll_amount <= 0:
+            await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**")
+            return
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
+        await self.start_roll(ctx, 3)
+
+    async def start_roll(self, ctx, rarity_bias):
         async def expire_msg():
             content    = "*⏳ This roll has expired.*"
-            components = [[Button(label = str(i+1), custom_id = f'claim {i+1}', style = ButtonStyle.gray, disabled = True)
-                          for i in range(self.roll_pc_count)]]
+            for i in range(self.roll_pc_count):
+                components[0][i].style    = ButtonStyle.gray
+                components[0][i].disabled = True
             await roll_msg.edit(content=content, components=components)
 
         async def button_check(i: discord.ComponentInteraction, com):
@@ -69,17 +131,10 @@ class RollCog(commands.Cog):
             await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
             await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
 
-        ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_roll')
-        if not ok:
-            await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**')
-            return
-
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
-
         loading_msg = await ctx.send('**Loading...**')
 
-        roll_pc_docs = [doc for doc in await db_utils.get_random_cards(self.roll_pc_count)]
+        roll_pc_docs = [doc for doc in await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)]
+        roll_pc_ids  = [doc['id'] for doc in roll_pc_docs]
         print('Rolled', roll_pc_docs)
 
         if len(roll_pc_docs) == 0:
@@ -87,7 +142,6 @@ class RollCog(commands.Cog):
             await loading_msg.delete()
             return
 
-        roll_pc_ids = [doc['id'] for doc in roll_pc_docs]
         stitched_img = await photocard_utils.stitch_images([doc['url'] for doc in roll_pc_docs])
         stitched_img = await photocard_utils.pillow_to_file(stitched_img)
 
@@ -96,8 +150,8 @@ class RollCog(commands.Cog):
         roll_headstart_id = ctx.author.id
 
         content = f'**{ctx.author.mention} has initiated a roll 🎲\n**'
-        components = [[Button(label = str(i+1), custom_id = f'claim {i+1}', style = ButtonStyle.green)
-                      for i in range(self.roll_pc_count)]]
+        components = [[Button(emoji=self.bot.RARITY[doc['rarity']], label = str(i+1), custom_id = f'claim {i+1}', style = ButtonStyle.green)
+                      for i, doc in enumerate(roll_pc_docs)]]
         roll_msg = await ctx.send(
             file=stitched_img,
             content=content,

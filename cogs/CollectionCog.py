@@ -27,7 +27,7 @@ class CollectionCog(commands.Cog):
             id     = f"🆔 {d['id']:04}"
             tag    = f"🏷️ {d['tag']}"
             rarity = f"{self.bot.RARITY[d['rarity']]}"
-            s     += f"{num:<5}{id:^10}{tag:^15}{rarity:>1}\n"
+            s     += f"{num:<5}{id:<10}{tag:<15}{rarity:>1}\n"
         s = "```" + s + "```"
         return s
 

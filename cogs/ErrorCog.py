@@ -6,7 +6,7 @@ class ErrorCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if   isinstance(error, commands.CheckFailure):
+        if   isinstance(error, commands.CheckFailure) and self.bot.get_command(ctx.invoked_with) not in self.bot.get_cog('RollCog').get_commands():
             await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
             return
         elif isinstance(error, commands.CommandOnCooldown):
@@ -14,6 +14,9 @@ class ErrorCog(commands.Cog):
             return
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f'**{ctx.author.mention} the command is missing arguments. Check the usage again.**')
+            return
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send(f'**{ctx.author.mention} the arguments given are invalid. Check the usage again.**')
             return
         else:
             pass

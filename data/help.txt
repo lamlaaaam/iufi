@@ -1,20 +1,14 @@
-**📓 Notes**
-*`x` = card's ID or tag name*
-*`m` = another player*
-*`t` = tag name*
-*`a` = amount*
-
 **ℹ️ Info**
-`qboard [qb]` `qcooldowns [qcd]` `qhelp [qh]` `qprofile [qp]`
+`qboard qcooldowns qcommandhelp qhelp qinventory qprofile`
 
 **🎴 Card**
-`qcardinfo x [qi x]` `qconvert x [qc x]` `qconvertlast [qcl]` `qgiftpc x @m [qgpc x @m]` `qgiftpclast @m [qgpcl @m]` `qmain x [qm x]` `qmainlast [qml]` `qremovetag x [qrt x]` `qsettag x t [qst x t]` `qview [qv]`
+`qcardinfo qconvert qconvertlast qgiftpc qgiftpclast qmain qmainlast qremovetag qsettag qsettaglast qview`
 
 **🍬 Starcandy**
-`qgiftsc a @m [qgsc a @m]`
+`qgiftsc`
 
 **🎮 Gameplay**
-`qdaily [qd]` `qroll [qr]` `qshop [qs]`
+`qdaily qepicroll qlegendroll qrareroll qroll qshop`
 
 **👨‍💼 Admin**
 `qregister`
@@ -23,6 +17,6 @@
 `qreset`
 
 **🙏🏼 Credits**
-Code       - 8 bol
-Photocards - 8 bol, Mods, Content Managers
-Playtest   - Mods, Content Managers, aly, Quaena, Blue, Mochi
+`Code       - 8 bol`
+`Photocards - 8 bol, Mods, Content Managers`
+`Playtest   - Mods, Content Managers, Aly, Quaena, Blue, Mochi`

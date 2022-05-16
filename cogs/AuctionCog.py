@@ -76,7 +76,7 @@ class AuctionCog(commands.Cog):
 
         if self.highest_bidder != None:
             amount_ok = (await db_utils.get_user(self.highest_bidder.id))['currency'] >= self.highest_bid
-            card_ok   = card_doc['id'] in (await db_utils.get_user(ctx.author.id)['collection'])
+            card_ok   = card_doc['id'] in (await db_utils.get_user(ctx.author.id))['collection']
             if amount_ok and card_ok:
                 await db_utils.update_user_currency(self.highest_bidder.id, -self.highest_bid)
                 await db_utils.update_user_currency(ctx.author.id, self.highest_bid)
@@ -100,15 +100,15 @@ class AuctionCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} there is no ongoing auction.**')
             return
         if ctx.author == self.auction_starter:
-            await ctx.send(f'**{ctx.author.mention} you cannot bid for your own auction.**')
+            await ctx.send(f'**{ctx.author.mention} you cannot bid for your own auction.**', delete_after=3)
             return
         user_doc = await db_utils.get_user(ctx.author.id)
         currency = user_doc['currency']
         if amt <= 0 or amt > currency:
-            await ctx.send(f'**{ctx.author.mention} invalid amount for bidding.**')
+            await ctx.send(f'**{ctx.author.mention} invalid amount for bidding.**', delete_after=3)
             return
         if amt <= self.highest_bid:
-            await ctx.send(f'**{ctx.author.mention} you must bid an amount higher than the current bidder.**')
+            await ctx.send(f'**{ctx.author.mention} you must bid an amount higher than the current bidder.**', delete_after=3)
             return
         
         self.highest_bidder = ctx.author

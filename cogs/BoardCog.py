@@ -10,7 +10,6 @@ class BoardCog(commands.Cog):
     @commands.check(db_utils.does_user_exist)
     async def board(self, ctx):
         top_user_docs = await db_utils.get_all_users()
-        #top_user_docs = sorted(top_user_docs, key=lambda doc: (doc['level'], doc['currency']), reverse=True)
         top_user_docs = sorted(top_user_docs, key=lambda doc: doc['level'], reverse=True)
         trophy        = '🏆'
         title         = f"{trophy}\u200b   IUFI Leaderboard"
@@ -32,10 +31,10 @@ class BoardCog(commands.Cog):
                 champ = user
 
             name = user.display_name.encode('ascii', 'ignore')
-            name = name.decode()[:15]
+            name = name.decode()[:10]
             if len(name) == 0:
                 u    = await self.bot.fetch_user(id)
-                name = u.display_name[:15]
+                name = u.display_name[:10]
 
             level    = doc['level']
             currency = doc['currency']
@@ -47,10 +46,6 @@ class BoardCog(commands.Cog):
                 break
 
         for i in range(len(names)):
-            #left   = f'{emojis[i]} {names[i]}'
-            #center = f'{levels[i]} ⚔️'
-            #right  = f'{currencies[i]} 🍬'
-            #row    = f"{left:<15}{center:^5}{right:>5}"
             left   = f'{emojis[i]} {names[i]}'
             right  = f'{levels[i]} ⚔️'
             row    = f"{left:<20}{right:>5}"

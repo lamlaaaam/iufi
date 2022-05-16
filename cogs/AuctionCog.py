@@ -42,6 +42,7 @@ class AuctionCog(commands.Cog):
             return
 
         title          = "**🔨   Auction**"
+        inst           = "*Use `qbid amount` to participate.*\n\n"
         id             = f"**🆔   `{card_doc['id']:04}`**\n"
         tag            = f"**🏷️   `{card_doc['tag']}`**\n"
         rarity         = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
@@ -49,7 +50,7 @@ class AuctionCog(commands.Cog):
         highest_bidder = f"**Highest bidder: `nobody`**\n"
         highest_bid    = f"**Bid amount: `0 🍬`**\n\n"
         timer          = "**Time:\n**" + '⬜ ' * 10 + '\n\n'
-        desc           = id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+        desc           = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
         embed          = discord.Embed(title=title, description=desc, color=discord.Color.dark_red())
 
         img_url         = card_doc['url']
@@ -67,7 +68,7 @@ class AuctionCog(commands.Cog):
             highest_bidder    = f"**Highest bidder: `{self.highest_bidder.display_name if self.highest_bidder else 'nobody'}`**\n"
             highest_bid       = f"**Bid amount: `{self.highest_bid} 🍬`**\n\n"
             timer             = "**Time:\n**" + '🟥 ' * (i+1) + '⬜ ' * (10-i-1) + '\n\n'
-            desc              = id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+            desc              = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
             embed.description = desc
             await self.auction_msg.edit(embed=embed)
         self.auction_msg    = None
@@ -87,7 +88,7 @@ class AuctionCog(commands.Cog):
             else:
                 await ctx.send(f"**The auction transaction has failed.**")
         else:
-            await ctx.send(f"**{ctx.author.mention} no one has bidded for your photocard.**")
+            await ctx.send(f"**{ctx.author.mention} no one bidded for your photocard.**")
 
         self.highest_bidder  = None
         self.highest_bid     = 0

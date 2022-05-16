@@ -113,3 +113,4 @@ class AuctionCog(commands.Cog):
         
         self.highest_bidder = ctx.author
         self.highest_bid    = amt
+        await ctx.send(f'**{ctx.author.mention} you have successfully placed a bid.**')

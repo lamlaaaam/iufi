@@ -31,7 +31,7 @@ class ProfileCog(commands.Cog):
         s     = f"📙   Photocards: `{len(user_doc['collection'])}`\n"
         s    += f"⚔️   Level: `{user_doc['level']}`\n\n"
         #s    += f"🍬   Starcandies: `{user_doc['currency']}`\n\n"
-        s    += "🌸"*11
+        s    += '🌸 ' * 10
         embed.add_field(name=s, value='\u200b', inline=False)
         embed.set_thumbnail(url=user.avatar_url)
 

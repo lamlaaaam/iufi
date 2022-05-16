@@ -138,7 +138,15 @@ async def update_user_roll(id, roll, delta):
         new_roll_amount = 0
     players_col.update_one({'discord_id': id}, {'$set': {roll: new_roll_amount}})
 
-# ----------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------
+
+async def check_pool_exists(bias):
+    if bias > 0:
+        available = len(list(cards_col.find({'rarity': bias, 'available': True})))
+    else:
+        available = len(list(cards_col.find({'available': True})))
+    pool_exists = available > 0
+    return pool_exists
 
 async def get_random_cards(num, probs, bias):
     cards   = []

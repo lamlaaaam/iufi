@@ -61,7 +61,7 @@ class ShopCog(commands.Cog):
             async with timeout(self.shop_time):
                 while True:
                     interaction, select = await self.bot.wait_for('selection_select', check = check)
-                    await interaction.defer()
+                    #await interaction.defer()
                     await buy(select.values[0])
         except asyncio.exceptions.TimeoutError:
             pass

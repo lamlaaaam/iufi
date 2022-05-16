@@ -67,7 +67,7 @@ class CollectionCog(commands.Cog):
             async with timeout(self.collection_time):
                 while True:
                     interaction, button = await self.bot.wait_for('button_click', check = check)
-                    await interaction.defer()
+                    #await interaction.defer()
                     cid = button.custom_id
                     if cid == 'nav_first':
                         current_page = 0

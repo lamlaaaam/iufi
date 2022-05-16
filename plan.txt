@@ -1,9 +1,10 @@
+
 Rarities:
 ◆🞚🞜❖
 ❤💛💚💙💜
 🌿🌸💎👑
 Common rest
-Rare 3% 30/1000
+Rare 10% 100/1000
 Epic 1% 10/1000
 Legendary 0.3% 3/1000
 for each roll card, decide rarity, then pick randomly from corresponding pool

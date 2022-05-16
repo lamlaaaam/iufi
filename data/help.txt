@@ -8,7 +8,7 @@
 `qgiftsc`
 
 **🎮 Gameplay**
-`qdaily qepicroll qlegendroll qrareroll qroll qshop`
+`qauction qbid qdaily qepicroll qlegendroll qrareroll qroll qshop`
 
 **👨‍💼 Admin**
 `qregister`
@@ -19,4 +19,4 @@
 **🙏🏼 Credits**
 `Code       - 8 bol`
 `Photocards - 8 bol, Mods, Content Managers`
-`Playtest   - Mods, Content Managers, Aly, Quaena, Blue, Mochi`
+`Playtest   - Mods, Content Managers, Quaena, Blue, Mochi`

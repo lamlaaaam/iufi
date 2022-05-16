@@ -22,6 +22,7 @@ from   cogs.CollectionCog   import CollectionCog
 from   cogs.CardCommandsCog import CardCommandsCog
 from   cogs.CommandHelpCog  import CommandHelpCog
 from   cogs.InventoryCog    import InventoryCog
+from   cogs.AuctionCog      import AuctionCog
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ ROLL_CLAIM_TIME      = 30  # Seconds
 ROLL_COOLDOWN        = 10  # Minutes
 ROLL_CLAIM_COOLDOWN  = 3   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
-ROLL_COMMON_COOLDOWN = 3   # Seconds
+ROLL_COMMON_COOLDOWN = 10  # Seconds
 
 COLLECTION_TIME      = 60  # Seconds
 SHOP_TIME            = 60  # Seconds
@@ -57,6 +58,8 @@ DAILY_REWARD         = 5   # Starcandies
 STREAK_MAX           = 5   # Days in a row before reward
 STREAK_REWARD        = 20  # Starcandies
 
+AUCTION_TIME         = 30  # Seconds
+
 COMMAND_MAP = {
     'qboard'      : ('qb', 'qboard', 'Shows the IUFI leaderboard.'),
     'qcooldowns'  : ('qcd', 'qcooldowns', 'Shows all your cooldowns.'),
@@ -64,9 +67,9 @@ COMMAND_MAP = {
     'qhelp'       : ('qh', 'qhelp', 'Shows the IUFI help screen.'),
     'qprofile'    : ('qp', 'qprofile @member', 'Shows the profile of a member. If called without a member, shows your own profile.'),
     'qcardinfo'   : ('qi', 'qcardinfo id_or_tag', 'Shows the details of a photocard. Card can be identified by its ID or given tag.'),
-    'qconvert'    : ('qc', 'qconvert id_or_tag', 'Converts the photocard into starcandies. Card can be identified by its ID or given tag. The amount of starcandies received is dependent on the card\'s rarity.'),
+    'qconvert'    : ('qc', 'qconvert id_or_tag1 id_or_tag2 ...', 'Converts the photocards into starcandies. Card can be identified by its ID or given tag. The amount of starcandies received is dependent on the card\'s rarity.'),
     'qconvertlast': ('qcl', 'qconvertlast', 'Converts the last photocard of your collection.'),
-    'qgiftpc'     : ('qgpc', 'qgiftpc id_or_tag @member', 'Gifts the member a photocard. Card can be identified by its ID or given tag.'),
+    'qgiftpc'     : ('qgpc', 'qgiftpc @member id_or_tag1 id_or_tag2 ...', 'Gifts the member photocards. Card can be identified by its ID or given tag.'),
     'qgiftpclast' : ('qgpcl', 'qgiftpclast @member', 'Gifts the member your last photocard in your collection.'),
     'qmain'       : ('qm', 'qmain id_or_tag', 'Sets the photocard as your profile display. Card can be identified by its ID or given tag.'),
     'qmainlast'   : ('qml', 'qmainlast', 'Sets the last photocard in your collection as your profile display.'),
@@ -74,7 +77,7 @@ COMMAND_MAP = {
     'qsettag'     : ('qst', 'qsettag id_or_tag tag', 'Sets the photocard\'s tag. Card can be identified by its ID or previous tag.'),
     'qsettaglast' : ('qstl', 'qsettaglast tag', 'Sets the tag of the last photocard in your collection.'),
     'qview'       : ('qv', 'qview', 'View your photocard collection.'),
-    'qgiftsc'     : ('qgsc', 'qgsc amount @member', 'Gifts the member the specified amount of starcandies.'),
+    'qgiftsc'     : ('qgsc', 'qgsc @member amount', 'Gifts the member the specified amount of starcandies.'),
     'qdaily'      : ('qd', 'qdaily', 'Claims your daily reward.'),
     'qroll'       : ('qr', 'qroll', 'Rolls a set of photocards for claiming.'),
     'qshop'       : ('qs', 'qshop', 'Brings up the IUFI shop'),
@@ -83,7 +86,9 @@ COMMAND_MAP = {
     'qrareroll'   : ('qrr', 'qrareroll', 'Starts a roll with at least one rare photocard guaranteed.'),
     'qepicroll'   : ('qer', 'qepicroll', 'Starts a roll with at least one epic photocard guaranteed.'),
     'qlegendroll' : ('qlr', 'qlegendroll', 'Starts a roll with at least one legendary photocard guaranteed.'),
-    'qinventory'  : ('qin', 'qinventory', 'Shows the items that you own.')
+    'qinventory'  : ('qin', 'qinventory', 'Shows the items that you own.'),
+    'qauction'    : ('qa', 'qauction id_or_tag', 'Puts your photocard up for auction. Card can be identified by its ID or given tag'),
+    'qbid'        : ('qbi', 'qbid amount', 'Places a bid for the ongoing auction.')
 }
 
 SHOP_LIST = [
@@ -97,7 +102,7 @@ SHOP_LIST = [
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
 bot.RARITY_NAME = ['Common', 'Rare', 'Epic', 'Legendary']
 bot.RARITY_SC   = [1, 5, 50, 500]
-bot.RARITY_PROB = [957, 987, 997, 1000] # Out of 1000
+bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 BOL      = 406986532205887488
 HAZE     = 95608676441661440
@@ -106,7 +111,8 @@ AYAX     = 135827436544851969
 NOCT     = 122062302865391616
 NEFFY    = 286513574191431682
 REVIVE   = 140889208783896576
-DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE]
+ALY      = 773162600380891156
+DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -157,6 +163,7 @@ async def on_ready():
     bot.add_cog(CardCommandsCog(bot))
     bot.add_cog(CommandHelpCog(bot, COMMAND_MAP))
     bot.add_cog(InventoryCog(bot))
+    bot.add_cog(AuctionCog(bot, AUCTION_TIME))
     print('Cogs added')
 
     print('Bot is ready')
@@ -172,6 +179,14 @@ async def on_message(msg):
         await msg.reply(f"**This game is not playable in this channel. Go to {bot.CHANNEL.mention}**")
         return
     await bot.process_commands(msg)
+
+@bot.event
+async def on_button_click(i, b):
+    await i.defer()
+
+@bot.event
+async def on_selection_select(i, s):
+    await i.defer()
 
 # ----------------------------------------------------------------------------------------------------------
 

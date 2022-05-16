@@ -13,7 +13,8 @@ class BoardCog(commands.Cog):
         top_user_docs = sorted(top_user_docs, key=lambda doc: doc['level'], reverse=True)
         trophy        = '🏆'
         title         = f"{trophy}\u200b   IUFI Leaderboard"
-        emojis        = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        #emojis        = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        emojis        = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅']
         names         = []
         levels        = []
         currencies    = []
@@ -31,10 +32,10 @@ class BoardCog(commands.Cog):
                 champ = user
 
             name = user.display_name.encode('ascii', 'ignore')
-            name = name.decode()[:10]
+            name = name.decode()[:15]
             if len(name) == 0:
                 u    = await self.bot.fetch_user(id)
-                name = u.display_name[:10]
+                name = u.display_name[:15]
 
             level    = doc['level']
             currency = doc['currency']

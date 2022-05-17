@@ -1,3 +1,4 @@
+import re
 import db_utils
 import photocard_utils
 import discord
@@ -58,7 +59,7 @@ class CardCommandsCog(commands.Cog):
         if card_doc['id'] not in user_doc['collection']:
             await self.card_not_owned_error(ctx)
             return
-        if not tag.isalnum():
+        if not re.match("^[A-Za-z0-9]*$", tag):
             await ctx.send(f"**{ctx.author.mention} the tag name must be alphanumeric.**")
             return
         if len(tag) > self.tag_limit:

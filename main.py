@@ -87,7 +87,7 @@ COMMAND_MAP = {
     'qepicroll'   : ('qer', 'qepicroll', 'Starts a roll with at least one epic photocard guaranteed.'),
     'qlegendroll' : ('qlr', 'qlegendroll', 'Starts a roll with at least one legendary photocard guaranteed.'),
     'qinventory'  : ('qin', 'qinventory', 'Shows the items that you own.'),
-    'qauction'    : ('qa', 'qauction id_or_tag', 'Puts your photocard up for auction. Card can be identified by its ID or given tag'),
+    'qauction'    : ('qa', 'qauction id_or_tag min_bid', 'Puts your photocard up for auction with a minimum bid amount. If not specified, minimum bid is 0. Card can be identified by its ID or given tag'),
     'qbid'        : ('qbi', 'qbid amount', 'Places a bid for the ongoing auction.')
 }
 

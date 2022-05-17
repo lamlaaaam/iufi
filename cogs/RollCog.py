@@ -47,7 +47,9 @@ class RollCog(commands.Cog):
         await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
 
-        await self.start_roll(ctx, 0)
+        success = await self.start_roll(ctx, 0)
+        if not success:
+            await db_utils.set_user_cooldown(ctx.author.id, 'next_roll')
 
     @commands.command(name = 'rareroll', aliases = ['rr'])
     async def rareroll(self, ctx):
@@ -64,7 +66,10 @@ class RollCog(commands.Cog):
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', -1)
-        await self.start_roll(ctx, 1)
+
+        success = await self.start_roll(ctx, 1)
+        if not success:
+            await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', 1)
 
     @commands.command(name = 'epicroll', aliases = ['er'])
     async def epicroll(self, ctx):
@@ -81,7 +86,10 @@ class RollCog(commands.Cog):
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', -1)
-        await self.start_roll(ctx, 2)
+
+        success = await self.start_roll(ctx, 2)
+        if not success:
+            await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', 1)
 
     @commands.command(name = 'legendroll', aliases = ['lr'])
     async def legendroll(self, ctx):
@@ -98,7 +106,10 @@ class RollCog(commands.Cog):
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
-        await self.start_roll(ctx, 3)
+
+        success = await self.start_roll(ctx, 3)
+        if not success:
+            await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', 1)
 
     async def start_roll(self, ctx, rarity_bias):
         async def expire_msg():
@@ -153,8 +164,11 @@ class RollCog(commands.Cog):
             await ctx.send('**The pool is empty!**')
             await loading_msg.delete()
             return
-
         stitched_img = await photocard_utils.stitch_images([doc['url'] for doc in roll_pc_docs])
+        if stitched_img == None:
+            await loading_msg.delete()
+            await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**")
+            return False
         stitched_img = await photocard_utils.pillow_to_file(stitched_img)
 
         await loading_msg.delete()
@@ -177,7 +191,6 @@ class RollCog(commands.Cog):
             async with timeout(self.roll_headstart_time):
                 while taken < 1:
                     interaction, button = await self.bot.wait_for('button_click', check = check)
-                    #await interaction.defer()
                     if await button_check(interaction, button):
                         card_index = int(button.custom_id.split()[1]) - 1
                         await handle_claim(interaction, button, card_index)
@@ -195,7 +208,6 @@ class RollCog(commands.Cog):
             async with timeout(self.roll_claim_time):
                 while taken < self.roll_pc_count:
                     interaction, button = await self.bot.wait_for('button_click', check = check)
-                    #await interaction.defer()
                     if await button_check(interaction, button):
                         card_index = int(button.custom_id.split()[1]) - 1
                         await handle_claim(interaction, button, card_index)
@@ -203,3 +215,4 @@ class RollCog(commands.Cog):
             pass
 
         await expire_msg()
+        return True

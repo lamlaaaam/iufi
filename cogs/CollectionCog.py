@@ -34,14 +34,21 @@ class CollectionCog(commands.Cog):
     @commands.command(name = 'view', aliases = ['v'])
     @commands.check(db_utils.does_user_exist)
     async def view(self, ctx):
-        cards_per_page  = 10
-        id              = ctx.author.id
-        user            = await self.bot.GUILD.fetch_member(id)
-        user_doc        = await db_utils.get_user(id)
-        user_collection = user_doc['collection']
-        cards_docs      = [await db_utils.get_card(id) for id in user_collection]
-        collection_size = len(cards_docs)
-        pages           = [cards_docs[i:i + cards_per_page] for i in range(0, collection_size, cards_per_page)]
+        cards_per_page    = 10
+        id                = ctx.author.id
+        user              = await self.bot.GUILD.fetch_member(id)
+        user_doc          = await db_utils.get_user(id)
+        user_collection   = user_doc['collection']
+        cards_docs_dict   = {}
+        cards_docs        = list(await db_utils.get_cards({'owned_by': id}))
+        cards_docs_sorted = [None] * len(cards_docs)
+        for doc in cards_docs:
+            cards_docs_dict[doc['id']] = doc
+        for i in range(len(user_collection)):
+            id                   = user_collection[i]
+            cards_docs_sorted[i] = cards_docs_dict[id]
+        collection_size = len(cards_docs_sorted)
+        pages           = [cards_docs_sorted[i:i + cards_per_page] for i in range(0, collection_size, cards_per_page)]
         num_pages       = len(pages)
 
         if collection_size == 0:
@@ -50,7 +57,7 @@ class CollectionCog(commands.Cog):
 
         title = f"📖   {user.display_name}'s Photocards"
         desc_pre = f"**📙   Collection size: `{collection_size}`**\n\n"
-        desc_pre += "🌸"*15 + "\n\n"
+        desc_pre += "🌸 " * 13 + "\n\n"
         desc = desc_pre + await self.page_to_str(pages, 0, cards_per_page)
         embed = discord.Embed(title = title, description = desc, color = discord.Color.gold())
         embed.set_thumbnail(url=user.avatar_url)

@@ -24,7 +24,7 @@ class AuctionCog(commands.Cog):
     @commands.command(name = 'auction', aliases = ['a'])
     @commands.check(db_utils.does_user_exist)
     @commands.cooldown(1, 60, commands.BucketType.channel)
-    async def auction(self, ctx, id_tag):
+    async def auction(self, ctx, id_tag, min_bid=0):
         if self.auction_msg != None:
             await ctx.send(f"**{ctx.author.mention} there is an ongoing auction. Please wait for it to end.**")
             self.auction.reset_cooldown(ctx)
@@ -41,14 +41,17 @@ class AuctionCog(commands.Cog):
             self.auction.reset_cooldown(ctx)
             return
 
-        title          = "**🔨   Auction**"
-        inst           = "*Use `qbid amount` to participate.*\n\n"
+        self.highest_bid     = min_bid
+        self.auction_starter = ctx.author
+
+        title          = f"**🔨   {ctx.author.display_name}'s Auction**"
+        inst           = "Use `qbid amount` to participate.\n\n"
         id             = f"**🆔   `{card_doc['id']:04}`**\n"
         tag            = f"**🏷️   `{card_doc['tag']}`**\n"
         rarity         = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
         owned          = f"**Owned by:   `{ctx.author.display_name}`**\n\n"
-        highest_bidder = f"**Highest bidder: `nobody`**\n"
-        highest_bid    = f"**Bid amount: `0 🍬`**\n\n"
+        highest_bidder = f"**Highest bidder: `None`**\n"
+        highest_bid    = f"**Amount to beat: `{min_bid} 🍬`**\n\n"
         timer          = "**Time:\n**" + '⬜ ' * 10 + '\n\n'
         desc           = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
         embed          = discord.Embed(title=title, description=desc, color=discord.Color.dark_red())
@@ -59,14 +62,13 @@ class AuctionCog(commands.Cog):
         embed.set_image(url=card_attachment)
         embed.set_thumbnail(url=ctx.author.avatar_url)
 
-        self.auction_starter = ctx.author
         self.auction_msg     = await ctx.send(embed=embed)
         local_msg            = self.auction_msg
         sleep_interval       = self.auction_time // 10
         for i in range(10):
             await asyncio.sleep(sleep_interval)
-            highest_bidder    = f"**Highest bidder: `{self.highest_bidder.display_name if self.highest_bidder else 'nobody'}`**\n"
-            highest_bid       = f"**Bid amount: `{self.highest_bid} 🍬`**\n\n"
+            highest_bidder    = f"**Highest bidder: `{self.highest_bidder.display_name if self.highest_bidder else 'None'}`**\n"
+            highest_bid       = f"**Amount to beat: `{self.highest_bid} 🍬`**\n\n"
             timer             = "**Time:\n**" + '🟥 ' * (i+1) + '⬜ ' * (10-i-1) + '\n\n'
             desc              = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
             embed.description = desc
@@ -109,7 +111,7 @@ class AuctionCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} invalid amount for bidding.**', delete_after=3)
             return
         if amt <= self.highest_bid:
-            await ctx.send(f'**{ctx.author.mention} you must bid an amount higher than the current bidder.**', delete_after=3)
+            await ctx.send(f'**{ctx.author.mention} you must bid higher than {self.highest_bid}.**', delete_after=3)
             return
         
         self.highest_bidder = ctx.author

@@ -1,9 +1,11 @@
+import asyncio
 import aiohttp
 import discord
 import io
 import numpy as np
 from   colorthief import ColorThief
 from   PIL import Image, ImageDraw
+from   async_timeout import timeout
 
 PC_GAP    = 50
 GALL_GAP  = 50
@@ -16,16 +18,20 @@ STARS_URL  = 'overlays/stars_smol.png'
 CLIENT_SESSION = None
 
 async def stitch_images(imgs_url):
-    n             = len(imgs_url)
-    imgs          = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
-    width, height = imgs[0].size
-    new_image     = Image.new('RGBA', (n * width + (n-1) * PC_GAP, height), (255,255,255,0))
-    curr_width    = 0
+    try:
+        async with timeout(30):
+            n             = len(imgs_url)
+            imgs          = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
+            width, height = imgs[0].size
+            new_image     = Image.new('RGBA', (n * width + (n-1) * PC_GAP, height), (255,255,255,0))
+            curr_width    = 0
 
-    for i in imgs:
-        new_image.paste(i, (curr_width, 0))
-        curr_width += width + PC_GAP
-    return new_image
+            for i in imgs:
+                new_image.paste(i, (curr_width, 0))
+                curr_width += width + PC_GAP
+            return new_image
+    except asyncio.exceptions.TimeoutError:
+        return None
 
 async def stitch_gallery(imgs_url):
     rows = 2

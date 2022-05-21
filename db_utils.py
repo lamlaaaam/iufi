@@ -85,7 +85,9 @@ async def add_card_to_user(user_id, card_id):
     players_col.update_one({'discord_id': user_id}, {'$push': {'collection': card_id}})
 
 async def remove_card_from_user(user_id, card_id):
-    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id, 'faves': card_id}})
+    faves     = (await get_user(user_id))['faves']
+    new_faves = [f if f != card_id else None for f in faves]
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id}, '$set': {'faves': new_faves}})
 
 async def get_user(id):
     return players_col.find_one({'discord_id': id})
@@ -209,11 +211,17 @@ async def set_card_tag(id_tag, tag):
 # ---------------------------------------------------------------------------------------------------------
 
 async def convert_cards(user_id, card_ids, reward):
-    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
+    faves     = (await get_user(user_id))['faves']
+    new_faves = [f if f not in card_ids else None for f in faves]
+    #players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
     cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None}})
     await update_user_currency(user_id, reward)
 
 async def gift_cards(giver_id, rec_id, card_ids):
-    players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
-    players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': card_ids}})
+    faves     = (await get_user(giver_id))['faves']
+    new_faves = [f if f not in card_ids else None for f in faves]
+    players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
+    #players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
+    players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': {'$each': card_ids}}})
     cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'owned_by': rec_id}})

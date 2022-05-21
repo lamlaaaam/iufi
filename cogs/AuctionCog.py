@@ -22,7 +22,6 @@ class AuctionCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you do not own this card.**")
 
     @commands.command(name = 'auction', aliases = ['a'])
-    @commands.check(db_utils.does_user_exist)
     @commands.cooldown(1, 60, commands.BucketType.channel)
     async def auction(self, ctx, id_tag, min_bid=0):
         if self.auction_msg != None:
@@ -97,7 +96,6 @@ class AuctionCog(commands.Cog):
         self.auction_starter = None
 
     @commands.command(name = 'bid', aliases = ['bi'])
-    @commands.check(db_utils.does_user_exist)
     async def bid(self, ctx, amt: int):
         if self.auction_msg == None:
             await ctx.send(f'**{ctx.author.mention} there is no ongoing auction.**')

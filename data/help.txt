@@ -2,7 +2,7 @@
 `qboard qcooldowns qcommandhelp qhelp qinventory qprofile`
 
 **🎴 Card**
-`qcardinfo qconvert qconvertlast qgiftpc qgiftpclast qmain qmainlast qremovetag qsettag qsettaglast qview`
+`qcardinfo qconvert qconvertlast qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`
 
 **🍬 Starcandy**
 `qgiftsc`

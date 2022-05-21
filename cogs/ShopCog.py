@@ -16,7 +16,6 @@ class ShopCog(commands.Cog):
         self.shop_time = shop_time
 
     @commands.command(name = 'shop', aliases = ['s'])
-    @commands.check(db_utils.does_user_exist)
     async def shop(self, ctx):
         id            = ctx.author.id
         user          = await self.bot.GUILD.fetch_member(id)
@@ -61,7 +60,6 @@ class ShopCog(commands.Cog):
             async with timeout(self.shop_time):
                 while True:
                     interaction, select = await self.bot.wait_for('selection_select', check = check)
-                    #await interaction.defer()
                     await buy(select.values[0])
         except asyncio.exceptions.TimeoutError:
             pass

@@ -43,6 +43,13 @@ async def setup_players():
 
 # ----------------------------------------------------------------------------------------------------------
 
+def sync_does_user_exist(q):
+    if isinstance(q, int):
+        already_exists = players_col.count_documents({'discord_id': q}, limit = 1)
+    else:
+        already_exists = players_col.count_documents({'discord_id': q.author.id}, limit = 1)
+    return already_exists
+
 async def does_user_exist(q):
     if isinstance(q, int):
         already_exists = players_col.count_documents({'discord_id': q}, limit = 1)
@@ -78,7 +85,7 @@ async def add_card_to_user(user_id, card_id):
     players_col.update_one({'discord_id': user_id}, {'$push': {'collection': card_id}})
 
 async def remove_card_from_user(user_id, card_id):
-    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id}})
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id, 'faves': card_id}})
 
 async def get_user(id):
     return players_col.find_one({'discord_id': id})
@@ -138,6 +145,12 @@ async def update_user_roll(id, roll, delta):
         new_roll_amount = 0
     players_col.update_one({'discord_id': id}, {'$set': {roll: new_roll_amount}})
 
+async def set_user_fave(user_id, card_id, slot):
+    players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': card_id}})
+
+async def remove_user_fave(user_id, slot):
+    players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': None}})
+
 # ---------------------------------------------------------------------------------------------------------
 
 async def check_pool_exists(bias):
@@ -192,3 +205,15 @@ async def set_card_tag(id_tag, tag):
         return
     except:
         cards_col.update_one({'tag': str(id_tag)}, {'$set': {'tag': tag}})
+
+# ---------------------------------------------------------------------------------------------------------
+
+async def convert_cards(user_id, card_ids, reward):
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None}})
+    await update_user_currency(user_id, reward)
+
+async def gift_cards(giver_id, rec_id, card_ids):
+    players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
+    players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': card_ids}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'owned_by': rec_id}})

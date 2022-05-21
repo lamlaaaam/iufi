@@ -16,7 +16,6 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you do not own this card.**")
 
     @commands.command(name = 'cardinfo', aliases = ['i'])
-    @commands.check(db_utils.does_user_exist)
     async def cardinfo(self, ctx, id_tag):
         card_doc = await db_utils.get_card(id_tag)
         if card_doc == None:
@@ -49,7 +48,6 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name = 'settag', aliases = ['st'])
-    @commands.check(db_utils.does_user_exist)
     async def settag(self, ctx, id_tag, tag):
         card_doc = await db_utils.get_card(id_tag)
         user_doc = await db_utils.get_user(ctx.author.id)
@@ -71,13 +69,14 @@ class CardCommandsCog(commands.Cog):
         if await db_utils.get_card(tag) != None:
             await ctx.send(f"**{ctx.author.mention} there is already a card with this tag.**")
             return
-
         await db_utils.set_card_tag(id_tag, tag)
         await ctx.send(f"**{ctx.author.mention} you have set the tag successfully.**")
         
     @commands.command(name = 'settaglast', aliases = ['stl'])
-    @commands.check(db_utils.does_user_exist)
     async def settaglast(self, ctx, tag):
+        if not re.match("^[A-Za-z0-9]*$", tag):
+            await ctx.send(f"**{ctx.author.mention} the tag name must be alphanumeric.**")
+            return
         if len(tag) > self.tag_limit:
             await ctx.send(f"**{ctx.author.mention} the tag name cannot be longer than {self.tag_limit} characters.**")
             return
@@ -97,7 +96,6 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you have set the tag successfully.**")
 
     @commands.command(name = 'removetag', aliases = ['rt'])
-    @commands.check(db_utils.does_user_exist)
     async def removetag(self, ctx, id_tag):
         card_doc = await db_utils.get_card(id_tag)
         user_doc = await db_utils.get_user(ctx.author.id)
@@ -118,47 +116,31 @@ class CardCommandsCog(commands.Cog):
             return None
         return cards[-1]
 
-    async def convert_card(self, user_id, card_id, rarity):
-        reward = self.bot.RARITY_SC[rarity]
-        await db_utils.remove_card_from_user(user_id, card_id)
-        await db_utils.set_card_availability(card_id, True)
-        await db_utils.set_card_tag(card_id, None)
-        await db_utils.set_card_owner(card_id, None)
-        await db_utils.update_user_currency(user_id, reward)
-        return reward
-
     @commands.command(name = 'convert', aliases = ['c'])
-    @commands.check(db_utils.does_user_exist)
     async def convert(self, ctx, *id_tags):
-        success = 0
-        fail    = 0
-        total   = 0
-        for id_tag in id_tags:
-            card_doc = await db_utils.get_card(id_tag)
-            user_doc = await db_utils.get_user(ctx.author.id)
-            if card_doc == None or card_doc['id'] not in user_doc['collection']:
-                fail += 1
-                continue
-            reward = await self.convert_card(ctx.author.id, card_doc['id'], card_doc['rarity'])
-            success += 1
-            total   += reward
-        await ctx.send(f"**{ctx.author.mention} you requested to convert {len(id_tags)} photocard(s). {success} succeeded and {fail} failed. You gained {total} starcandies.**")
+        id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
+        valid_docs = list(await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]}))
+        success    = len(valid_docs)
+        fail       = len(id_tags) - success
+        reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
+        card_ids   = [doc['id'] for doc in valid_docs]
+        await db_utils.convert_cards(ctx.author.id, card_ids, reward)
+        await ctx.send(f"**{ctx.author.mention} you requested to convert {len(id_tags)} photocard(s). {success} succeeded and {fail} failed. You gained {reward} starcandies.**")
 
     @commands.command(name = 'convertlast', aliases = ['cl'])
-    @commands.check(db_utils.does_user_exist)
     async def convert_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
             ctx.send(f'**{ctx.author.mention} you have no photocards.**')
             return
-        reward = await self.convert_card(ctx.author.id, last_card, (await db_utils.get_card(last_card))['rarity'])
+        reward = self.bot.RARITY_SC[(await db_utils.get_card(last_card))['rarity']]
+        await db_utils.convert_cards(ctx.author.id, [last_card], reward)
         await ctx.send(f'**{ctx.author.mention} you converted your last photocard and gained {reward} starcandies.**')
 
     async def main_card(self, user_id, card_id):
         await db_utils.set_main(user_id, card_id)
 
     @commands.command(name = 'main', aliases = ['m'])
-    @commands.check(db_utils.does_user_exist)
     async def main(self, ctx, id_tag):
         card_doc = await db_utils.get_card(id_tag)
         user_doc = await db_utils.get_user(ctx.author.id)
@@ -172,7 +154,6 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f'**{ctx.author.mention} you have successfully set a main photocard.**')
 
     @commands.command(name = 'mainlast', aliases = ['ml'])
-    @commands.check(db_utils.does_user_exist)
     async def mainlast(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
@@ -181,13 +162,7 @@ class CardCommandsCog(commands.Cog):
         await self.main_card(ctx.author.id, last_card)
         await ctx.send(f'**{ctx.author.mention} you have successfully set your last photocard as your main.**')
 
-    async def gift_card(self, giver, rec, card_id):
-        await db_utils.remove_card_from_user(giver.id, card_id)
-        await db_utils.add_card_to_user(rec.id, card_id)
-        await db_utils.set_card_owner(card_id, rec.id)
-
     @commands.command(name = 'giftpc', aliases = ['gpc'])
-    @commands.check(db_utils.does_user_exist)
     async def giftpc(self, ctx, rec: discord.Member, *id_tags):
         if rec.id == ctx.author.id:
             await ctx.send(f'**{ctx.author.mention} you cannot gift yourself.**')
@@ -196,23 +171,17 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} the recipient is not registered.**')
             return
 
-        success = 0
-        fail    = 0
-        for id_tag in id_tags:
-            card_doc = await db_utils.get_card(id_tag)
-            user_doc = await db_utils.get_user(ctx.author.id)
-            if card_doc == None or card_doc['id'] not in user_doc['collection']:
-                fail += 1
-                continue
-            await self.gift_card(ctx.author, rec, card_doc['id'])
-            success += 1
-
+        id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
+        valid_docs = list(await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]}))
+        success    = len(valid_docs)
+        fail       = len(id_tags) - success
+        card_ids   = [doc['id'] for doc in valid_docs]
+        await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
         await ctx.send(f'**{ctx.author.mention} you requested to gift {len(id_tags)} photocard(s). {success} succeeded and {fail} failed.**')
         if success > 0:
             await ctx.send(f'**{rec.mention} you have received {success} photocard(s) from {ctx.author.mention}!**')
 
     @commands.command(name = 'giftpclast', aliases = ['gpcl'])
-    @commands.check(db_utils.does_user_exist)
     async def giftpclast(self, ctx, rec: discord.Member=None):
         if rec == None:
             await ctx.send(f'**{ctx.author.mention} pick a recipient for your gifts.**')
@@ -229,6 +198,52 @@ class CardCommandsCog(commands.Cog):
             ctx.send(f'**{ctx.author.mention} you have no photocards.**')
             return
 
-        await self.gift_card(ctx.author, rec, last_card)
+        await db_utils.gift_cards(ctx.author.id, rec.id, [last_card])
         await ctx.send(f'**{ctx.author.mention} you have successfully gifted your last photocard.**')
         await ctx.send(f'**{rec.mention} you have received a photocard gift from {ctx.author.mention}!**')
+
+    async def set_fave(self, user_id, card_id, slot):
+        await db_utils.set_user_fave(user_id, card_id, slot-1)
+
+    @commands.command(name = 'removefaves', aliases = ['rf'])
+    async def remove_faves(self, ctx, slot: int):
+        if slot <= 0 or slot > 6:
+            await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**")
+            return
+        await db_utils.remove_user_fave(ctx.author.id, slot-1)
+        await ctx.send(f'**{ctx.author.mention} you have successfully removed the favorite photocard in slot {slot}.**')
+
+    @commands.command(name = 'setfaves', aliases = ['sf'])
+    async def set_faves(self, ctx, slot: int, id_tag):
+        if slot <= 0 or slot > 6:
+            await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**")
+            return
+        card_doc = await db_utils.get_card(id_tag)
+        user_doc = await db_utils.get_user(ctx.author.id)
+        if card_doc == None:
+            await self.card_not_found_error(ctx)
+            return
+        if card_doc['id'] not in user_doc['collection']:
+            await self.card_not_owned_error(ctx)
+            return
+        if card_doc['id'] in user_doc['faves']:
+            await ctx.send(f"**{ctx.author.mention} this photocard is already set as a favorite in slot {user_doc['faves'].index(card_doc['id'])+1}.**")
+            return
+        await self.set_fave(ctx.author.id, card_doc['id'], slot)
+        await ctx.send(f'**{ctx.author.mention} you have successfully set a favorite photocard in slot {slot}.**')
+
+    @commands.command(name = 'setfaveslast', aliases = ['sfl'])
+    async def set_faves_last(self, ctx, slot: int):
+        if slot <= 0 or slot > 6:
+            await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**")
+            return
+        last_card = await self.get_last_card_id(ctx.author.id)
+        user_doc = await db_utils.get_user(ctx.author.id)
+        if last_card == None:
+            ctx.send(f'**{ctx.author.mention} you have no photocards.**')
+            return
+        if last_card in user_doc['faves']:
+            await ctx.send(f"**{ctx.author.mention} this photocard is already set as a favorite in slot {user_doc['faves'].index(card_doc['id'])+1}.**")
+            return
+        await self.set_fave(ctx.author.id, last_card, slot)
+        await ctx.send(f'**{ctx.author.mention} you have successfully set your last photocard as a favorite in slot {slot}.**')

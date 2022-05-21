@@ -8,7 +8,6 @@ class ProfileCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'profile', aliases = ['p'])
-    @commands.check(db_utils.does_user_exist)
     async def profile(self, ctx, user: discord.Member=None):
         if user == None:
             id   = ctx.author.id
@@ -21,6 +20,9 @@ class ProfileCog(commands.Cog):
         user_doc      = await db_utils.get_user(id)
         user_cards    = user_doc['collection']
         user_main     = user_doc['main']
+        user_level    = user_doc['level']
+        user_exp      = user_doc['exp']
+        user_progress = round((user_exp / (user_level**2+10)) * 100, 1)
         main_card_doc = None
 
         if user_main in user_cards:
@@ -29,8 +31,7 @@ class ProfileCog(commands.Cog):
         title = f"**👤   {user.display_name}'s Profile**"
         embed = discord.Embed(title=title, color=discord.Color.gold())
         s     = f"📙   Photocards: `{len(user_doc['collection'])}`\n"
-        s    += f"⚔️   Level: `{user_doc['level']}`\n\n"
-        #s    += f"🍬   Starcandies: `{user_doc['currency']}`\n\n"
+        s    += f"⚔️   Level: `{user_doc['level']} ({user_progress}%)`\n\n"
         s    += '🌸 ' * 10
         embed.add_field(name=s, value='\u200b', inline=False)
         embed.set_thumbnail(url=user.avatar_url)

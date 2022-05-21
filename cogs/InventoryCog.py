@@ -8,7 +8,6 @@ class InventoryCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'inventory', aliases = ['in'])
-    @commands.check(db_utils.does_user_exist)
     async def inventory(self, ctx):
         id               = ctx.author.id
         user             = await self.bot.GUILD.fetch_member(id)

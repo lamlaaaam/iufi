@@ -32,7 +32,6 @@ class CollectionCog(commands.Cog):
         return s
 
     @commands.command(name = 'view', aliases = ['v'])
-    @commands.check(db_utils.does_user_exist)
     async def view(self, ctx):
         cards_per_page    = 10
         id                = ctx.author.id
@@ -74,7 +73,6 @@ class CollectionCog(commands.Cog):
             async with timeout(self.collection_time):
                 while True:
                     interaction, button = await self.bot.wait_for('button_click', check = check)
-                    #await interaction.defer()
                     cid = button.custom_id
                     if cid == 'nav_first':
                         current_page = 0

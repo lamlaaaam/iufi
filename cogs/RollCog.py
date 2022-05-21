@@ -33,9 +33,6 @@ class RollCog(commands.Cog):
 
     @commands.command(name = 'roll', aliases = ['r'])
     async def roll(self, ctx):
-        if not await db_utils.does_user_exist(ctx.author.id):
-            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
-            return
         ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_roll')
         if not ok:
             await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**')
@@ -53,9 +50,6 @@ class RollCog(commands.Cog):
 
     @commands.command(name = 'rareroll', aliases = ['rr'])
     async def rareroll(self, ctx):
-        if not await db_utils.does_user_exist(ctx.author.id):
-            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
-            return
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['rare_rolls']
         if roll_amount <= 0:
@@ -73,9 +67,6 @@ class RollCog(commands.Cog):
 
     @commands.command(name = 'epicroll', aliases = ['er'])
     async def epicroll(self, ctx):
-        if not await db_utils.does_user_exist(ctx.author.id):
-            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
-            return
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['epic_rolls']
         if roll_amount <= 0:
@@ -93,9 +84,6 @@ class RollCog(commands.Cog):
 
     @commands.command(name = 'legendroll', aliases = ['lr'])
     async def legendroll(self, ctx):
-        if not await db_utils.does_user_exist(ctx.author.id):
-            await ctx.send(f'**{ctx.author.mention} has no permissions to run this command.**')
-            return
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['legend_rolls']
         if roll_amount <= 0:
@@ -206,7 +194,7 @@ class RollCog(commands.Cog):
 
         try:
             async with timeout(self.roll_claim_time):
-                while taken < self.roll_pc_count:
+                while taken < len(roll_pc_docs):
                     interaction, button = await self.bot.wait_for('button_click', check = check)
                     if await button_check(interaction, button):
                         card_index = int(button.custom_id.split()[1]) - 1

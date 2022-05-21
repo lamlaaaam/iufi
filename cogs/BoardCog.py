@@ -7,13 +7,11 @@ class BoardCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'board', aliases = ['b'])
-    @commands.check(db_utils.does_user_exist)
     async def board(self, ctx):
         top_user_docs = await db_utils.get_all_users()
-        top_user_docs = sorted(top_user_docs, key=lambda doc: doc['level'], reverse=True)
+        top_user_docs = sorted(top_user_docs, key=lambda doc: (doc['level'], doc['exp']), reverse=True)
         trophy        = '🏆'
         title         = f"{trophy}\u200b   IUFI Leaderboard"
-        #emojis        = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
         emojis        = ['🥇', '🥈', '🥉', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅', '🏅']
         names         = []
         levels        = []

@@ -7,7 +7,6 @@ class CooldownsCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'cooldowns', aliases = ['cd'])
-    @commands.check(db_utils.does_user_exist)
     async def cooldowns(self, ctx):
         id               = ctx.author.id
         user             = await self.bot.GUILD.fetch_member(id)

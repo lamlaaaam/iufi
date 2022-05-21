@@ -7,7 +7,6 @@ class GiftSCCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'giftsc', aliases = ['gsc'])
-    @commands.check(db_utils.does_user_exist)
     async def giftsc(self, ctx, rec: discord.Member=None, amt: int=0):
         if rec == None:
             await ctx.send(f'**{ctx.author.mention} pick a recipient for your gift.**')

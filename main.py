@@ -23,6 +23,8 @@ from   cogs.CardCommandsCog import CardCommandsCog
 from   cogs.CommandHelpCog  import CommandHelpCog
 from   cogs.InventoryCog    import InventoryCog
 from   cogs.AuctionCog      import AuctionCog
+from   cogs.EventDropCog    import EventDropCog
+from   cogs.FavesCog        import FavesCog
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -46,7 +48,7 @@ bot.TEMP_PATH = 'temp/'
 
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
-ROLL_COOLDOWN        = 10  # Minutes
+ROLL_COOLDOWN        = 12  # Minutes
 ROLL_CLAIM_COOLDOWN  = 3   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 10  # Seconds
@@ -60,35 +62,42 @@ STREAK_REWARD        = 20  # Starcandies
 
 AUCTION_TIME         = 30  # Seconds
 
+EVENT_DROP_INTERVAL  = 1   # Hours
+EVENT_DROP_VALID     = 60  # Seconds
+
 COMMAND_MAP = {
-    'qboard'      : ('qb', 'qboard', 'Shows the IUFI leaderboard.'),
-    'qcooldowns'  : ('qcd', 'qcooldowns', 'Shows all your cooldowns.'),
-    'qcommandhelp': ('qch', 'qcommandhelp command', 'Shows the details for a command, including aliases, usage and description.'),
-    'qhelp'       : ('qh', 'qhelp', 'Shows the IUFI help screen.'),
-    'qprofile'    : ('qp', 'qprofile @member', 'Shows the profile of a member. If called without a member, shows your own profile.'),
-    'qcardinfo'   : ('qi', 'qcardinfo id_or_tag', 'Shows the details of a photocard. Card can be identified by its ID or given tag.'),
-    'qconvert'    : ('qc', 'qconvert id_or_tag1 id_or_tag2 ...', 'Converts the photocards into starcandies. Card can be identified by its ID or given tag. The amount of starcandies received is dependent on the card\'s rarity.'),
-    'qconvertlast': ('qcl', 'qconvertlast', 'Converts the last photocard of your collection.'),
-    'qgiftpc'     : ('qgpc', 'qgiftpc @member id_or_tag1 id_or_tag2 ...', 'Gifts the member photocards. Card can be identified by its ID or given tag.'),
-    'qgiftpclast' : ('qgpcl', 'qgiftpclast @member', 'Gifts the member your last photocard in your collection.'),
-    'qmain'       : ('qm', 'qmain id_or_tag', 'Sets the photocard as your profile display. Card can be identified by its ID or given tag.'),
-    'qmainlast'   : ('qml', 'qmainlast', 'Sets the last photocard in your collection as your profile display.'),
-    'qremovetag'  : ('qrt', 'qremovetag id_or_tag', 'Removes the photocard\'s tag. Card can be identified by its ID or given tag.'),
-    'qsettag'     : ('qst', 'qsettag id_or_tag tag', 'Sets the photocard\'s tag. Card can be identified by its ID or previous tag.'),
-    'qsettaglast' : ('qstl', 'qsettaglast tag', 'Sets the tag of the last photocard in your collection.'),
-    'qview'       : ('qv', 'qview', 'View your photocard collection.'),
-    'qgiftsc'     : ('qgsc', 'qgsc @member amount', 'Gifts the member the specified amount of starcandies.'),
-    'qdaily'      : ('qd', 'qdaily', 'Claims your daily reward.'),
-    'qroll'       : ('qr', 'qroll', 'Rolls a set of photocards for claiming.'),
-    'qshop'       : ('qs', 'qshop', 'Brings up the IUFI shop'),
-    'qregister'   : ('None', 'qregister', 'Registers yourself if you are a new player.'),
-    'qreset'      : ('None', 'qreset', 'Resets IUFI. Only for those with admin privileges.'),
-    'qrareroll'   : ('qrr', 'qrareroll', 'Starts a roll with at least one rare photocard guaranteed.'),
-    'qepicroll'   : ('qer', 'qepicroll', 'Starts a roll with at least one epic photocard guaranteed.'),
-    'qlegendroll' : ('qlr', 'qlegendroll', 'Starts a roll with at least one legendary photocard guaranteed.'),
-    'qinventory'  : ('qin', 'qinventory', 'Shows the items that you own.'),
-    'qauction'    : ('qa', 'qauction id_or_tag min_bid', 'Puts your photocard up for auction with a minimum bid amount. If not specified, minimum bid is 0. Card can be identified by its ID or given tag'),
-    'qbid'        : ('qbi', 'qbid amount', 'Places a bid for the ongoing auction.')
+    'qboard'       : ('qb', 'qboard', 'Shows the IUFI leaderboard.'),
+    'qcooldowns'   : ('qcd', 'qcooldowns', 'Shows all your cooldowns.'),
+    'qcommandhelp' : ('qch', 'qcommandhelp command', 'Shows the details for a command, including aliases, usage and description.'),
+    'qhelp'        : ('qh', 'qhelp', 'Shows the IUFI help screen.'),
+    'qprofile'     : ('qp', 'qprofile @member', 'Shows the profile of a member. If called without a member, shows your own profile.'),
+    'qcardinfo'    : ('qi', 'qcardinfo id_or_tag', 'Shows the details of a photocard. Card can be identified by its ID or given tag.'),
+    'qconvert'     : ('qc', 'qconvert id_or_tag1 id_or_tag2 ...', 'Converts the photocards into starcandies. Card can be identified by its ID or given tag. The amount of starcandies received is dependent on the card\'s rarity.'),
+    'qconvertlast' : ('qcl', 'qconvertlast', 'Converts the last photocard of your collection.'),
+    'qgiftpc'      : ('qgpc', 'qgiftpc @member id_or_tag1 id_or_tag2 ...', 'Gifts the member photocards. Card can be identified by its ID or given tag.'),
+    'qgiftpclast'  : ('qgpcl', 'qgiftpclast @member', 'Gifts the member your last photocard in your collection.'),
+    'qmain'        : ('qm', 'qmain id_or_tag', 'Sets the photocard as your profile display. Card can be identified by its ID or given tag.'),
+    'qmainlast'    : ('qml', 'qmainlast', 'Sets the last photocard in your collection as your profile display.'),
+    'qremovetag'   : ('qrt', 'qremovetag id_or_tag', 'Removes the photocard\'s tag. Card can be identified by its ID or given tag.'),
+    'qsettag'      : ('qst', 'qsettag id_or_tag tag', 'Sets the photocard\'s tag. Card can be identified by its ID or previous tag.'),
+    'qsettaglast'  : ('qstl', 'qsettaglast tag', 'Sets the tag of the last photocard in your collection.'),
+    'qview'        : ('qv', 'qview', 'View your photocard collection.'),
+    'qgiftsc'      : ('qgsc', 'qgsc @member amount', 'Gifts the member the specified amount of starcandies.'),
+    'qdaily'       : ('qd', 'qdaily', 'Claims your daily reward.'),
+    'qroll'        : ('qr', 'qroll', 'Rolls a set of photocards for claiming.'),
+    'qshop'        : ('qs', 'qshop', 'Brings up the IUFI shop'),
+    'qregister'    : ('None', 'qregister', 'Registers yourself if you are a new player.'),
+    'qreset'       : ('None', 'qreset', 'Resets IUFI. Only for those with admin privileges.'),
+    'qrareroll'    : ('qrr', 'qrareroll', 'Starts a roll with at least one rare photocard guaranteed.'),
+    'qepicroll'    : ('qer', 'qepicroll', 'Starts a roll with at least one epic photocard guaranteed.'),
+    'qlegendroll'  : ('qlr', 'qlegendroll', 'Starts a roll with at least one legendary photocard guaranteed.'),
+    'qinventory'   : ('qin', 'qinventory', 'Shows the items that you own.'),
+    'qauction'     : ('qa', 'qauction id_or_tag min_bid', 'Puts your photocard up for auction with a minimum bid amount. If not specified, minimum bid is 0. Card can be identified by its ID or given tag'),
+    'qbid'         : ('qbi', 'qbid amount', 'Places a bid for the ongoing auction.'),
+    'qsetfaves'    : ('qsf', 'qsetfaves slot id_or_tag', 'Sets a photocard in the given slot [1 to 6] as your favorite. Card can be identified by its ID or given tag.'),
+    'qremovefaves' : ('qrf', 'qremovefaves slot', 'Removes the photocard in the given slot [1 to 6].'),
+    'qsetfaveslast': ('qsfl', 'qsetfaveslast slot', 'Sets your last photocard as a favorite in the given slot [1 to 6].'),
+    'qfaves'       : ('qf', 'qfaves', 'Shows all 6 of your favorite photocards.')
 }
 
 SHOP_LIST = [
@@ -164,6 +173,10 @@ async def on_ready():
     bot.add_cog(CommandHelpCog(bot, COMMAND_MAP))
     bot.add_cog(InventoryCog(bot))
     bot.add_cog(AuctionCog(bot, AUCTION_TIME))
+    bot.add_cog(EventDropCog(bot,
+                             EVENT_DROP_INTERVAL,
+                             EVENT_DROP_VALID))
+    bot.add_cog(FavesCog(bot))
     print('Cogs added')
 
     print('Bot is ready')
@@ -175,8 +188,13 @@ async def on_ready():
 async def on_message(msg):
     if msg.author == bot.user:
         return
-    if msg.content[0] in ['q', 'Q'] and msg.channel != bot.CHANNEL:
+    ctx    = await bot.get_context(msg)
+    is_cmd = ctx.valid
+    if is_cmd and msg.channel != bot.CHANNEL:
         await msg.reply(f"**This game is not playable in this channel. Go to {bot.CHANNEL.mention}**")
+        return
+    if msg.channel == bot.CHANNEL and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
+        await msg.reply(f"**You are not registered.**")
         return
     await bot.process_commands(msg)
 

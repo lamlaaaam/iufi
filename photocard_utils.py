@@ -33,25 +33,25 @@ async def stitch_images(imgs_url):
     except asyncio.exceptions.TimeoutError:
         return None
 
-async def stitch_gallery(imgs_url):
-    rows = 2
-    cols = 3
-
+async def stitch_gallery(imgs_url, rows, cols):
     imgs = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
 
-    width, height = imgs[0].size
+    width, height = [img for img in imgs if img != None][0].size
     new_image     = Image.new('RGBA', (cols * width + (cols-1) * GALL_GAP, rows * height + (rows-1) * GALL_GAP), (255,255,255,0))
 
     i = 0
-    for r in range(3):
-        for c in range(3):
+    for r in range(rows):
+        for c in range(cols):
             if i >= len(imgs):
                 return new_image
-            new_image.paste(imgs[i], ((width + GALL_GAP) * c, (height + GALL_GAP) * r))
+            if imgs[i] != None:
+                new_image.paste(imgs[i], ((width + GALL_GAP) * c, (height + GALL_GAP) * r))
             i += 1
     return new_image
 
 async def create_photocard(base_url, border=False, stars=False, fade=False):
+    if base_url == None:
+        return None
     img      = await download_url(base_url)
     base_img = Image.open(img).resize(CARD_SIZE).convert('RGBA')
     col      = ColorThief(img).get_color(quality=10)

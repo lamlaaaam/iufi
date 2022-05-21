@@ -14,7 +14,6 @@ class DailyCog(commands.Cog):
         self.streak_reward = streak_reward
 
     @commands.command(name = 'daily', aliases = ['d'])
-    @commands.check(db_utils.does_user_exist)
     async def daily(self, ctx):
         ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_daily')
         if not ok:

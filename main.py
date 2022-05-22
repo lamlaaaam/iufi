@@ -107,7 +107,7 @@ COMMAND_MAP = {
     'qsetfaves'    : ('qsf', 'qsetfaves slot id_or_tag', 'Sets a photocard in the given slot [1 to 6] as your favorite. Card can be identified by its ID or given tag.'),
     'qremovefaves' : ('qrf', 'qremovefaves slot', 'Removes the photocard in the given slot [1 to 6].'),
     'qsetfaveslast': ('qsfl', 'qsetfaveslast slot', 'Sets your last photocard as a favorite in the given slot [1 to 6].'),
-    'qfaves'       : ('qf', 'qfaves', 'Shows all 6 of your favorite photocards.'),
+    'qfaves'       : ('qf', 'qfaves @member', 'Shows the given member\'s favorite photocards. If not specified, shows your own.'),
     'qsetbio'      : ('qsb', 'qsetbio "bio"', 'Sets your profile bio. Make sure to enclose your bio in double quotes ("")'),
     'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.')
 }

@@ -19,6 +19,20 @@ DATA_PATH = 'data/'
 
 # ----------------------------------------------------------------------------------------------------------
 
+def add_cards(path, last_id, rarity):
+    card_docs = []
+    id = last_id+1
+    for url in open(path, 'r'):
+        doc = {'id'       : id,
+               'tag'      : None,
+               'url'      : url.strip(),
+               'available': True,
+               'owned_by' : None,
+               'rarity'   : rarity} 
+        card_docs.append(doc)
+        id += 1
+    cards_col.insert_many(card_docs)
+
 async def setup_cards():
     if cards_col.count_documents({}) > 0:
         cards_col.drop()
@@ -74,7 +88,8 @@ async def register_user(id):
                             'faves'        : [],
                             'rare_rolls'   : 0,
                             'epic_rolls'   : 0,
-                            'legend_rolls' : 0})
+                            'legend_rolls' : 0,
+                            'bio'          : "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!"})
     return True
 
 async def add_card_to_user(user_id, card_id):
@@ -153,6 +168,12 @@ async def set_user_fave(user_id, card_id, slot):
 async def remove_user_fave(user_id, slot):
     players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': None}})
 
+async def set_user_bio(user_id, bio):
+    players_col.update_one({'discord_id': user_id}, {'$set': {'bio': bio}})
+
+async def remove_user_bio(user_id):
+    players_col.update_one({'discord_id': user_id}, {'$set': {'bio': "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!"}})
+
 # ---------------------------------------------------------------------------------------------------------
 
 async def check_pool_exists(bias):
@@ -213,7 +234,6 @@ async def set_card_tag(id_tag, tag):
 async def convert_cards(user_id, card_ids, reward):
     faves     = (await get_user(user_id))['faves']
     new_faves = [f if f not in card_ids else None for f in faves]
-    #players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
     players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
     cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None}})
     await update_user_currency(user_id, reward)
@@ -222,6 +242,5 @@ async def gift_cards(giver_id, rec_id, card_ids):
     faves     = (await get_user(giver_id))['faves']
     new_faves = [f if f not in card_ids else None for f in faves]
     players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
-    #players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}, 'faves': {'$in': card_ids}}})
     players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': {'$each': card_ids}}})
     cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'owned_by': rec_id}})

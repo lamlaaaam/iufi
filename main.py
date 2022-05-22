@@ -49,7 +49,7 @@ bot.TEMP_PATH = 'temp/'
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
 ROLL_COOLDOWN        = 12  # Minutes
-ROLL_CLAIM_COOLDOWN  = 3   # Minutes
+ROLL_CLAIM_COOLDOWN  = 4   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 10  # Seconds
 
@@ -57,13 +57,23 @@ COLLECTION_TIME      = 60  # Seconds
 SHOP_TIME            = 60  # Seconds
 
 DAILY_REWARD         = 5   # Starcandies
-STREAK_MAX           = 5   # Days in a row before reward
-STREAK_REWARD        = 20  # Starcandies
+STREAK_END           = 30  # Days before reset
+STREAK_INTERVAL      = 5   # Days before big reward
+STREAK_REWARDS       = [
+    ("50 Starcandies",   lambda id: db_utils.update_user_currency(id, 50)),
+    ("1 Rare Roll",      lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
+    ("100 Starcandies",  lambda id: db_utils.update_user_currency(id, 100)),
+    ("1 Epic Roll",      lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
+    ("500 Starcandies",  lambda id: db_utils.update_user_currency(id, 500)),
+    ("1 Legendary Roll", lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1))
+]
 
 AUCTION_TIME         = 30  # Seconds
 
 EVENT_DROP_INTERVAL  = 1   # Hours
 EVENT_DROP_VALID     = 60  # Seconds
+
+BIO_LIMIT            = 100 # Chars
 
 COMMAND_MAP = {
     'qboard'       : ('qb', 'qboard', 'Shows the IUFI leaderboard.'),
@@ -97,7 +107,9 @@ COMMAND_MAP = {
     'qsetfaves'    : ('qsf', 'qsetfaves slot id_or_tag', 'Sets a photocard in the given slot [1 to 6] as your favorite. Card can be identified by its ID or given tag.'),
     'qremovefaves' : ('qrf', 'qremovefaves slot', 'Removes the photocard in the given slot [1 to 6].'),
     'qsetfaveslast': ('qsfl', 'qsetfaveslast slot', 'Sets your last photocard as a favorite in the given slot [1 to 6].'),
-    'qfaves'       : ('qf', 'qfaves', 'Shows all 6 of your favorite photocards.')
+    'qfaves'       : ('qf', 'qfaves', 'Shows all 6 of your favorite photocards.'),
+    'qsetbio'      : ('qsb', 'qsetbio "bio"', 'Sets your profile bio. Make sure to enclose your bio in double quotes ("")'),
+    'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.')
 }
 
 SHOP_LIST = [
@@ -154,14 +166,15 @@ async def on_ready():
                         ROLL_COOLDOWN,
                         ROLL_CLAIM_COOLDOWN,
                         ROLL_COMMON_COOLDOWN))
-    bot.add_cog(ProfileCog(bot))
+    bot.add_cog(ProfileCog(bot, BIO_LIMIT))
     bot.add_cog(GiftSCCog(bot))
     bot.add_cog(BoardCog(bot))
     bot.add_cog(CooldownsCog(bot))
     bot.add_cog(DailyCog(bot,
-                         STREAK_MAX,
                          DAILY_REWARD,
-                         STREAK_REWARD))
+                         STREAK_END,
+                         STREAK_INTERVAL,
+                         STREAK_REWARDS))
     bot.add_cog(ShopCog(bot,
                         SHOP_LIST,
                         SHOP_TIME))

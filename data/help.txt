@@ -1,5 +1,5 @@
 **ℹ️ Info**
-`qboard qcooldowns qcommandhelp qhelp qinventory qprofile`
+`qboard qcooldowns qcommandhelp qhelp qinventory qprofile qremovebio qsetbio`
 
 **🎴 Card**
 `qcardinfo qconvert qconvertlast qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`

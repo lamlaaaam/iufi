@@ -8,13 +8,21 @@ class FavesCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name = 'faves', aliases = ['f'])
-    async def faves(self, ctx):
-        user       = await self.bot.GUILD.fetch_member(ctx.author.id)
-        user_doc   = await db_utils.get_user(ctx.author.id)
+    async def faves(self, ctx, user: discord.Member=None):
+        if user == None:
+            id   = ctx.author.id
+            user = await self.bot.GUILD.fetch_member(id)
+        else:
+            if not await db_utils.does_user_exist(user.id):
+                await ctx.send(f"**{ctx.author.mention} The user provided is not registered.**")
+                return
+            id = user.id
+
+        user_doc   = await db_utils.get_user(id)
         faves      = user_doc['faves']
 
         if len([f for f in faves if f != None]) == 0:
-            await ctx.send(f"**{ctx.author.mention} you have not set any favorites.**")
+            await ctx.send(f"**{user.mention} has not set any favorites.**")
             return
 
         cards_docs   = list(await db_utils.get_cards({'id': {'$in': faves}}))
@@ -23,19 +31,19 @@ class FavesCog(commands.Cog):
         for doc in cards_docs:
             faves_dict[doc['id']] = doc
         for i in range(len(faves)):
-            id = faves[i]
-            if id == None:
+            cid = faves[i]
+            if cid == None:
                 continue
-            faves_sorted[i] = faves_dict[id]
+            faves_sorted[i] = faves_dict[cid]
 
         desc = ""
         for r, d in enumerate(faves_sorted):
             num = f"{r+1}."
             if d != None:
-                id     = f"🆔 {d['id']:04}"
+                cid     = f"🆔 {d['id']:04}"
                 tag    = f"🏷️ {d['tag']}"
                 rarity = f"{self.bot.RARITY[d['rarity']]}"
-                desc  += f"{num:<5}{id:<10}{tag:<15}{rarity:>1}\n"
+                desc  += f"{num:<5}{cid:<10}{tag:<15}{rarity:>1}\n"
             else:
                 desc  += f"{num:<5}\n"
         desc  = "```\n" + desc + "```\n"

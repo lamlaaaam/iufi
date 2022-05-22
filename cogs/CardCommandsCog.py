@@ -227,8 +227,7 @@ class CardCommandsCog(commands.Cog):
             await self.card_not_owned_error(ctx)
             return
         if card_doc['id'] in user_doc['faves']:
-            await ctx.send(f"**{ctx.author.mention} this photocard is already set as a favorite in slot {user_doc['faves'].index(card_doc['id'])+1}.**")
-            return
+            await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(card_doc['id']))
         await self.set_fave(ctx.author.id, card_doc['id'], slot)
         await ctx.send(f'**{ctx.author.mention} you have successfully set a favorite photocard in slot {slot}.**')
 
@@ -243,7 +242,6 @@ class CardCommandsCog(commands.Cog):
             ctx.send(f'**{ctx.author.mention} you have no photocards.**')
             return
         if last_card in user_doc['faves']:
-            await ctx.send(f"**{ctx.author.mention} this photocard is already set as a favorite in slot {user_doc['faves'].index(last_card)+1}.**")
-            return
+            await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(last_card))
         await self.set_fave(ctx.author.id, last_card, slot)
         await ctx.send(f'**{ctx.author.mention} you have successfully set your last photocard as a favorite in slot {slot}.**')

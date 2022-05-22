@@ -22,6 +22,9 @@ async def stitch_images(imgs_url):
         async with timeout(30):
             n             = len(imgs_url)
             imgs          = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
+            none_check     = None in imgs
+            if none_check:
+                return None
             width, height = imgs[0].size
             new_image     = Image.new('RGBA', (n * width + (n-1) * PC_GAP, height), (255,255,255,0))
             curr_width    = 0
@@ -53,6 +56,8 @@ async def create_photocard(base_url, border=False, stars=False, fade=False):
     if base_url == None:
         return None
     img      = await download_url(base_url)
+    if img == None:
+        return None
     base_img = Image.open(img).resize(CARD_SIZE).convert('RGBA')
     col      = ColorThief(img).get_color(quality=10)
     com      = await complement(col[0], col[1], col[2])
@@ -119,6 +124,6 @@ async def download_url(url):
         CLIENT_SESSION = aiohttp.ClientSession()
     async with CLIENT_SESSION.get(url) as resp:
         if resp.status != 200:
-            print("Download failed")
+            return None
         data = io.BytesIO(await resp.read())
         return data

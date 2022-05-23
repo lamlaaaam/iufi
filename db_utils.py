@@ -19,41 +19,70 @@ DATA_PATH = 'data/'
 
 # ----------------------------------------------------------------------------------------------------------
 
-def add_cards(path, last_id, rarity):
+#def add_cards(path, last_id, rarity):
+#    card_docs = []
+#    id = last_id+1
+#    for url in open(path, 'r'):
+#        doc = {'id'       : id,
+#               'tag'      : None,
+#               'url'      : url.strip(),
+#               'available': True,
+#               'owned_by' : None,
+#               'rarity'   : rarity} 
+#        card_docs.append(doc)
+#        id += 1
+#    cards_col.insert_many(card_docs)
+#
+#async def setup_cards():
+#    if cards_col.count_documents({}) > 0:
+#        cards_col.drop()
+#    
+#    card_docs = []
+#    id = 1
+#    for x in range(4):
+#        for url in open(os.path.join(DATA_PATH, f"{x}.txt"), 'r'):
+#            doc = {'id'       : id,
+#                   'tag'      : None,
+#                   'url'      : url.strip(),
+#                   'available': True,
+#                   'owned_by' : None,
+#                   'rarity'   : x} 
+#            card_docs.append(doc)
+#            id += 1
+#    cards_col.insert_many(card_docs)
+
+def drop_cards(cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    cards_col    = iufi_db['Cards']
+    if cards_col.count_documents({}) > 0:
+        cards_col.drop()
+
+def drop_players(cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    players_col  = iufi_db['Players']
+    if players_col.count_documents({}) > 0:
+        players_col.drop()
+
+def setup_cards(rarity, start_id, end_id, db_id, cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    cards_col    = iufi_db['Cards']
     card_docs = []
-    id = last_id+1
-    for url in open(path, 'r'):
-        doc = {'id'       : id,
+    for aws_id in range(start_id, end_id+1):
+        doc = {'id'       : db_id,
                'tag'      : None,
-               'url'      : url.strip(),
+               'url'      : f"{rarity}-{aws_id:05}",
                'available': True,
                'owned_by' : None,
                'rarity'   : rarity} 
         card_docs.append(doc)
-        id += 1
+        db_id += 1
     cards_col.insert_many(card_docs)
-
-async def setup_cards():
-    if cards_col.count_documents({}) > 0:
-        cards_col.drop()
-    
-    card_docs = []
-    id = 1
-    for x in range(4):
-        for url in open(os.path.join(DATA_PATH, f"{x}.txt"), 'r'):
-            doc = {'id'       : id,
-                   'tag'      : None,
-                   'url'      : url.strip(),
-                   'available': True,
-                   'owned_by' : None,
-                   'rarity'   : x} 
-            card_docs.append(doc)
-            id += 1
-    cards_col.insert_many(card_docs)
-
-async def setup_players():
-    if players_col.count_documents({}) > 0:
-        players_col.drop()
 
 # ----------------------------------------------------------------------------------------------------------
 

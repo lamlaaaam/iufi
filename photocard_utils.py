@@ -1,3 +1,4 @@
+import aws_utils
 import asyncio
 import aiohttp
 import discord
@@ -55,7 +56,9 @@ async def stitch_gallery(imgs_url, rows, cols):
 async def create_photocard(base_url, border=False, stars=False, fade=False):
     if base_url == None:
         return None
-    img      = await download_url(base_url)
+    #img      = await download_url(base_url)
+    rarity, id = base_url.split('-')
+    img      = aws_utils.get_image(rarity, id)
     if img == None:
         return None
     base_img = Image.open(img).resize(CARD_SIZE).convert('RGBA')

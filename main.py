@@ -30,7 +30,6 @@ from   cogs.FavesCog        import FavesCog
 
 load_dotenv()
 TOKEN        = os.getenv('DISCORD_TOKEN')
-RESET        = os.getenv('RESET')
 CHANNEL_ID   = os.getenv('CHANNEL_ID')
 GUILD_ID     = os.getenv('GUILD_ID')
 WASTELAND_ID = os.getenv('WASTELAND_ID')
@@ -141,11 +140,6 @@ DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
 async def on_ready():
 
     print('We have logged in as {0.user}'.format(bot))
-
-    if RESET == '1':
-        await db_utils.setup_cards()
-        await db_utils.setup_players()
-        print('DB resetted')
 
     bot.CHANNEL   = await bot.fetch_channel(CHANNEL_ID)
     bot.WASTELAND = await bot.fetch_channel(WASTELAND_ID)

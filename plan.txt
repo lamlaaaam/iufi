@@ -1,4 +1,8 @@
 
+db.setup_cards(0,1,3356,'US')
+db.setup_cards(1,3357,5206,'US')
+db.setup_cards(2,5207,6269,'US')
+db.setup_cards(3,6270,6487,'US')
 Rarities:
 ◆🞚🞜❖
 ❤💛💚💙💜

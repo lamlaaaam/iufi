@@ -56,9 +56,9 @@ async def stitch_gallery(imgs_url, rows, cols):
 async def create_photocard(base_url, border=False, stars=False, fade=False):
     if base_url == None:
         return None
-    #img      = await download_url(base_url)
-    rarity, id = base_url.split('-')
-    img      = aws_utils.get_image(rarity, id)
+    img      = await download_url(base_url)
+    #rarity, id = base_url.split('-')
+    #img      = aws_utils.get_image(rarity, id)
     if img == None:
         return None
     base_img = Image.open(img).resize(CARD_SIZE).convert('RGBA')
@@ -125,7 +125,7 @@ async def download_url(url):
     global CLIENT_SESSION
     if not CLIENT_SESSION:
         CLIENT_SESSION = aiohttp.ClientSession()
-    async with CLIENT_SESSION.get(url) as resp:
+    async with CLIENT_SESSION.get('http://'+url) as resp:
         if resp.status != 200:
             return None
         data = io.BytesIO(await resp.read())

@@ -186,13 +186,22 @@ def add_corners(im, rad):
 #import numpy as np
 #diy_photocard('overlays/img2.jpg', 'overlays/border.png', 'overlays/fade.png', 'overlays/out.png')
 
-d = 'E:\\x\\legendary'
-out = 'E:\\legendary_out'
-i = 1
+#d = 'E:\\x\\legendary'
+#out = 'E:\\legendary_out'
+#i = 1
+#for filename in os.listdir(d):
+#    f = os.path.join(d, filename)
+#    # checking if it is a file
+#    if os.path.isfile(f):
+#        Image.open(f).convert('RGB').resize((360,640)).save(os.path.join(out, f'{i:05}.jpg'), optimize=True, quality = 85)
+#        #print('done', i)
+#        i += 1
+
+d = 'E:\\cards\\legendary_out'
+i = 6270
 for filename in os.listdir(d):
     f = os.path.join(d, filename)
     # checking if it is a file
     if os.path.isfile(f):
-        Image.open(f).convert('RGB').resize((360,640)).save(os.path.join(out, f'{i:05}.jpg'), optimize=True, quality = 85)
-        #print('done', i)
+        os.rename(f, os.path.join(d, f"{i:05}.jpg"))
         i += 1

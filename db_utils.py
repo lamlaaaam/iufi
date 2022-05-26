@@ -6,7 +6,8 @@ from   datetime import datetime, timedelta
 
 # ----------------------------------------------------------------------------------------------------------
 load_dotenv()
-MONGO_STRING = os.getenv('MONGO_STRING')
+MONGO_STRING      = os.getenv('MONGO_STRING')
+CLOUDFRONT_PREFIX = os.getenv('CLOUDFRONT_PREFIX')
 client       = pymongo.MongoClient(MONGO_STRING)
 iufi_db      = client['IUFI_DB']
 cards_col    = iufi_db['Cards']
@@ -67,23 +68,38 @@ def drop_players(cluster):
     if players_col.count_documents({}) > 0:
         players_col.drop()
 
-def setup_cards(rarity, start_id, end_id, db_id, cluster):
+#def setup_cards(rarity, start_id, end_id, db_id, cluster):
+#    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+#    client       = pymongo.MongoClient(MONGO_STRING)
+#    iufi_db      = client['IUFI_DB']
+#    cards_col    = iufi_db['Cards']
+#    card_docs = []
+#    for aws_id in range(start_id, end_id+1):
+#        doc = {'id'       : db_id,
+#               'tag'      : None,
+#               'url'      : f"{rarity}-{aws_id:05}",
+#               'available': True,
+#               'owned_by' : None,
+#               'rarity'   : rarity} 
+#        card_docs.append(doc)
+#        db_id += 1
+#    cards_col.insert_many(card_docs)
+
+def setup_cards(rarity, start_id, end_id, cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
     client       = pymongo.MongoClient(MONGO_STRING)
     iufi_db      = client['IUFI_DB']
     cards_col    = iufi_db['Cards']
     card_docs = []
     for aws_id in range(start_id, end_id+1):
-        doc = {'id'       : db_id,
+        doc = {'id'       : aws_id,
                'tag'      : None,
-               'url'      : f"{rarity}-{aws_id:05}",
+               'url'      : f"{CLOUDFRONT_PREFIX}/{aws_id:05}.jpg",
                'available': True,
                'owned_by' : None,
                'rarity'   : rarity} 
         card_docs.append(doc)
-        db_id += 1
     cards_col.insert_many(card_docs)
-
 # ----------------------------------------------------------------------------------------------------------
 
 def sync_does_user_exist(q):

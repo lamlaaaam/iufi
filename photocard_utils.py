@@ -125,7 +125,7 @@ async def download_url(url):
     global CLIENT_SESSION
     if not CLIENT_SESSION:
         CLIENT_SESSION = aiohttp.ClientSession()
-    async with CLIENT_SESSION.get('http://'+url) as resp:
+    async with CLIENT_SESSION.get(url) as resp:
         if resp.status != 200:
             return None
         data = io.BytesIO(await resp.read())

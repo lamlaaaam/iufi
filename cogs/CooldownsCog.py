@@ -56,6 +56,9 @@ class CooldownsCog(commands.Cog):
         member = await self.bot.GUILD.fetch_member(id)
         if member == None:
             return
-        ch     = await member.create_dm()
-        await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**")
+        try:
+            ch     = await member.create_dm()
+            await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**")
+        except discord.Forbidden:
+            print("User cannot be reached for reminders.")
 

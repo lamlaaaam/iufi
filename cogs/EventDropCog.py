@@ -28,6 +28,7 @@ class EventDropCog(commands.Cog):
 
     async def random_drop(self):
         card_doc = (await db_utils.get_random_cards(1, self.bot.RARITY_PROB, 0))[0]
+        await db_utils.set_card_availability(card_doc['id'], False)
         title    = "**🎁   Random Card Drop**"
         id       = f"**🆔   `{card_doc['id']:04}`**\n"
         tag      = f"**🏷️   `{card_doc['tag']}`**\n"
@@ -49,12 +50,11 @@ class EventDropCog(commands.Cog):
 
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
-            await db_utils.set_card_availability(card_doc['id'], False)
             await db_utils.set_card_owner(card_doc['id'], msg.author.id)
             await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
             await self.bot.CHANNEL.send(f"**{msg.author.mention} has won the random card drop.**")
         except asyncio.TimeoutError:
-            pass
+            await db_utils.set_card_availability(card_doc['id'], True)
         finally:
             code              = f"*This drop has expired*"
             desc              = id + tag + rarity + code + '\n\n'

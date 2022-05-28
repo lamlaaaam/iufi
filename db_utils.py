@@ -152,6 +152,9 @@ async def remove_card_from_user(user_id, card_id):
 async def get_user(id):
     return players_col.find_one({'discord_id': id})
 
+async def get_users(pred):
+    return players_col.find(pred)
+
 async def update_user_currency(id, delta):
     user         = await get_user(id)
     currency     = user['currency']
@@ -218,6 +221,9 @@ async def set_user_bio(user_id, bio):
 
 async def remove_user_bio(user_id):
     players_col.update_one({'discord_id': user_id}, {'$set': {'bio': "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!"}})
+
+async def set_user_reminders(user_id, state):
+    players_col.update_one({'discord_id': user_id}, {'$set': {'reminders': state}})
 
 # ---------------------------------------------------------------------------------------------------------
 

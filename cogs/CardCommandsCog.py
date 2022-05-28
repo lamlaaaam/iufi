@@ -15,12 +15,8 @@ class CardCommandsCog(commands.Cog):
     async def card_not_owned_error(self, ctx):
         await ctx.send(f"**{ctx.author.mention} you do not own this card.**")
 
-    @commands.command(name = 'cardinfo', aliases = ['i'])
-    async def cardinfo(self, ctx, id_tag):
-        card_doc = await db_utils.get_card(id_tag)
-        if card_doc == None:
-            await self.card_not_found_error(ctx)
-            return
+    async def show_card_info(self, ctx, id):
+        card_doc = await db_utils.get_card(id)
 
         title  = "**ℹ️   Card Info**"
         id     = f"**🆔   `{card_doc['id']:04}`**\n"
@@ -44,11 +40,27 @@ class CardCommandsCog(commands.Cog):
             embed.set_thumbnail(url=owner.avatar_url)
         except:
             pass
-
         await ctx.send(embed=embed)
 
+    @commands.command(name = 'cardinfo', aliases = ['i'])
+    async def card_info(self, ctx, id_tag):
+        card_doc = await db_utils.get_card(id_tag)
+        if card_doc == None:
+            await self.card_not_found_error(ctx)
+            return
+        await self.show_card_info(ctx, card_doc['id'])
+
+    @commands.command(name = 'cardinfolast', aliases = ['il'])
+    async def card_info_last(self, ctx):
+        last_card = await self.get_last_card_id(ctx.author.id)
+        if last_card == None:
+            ctx.send(f'**{ctx.author.mention} you have no photocards.**')
+            return
+        await self.show_card_info(ctx, last_card)
+
+
     @commands.command(name = 'settag', aliases = ['st'])
-    async def settag(self, ctx, id_tag, tag):
+    async def set_tag(self, ctx, id_tag, tag):
         card_doc = await db_utils.get_card(id_tag)
         user_doc = await db_utils.get_user(ctx.author.id)
         if card_doc == None:
@@ -73,7 +85,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you have set the tag successfully.**")
         
     @commands.command(name = 'settaglast', aliases = ['stl'])
-    async def settaglast(self, ctx, tag):
+    async def set_tag_last(self, ctx, tag):
         if not re.match("^[A-Za-z0-9]*$", tag):
             await ctx.send(f"**{ctx.author.mention} the tag name must be alphanumeric.**")
             return
@@ -96,7 +108,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you have set the tag successfully.**")
 
     @commands.command(name = 'removetag', aliases = ['rt'])
-    async def removetag(self, ctx, id_tag):
+    async def remove_tag(self, ctx, id_tag):
         card_doc = await db_utils.get_card(id_tag)
         user_doc = await db_utils.get_user(ctx.author.id)
         if card_doc == None:
@@ -154,7 +166,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f'**{ctx.author.mention} you have successfully set a main photocard.**')
 
     @commands.command(name = 'mainlast', aliases = ['ml'])
-    async def mainlast(self, ctx):
+    async def main_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
             ctx.send(f'**{ctx.author.mention} you have no photocards.**')
@@ -163,7 +175,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f'**{ctx.author.mention} you have successfully set your last photocard as your main.**')
 
     @commands.command(name = 'giftpc', aliases = ['gpc'])
-    async def giftpc(self, ctx, rec: discord.Member, *id_tags):
+    async def gift_pc(self, ctx, rec: discord.Member, *id_tags):
         if rec.id == ctx.author.id:
             await ctx.send(f'**{ctx.author.mention} you cannot gift yourself.**')
             return
@@ -182,7 +194,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f'**{rec.mention} you have received {success} photocard(s) from {ctx.author.mention}!**')
 
     @commands.command(name = 'giftpclast', aliases = ['gpcl'])
-    async def giftpclast(self, ctx, rec: discord.Member=None):
+    async def gift_pc_last(self, ctx, rec: discord.Member=None):
         if rec == None:
             await ctx.send(f'**{ctx.author.mention} pick a recipient for your gifts.**')
             return

@@ -81,6 +81,7 @@ COMMAND_MAP = {
     'qhelp'        : ('qh', 'qhelp', 'Shows the IUFI help screen.'),
     'qprofile'     : ('qp', 'qprofile @member', 'Shows the profile of a member. If called without a member, shows your own profile.'),
     'qcardinfo'    : ('qi', 'qcardinfo id_or_tag', 'Shows the details of a photocard. Card can be identified by its ID or given tag.'),
+    'qcardinfolast': ('qil', 'qcardinfolast', 'Shows the details of your last photocard.'),
     'qconvert'     : ('qc', 'qconvert id_or_tag1 id_or_tag2 ...', 'Converts the photocards into starcandies. Card can be identified by its ID or given tag. The amount of starcandies received is dependent on the card\'s rarity.'),
     'qconvertlast' : ('qcl', 'qconvertlast', 'Converts the last photocard of your collection.'),
     'qgiftpc'      : ('qgpc', 'qgiftpc @member id_or_tag1 id_or_tag2 ...', 'Gifts the member photocards. Card can be identified by its ID or given tag.'),
@@ -108,7 +109,9 @@ COMMAND_MAP = {
     'qsetfaveslast': ('qsfl', 'qsetfaveslast slot', 'Sets your last photocard as a favorite in the given slot [1 to 6].'),
     'qfaves'       : ('qf', 'qfaves @member', 'Shows the given member\'s favorite photocards. If not specified, shows your own.'),
     'qsetbio'      : ('qsb', 'qsetbio "bio"', 'Sets your profile bio. Make sure to enclose your bio in double quotes ("")'),
-    'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.')
+    'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.'),
+    'qremindon'    : ('qron', 'qremindon', 'Turns reminders on for your cooldowns.'),
+    'qremindoff'   : ('qroff', 'qremindoff', 'Turns reminders off for your cooldowns.')
 }
 
 SHOP_LIST = [

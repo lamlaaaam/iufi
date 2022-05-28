@@ -42,9 +42,9 @@ class CooldownsCog(commands.Cog):
     async def cd_check(self):
         now       = datetime.now()
         user_docs = list(await db_utils.get_users({'reminders':True}))
-        roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll'] and (now-doc['next_roll']).seconds < 90]
+        roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll'] and (now-doc['next_roll']).seconds < 65]
         #claim_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_claim']]
-        daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily'] and (now-doc['next_daily']).seconds < 90]
+        daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily'] and (now-doc['next_daily']).seconds < 65]
         for id in roll_up:
             await self.send_dm(id, "roll")
         #for id in claim_up:
@@ -57,7 +57,7 @@ class CooldownsCog(commands.Cog):
         if member == None:
             return
         try:
-            ch     = await member.create_dm()
+            ch = await member.create_dm()
             await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**")
         except discord.Forbidden:
             print("User cannot be reached for reminders.")

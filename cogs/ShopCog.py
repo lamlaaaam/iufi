@@ -1,5 +1,4 @@
 import asyncio
-from re import I
 import db_utils
 import discord
 from   async_timeout import timeout
@@ -44,7 +43,7 @@ class ShopCog(commands.Cog):
         async def buy(i):
             nonlocal shop_msg
             _, name, price, _, effect = self.shop_list[i]
-            if user_currency >= price:
+            if (await db_utils.get_user(id))['currency'] >= price:
                 await db_utils.update_user_currency(id, -price)
                 await effect(id)
                 await ctx.send(f"**{ctx.author.mention} you have purchased a {name}.**", delete_after=3)

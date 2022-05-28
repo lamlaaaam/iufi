@@ -110,7 +110,7 @@ COMMAND_MAP = {
     'qfaves'       : ('qf', 'qfaves @member', 'Shows the given member\'s favorite photocards. If not specified, shows your own.'),
     'qsetbio'      : ('qsb', 'qsetbio "bio"', 'Sets your profile bio. Make sure to enclose your bio in double quotes ("")'),
     'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.'),
-    'qremindon'    : ('qron', 'qremindon', 'Turns reminders on for your cooldowns.'),
+    'qremindon'    : ('qron', 'qremindon', 'Turns reminders on for your cooldowns. Make sure you are not blocking DMs.'),
     'qremindoff'   : ('qroff', 'qremindoff', 'Turns reminders off for your cooldowns.')
 }
 

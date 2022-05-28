@@ -57,5 +57,5 @@ class CooldownsCog(commands.Cog):
         if member == None:
             return
         ch     = await member.create_dm()
-        await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**", delete_after=30)
+        await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**", delete_after=60)
 

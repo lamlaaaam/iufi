@@ -1,10 +1,10 @@
 name frames id-name.png e.g. 001-fire.jpg
 throw cards into a card folder in s3, make frame folder
 throw frames into frame folder
-populate db with id and tag following filenames, and url
+populate db with id and tag following filenames, and url, and auto color
 add user owned frames
 add card applied what frame, 0 is default
-photocard utils create takes in frame url and apply
+photocard utils create takes in frame url and apply, with auto color
 shop add frames (id and tag and price)
 query frame info (like card)
 inventory shows frame count

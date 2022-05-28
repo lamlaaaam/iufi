@@ -1,8 +1,16 @@
+name frames id-name.png e.g. 001-fire.jpg
+throw cards into a card folder in s3, make frame folder
+throw frames into frame folder
+populate db with id and tag following filenames, and url
+add user owned frames
+add card applied what frame, 0 is default
+photocard utils create takes in frame url and apply
+shop add frames (id and tag and price)
+query frame info (like card)
+inventory shows frame count
+photocard apply frame, remove frame
+converting returns frame
 
-db.setup_cards(0,1,3356,'US')
-db.setup_cards(1,3357,5206,'US')
-db.setup_cards(2,5207,6269,'US')
-db.setup_cards(3,6270,6487,'US')
 Rarities:
 ◆🞚🞜❖
 ❤💛💚💙💜

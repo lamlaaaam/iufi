@@ -43,17 +43,19 @@ class CooldownsCog(commands.Cog):
         now       = datetime.now()
         user_docs = list(await db_utils.get_users({'reminders':True}))
         roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll']]
-        claim_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_claim']]
+        #claim_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_claim']]
         daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily']]
         for id in roll_up:
             await self.send_dm(id, "roll")
-        for id in claim_up:
-            await self.send_dm(id, "claim")
+        #for id in claim_up:
+        #    await self.send_dm(id, "claim")
         for id in daily_up:
             await self.send_dm(id, "daily")
 
     async def send_dm(self, id, type):
         member = await self.bot.GUILD.fetch_member(id)
+        if member == None:
+            return
         ch     = await member.create_dm()
         await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**", delete_after=30)
 

@@ -50,7 +50,7 @@ ROLL_CLAIM_TIME      = 30  # Seconds
 ROLL_COOLDOWN        = 10  # Minutes
 ROLL_CLAIM_COOLDOWN  = 3   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
-ROLL_COMMON_COOLDOWN = 10  # Seconds
+ROLL_COMMON_COOLDOWN = 3   # Seconds
 
 COLLECTION_TIME      = 60  # Seconds
 SHOP_TIME            = 60  # Seconds

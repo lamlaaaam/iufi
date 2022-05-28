@@ -10,6 +10,7 @@ query frame info (like card)
 inventory shows frame count
 photocard apply frame, remove frame
 converting returns frame
+remember to change register user to add frame field and for cards too, and util for setting up frames
 
 Rarities:
 ◆🞚🞜❖

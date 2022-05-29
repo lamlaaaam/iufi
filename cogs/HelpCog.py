@@ -1,5 +1,6 @@
 import discord
 from   discord.ext import commands
+from   discord       import Button, ButtonStyle
 
 class HelpCog(commands.Cog):
     def __init__(self,
@@ -16,4 +17,7 @@ class HelpCog(commands.Cog):
         desc += self.help_msg
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        await ctx.send(embed=embed)
+        components = [[Button(emoji='🐦', label = '@ui8ball', url = 'https://twitter.com/ui8ball', style = ButtonStyle.url),
+                       Button(emoji='💻', label = '@lamlaaaam', url = 'https://github.com/lamlaaaam', style = ButtonStyle.url),
+                       Button(emoji='📗', label = 'Beginner Guide', url = 'https://docs.google.com/document/d/1VAD20wZQ56S_wDeMJlwIKn_jImIPuxh2lgy1fn17z0c/edit?usp=sharing', style = ButtonStyle.url)]]
+        await ctx.send(embed=embed, components=components)

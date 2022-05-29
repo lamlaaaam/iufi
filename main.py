@@ -120,20 +120,20 @@ COMMAND_MAP = {
 }
 
 SHOP_LIST = [
-    ('🃏', 'CLAIM RESET'   , 2,    'Resets your claim cooldown.', lambda id: db_utils.set_user_cooldown(id, 'next_claim')),
-    ('🎲', 'ROLL RESET'    , 5,    'Resets your roll cooldown.',  lambda id: db_utils.set_user_cooldown(id, 'next_roll')),
-    ('🌸', 'RARE ROLL'     , 10,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
-    ('💎', 'EPIC ROLL'     , 100,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
-    ('👑', 'LEGENDARY ROLL', 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
-    ('💕', 'HEARTS FRAME'  , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
-    ('💌', 'UAENA FRAME'     , 30,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),
-    ('🌷', 'DANDELIONS FRAME', 40,  'Dandelion stickers drawn by IU!', lambda id: db_utils.update_user_frames(id, 4, 1)),
-    ('✨', 'SHINE FRAME'     , 50,  'Add some shine effect to your photocard!', lambda id: db_utils.update_user_frames(id, 5, 1)),
-    ('💠', 'LOVEPOEM FRAME'  , 50,  'For the Love Poem lovers!', lambda id: db_utils.update_user_frames(id, 6, 1)),
-    ('🌟', 'CELEBRITY FRAME' , 50,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
-    ('🍓', 'SMOON FRAME', 80,  'Brighten the night with stars and a strawberry moon!', lambda id: db_utils.update_user_frames(id, 8, 1)),
+    ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id: db_utils.set_user_cooldown(id, 'next_claim')),
+    ('🎲', 'ROLL RESET'      , 10,    'Resets your roll cooldown.',  lambda id: db_utils.set_user_cooldown(id, 'next_roll')),
+    ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
+    ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
+    ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
+    ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
+    ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
+    ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),
+    ('🌷', 'DANDELIONS FRAME', 50,  'Dandelion stickers drawn by IU!', lambda id: db_utils.update_user_frames(id, 4, 1)),
+    ('✨', 'SHINE FRAME'     , 60,  'Add some shine effect to your photocard!', lambda id: db_utils.update_user_frames(id, 5, 1)),
+    ('💠', 'LOVEPOEM FRAME'  , 70,  'For the Love Poem lovers!', lambda id: db_utils.update_user_frames(id, 6, 1)),
     ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id: db_utils.update_user_frames(id, 9, 1)),
-    ('✍️', ' SIGNED FRAME'    , 100, 'IU\'s signature, what else do you need?', lambda id: db_utils.update_user_frames(id, 1, 1)),
+    ('🍓', 'SMOON FRAME'     , 90,  'Brighten the night with stars and a strawberry moon!', lambda id: db_utils.update_user_frames(id, 8, 1)),
+    ('✍️', ' SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id: db_utils.update_user_frames(id, 1, 1)),
 ]
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']

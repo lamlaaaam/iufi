@@ -22,10 +22,13 @@ class InventoryCog(commands.Cog):
         s               += f"{'💎 Epic rolls':<20}{'x'+str(epic_rolls):<5}\n"
         s               += f"{'👑 Legend rolls':<20}{'x'+str(legend_rolls):<5}\n\n"
         s               += f"{'🖼️ Frames':<20}\n"
-        i = 1
-        for name, count in frames.items():
-            s += f"{str(i)+'. '+name.upper():<20} {'x'+str(count):<5}\n"
-            i += 1
+        if len(frames) == 0:
+            s += "You have no frames.\n"
+        else:
+            i = 1
+            for name, count in frames.items():
+                s += f"{str(i)+'. '+name.upper():<20} {'x'+str(count):<5}\n"
+                i += 1
         s     = '```' + s + '```'
         embed = discord.Embed(title = title, description=s, color = discord.Color.dark_green())
 

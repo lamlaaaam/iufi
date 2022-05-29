@@ -60,13 +60,6 @@ def setup_frames(id, name, auto_col, cluster):
            'auto'     : auto_col}
     frames_col.insert_one(doc)
 
-def a():
-    MONGO_STRING = os.getenv('MONGO_STRING_US')
-    client       = pymongo.MongoClient(MONGO_STRING)
-    iufi_db      = client['IUFI_DB']
-    cards_col    = iufi_db['Cards']
-    cards_col.update_many({}, {'$set': {'frame': 0}})
-
 # ----------------------------------------------------------------------------------------------------------
 
 def sync_does_user_exist(q):

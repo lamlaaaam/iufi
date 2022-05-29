@@ -40,14 +40,15 @@ class FavesCog(commands.Cog):
         for r, d in enumerate(faves_sorted):
             num = f"{r+1}."
             if d != None:
-                cid     = f"🆔 {d['id']:04}"
+                cid    = f"🆔 {d['id']:04}"
                 tag    = f"🏷️ {d['tag']}"
-                frame  = f"🖼️ {d['frame']:03}"
+                f      = d['frame'] if d['frame'] != 0 else '-'
+                frame  = f"🖼️ {f:03}"
                 rarity = f"{self.bot.RARITY[d['rarity']]}"
                 desc  += f"{cid:<8}{tag:<15}{frame:>5}{rarity:>2}\n"
             else:
                 #desc  += f"{num:<5}\n"
-                desc  += f"\n"
+                desc  += f" \n"
         desc  = "```\n" + desc + "```\n"
         desc += "🌸 " * 13 + "\n\n"
 

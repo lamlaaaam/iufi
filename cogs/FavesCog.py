@@ -42,8 +42,9 @@ class FavesCog(commands.Cog):
             if d != None:
                 cid     = f"🆔 {d['id']:04}"
                 tag    = f"🏷️ {d['tag']}"
+                frame  = f"🖼️ {d['frame']:03}"
                 rarity = f"{self.bot.RARITY[d['rarity']]}"
-                desc  += f"{num:<5}{cid:<10}{tag:<15}{rarity:>1}\n"
+                desc  += f"{num:<5}{cid:<10}{tag:<15}{frame:>5}{rarity:>1}\n"
             else:
                 desc  += f"{num:<5}\n"
         desc  = "```\n" + desc + "```\n"

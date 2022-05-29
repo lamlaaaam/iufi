@@ -34,7 +34,7 @@ class ProfileCog(commands.Cog):
         embed = discord.Embed(title=title, description=bio, color=discord.Color.gold())
         s     = f"📙   Photocards: `{len(user_doc['collection'])}`\n"
         s    += f"⚔️   Level: `{user_doc['level']} ({user_progress}%)`\n\n"
-        s    += '🌸 ' * 10
+        #s    += '🌸 ' * 10
         embed.add_field(name=s, value='\u200b', inline=False)
         embed.set_thumbnail(url=user.avatar_url)
 

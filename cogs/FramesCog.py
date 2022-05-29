@@ -96,7 +96,7 @@ class FramesCog(commands.Cog):
         id     = f"**🆔   `{frame_doc['id']:03}`**\n"
         tag    = f"**🏷️   `{frame_doc['tag']}`**\n"
         desc   = id + tag + '\n'
-        desc  += "🌸 "*10 + '\n\n'
+        #desc  += "🌸 "*10 + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
         frame_img        = await photocard_utils.create_frame(frame_doc)

@@ -30,7 +30,7 @@ class CardCommandsCog(commands.Cog):
         except:
             owned  = "**Owned by:   nobody**"
         desc   = id + tag + frame + rarity + owned + '\n\n'
-        desc  += "🌸 "*10 + '\n\n'
+        #desc  += "🌸 "*10 + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
         card_img        = await photocard_utils.create_photocard(card_doc)

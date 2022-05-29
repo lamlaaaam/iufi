@@ -50,7 +50,7 @@ class FavesCog(commands.Cog):
                 #desc  += f"{num:<5}\n"
                 desc  += f" \n"
         desc  = "```\n" + desc + "```\n"
-        desc += "🌸 " * 13 + "\n\n"
+        #desc += "🌸 " * 13 + "\n\n"
 
         img        = await photocard_utils.stitch_gallery(faves_sorted, 2, 3)
         attachment = await photocard_utils.pillow_to_attachment(img, self.bot.WASTELAND)

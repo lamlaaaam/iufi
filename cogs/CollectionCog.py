@@ -58,7 +58,7 @@ class CollectionCog(commands.Cog):
 
         title = f"📖   {user.display_name}'s Photocards"
         desc_pre = f"**📙   Collection size: `{collection_size}`**\n\n"
-        desc_pre += "🌸 " * 13 + "\n\n"
+        #desc_pre += "🌸 " * 13 + "\n\n"
         desc = desc_pre + await self.page_to_str(pages, 0, cards_per_page)
         embed = discord.Embed(title = title, description = desc, color = discord.Color.gold())
         embed.set_thumbnail(url=user.avatar_url)

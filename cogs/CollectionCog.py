@@ -28,7 +28,7 @@ class CollectionCog(commands.Cog):
             tag    = f"🏷️ {d['tag']}"
             frame  = f"🖼️ {d['frame']:03}"
             rarity = f"{self.bot.RARITY[d['rarity']]}"
-            s     += f"{id:<10}{tag:<15}{frame:>5}{rarity:>2}\n"
+            s     += f"{id:<8}{tag:<15}{frame:>5}{rarity:>2}\n"
         s = "```" + s + "```"
         return s
 

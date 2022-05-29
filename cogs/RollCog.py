@@ -152,7 +152,7 @@ class RollCog(commands.Cog):
             await ctx.send('**The pool is empty!**')
             await loading_msg.delete()
             return
-        stitched_img = await photocard_utils.stitch_images([doc['url'] for doc in roll_pc_docs])
+        stitched_img = await photocard_utils.stitch_images(roll_pc_docs)
         if stitched_img == None:
             await loading_msg.delete()
             await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**")

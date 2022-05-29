@@ -25,6 +25,7 @@ from   cogs.InventoryCog    import InventoryCog
 from   cogs.AuctionCog      import AuctionCog
 from   cogs.EventDropCog    import EventDropCog
 from   cogs.FavesCog        import FavesCog
+from   cogs.FramesCog       import FramesCog
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -111,7 +112,11 @@ COMMAND_MAP = {
     'qsetbio'      : ('qsb', 'qsetbio "bio"', 'Sets your profile bio. Make sure to enclose your bio in double quotes ("")'),
     'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.'),
     'qremindon'    : ('qron', 'qremindon', 'Turns reminders on for your cooldowns. Make sure you are not blocking DMs.'),
-    'qremindoff'   : ('qroff', 'qremindoff', 'Turns reminders off for your cooldowns.')
+    'qremindoff'   : ('qroff', 'qremindoff', 'Turns reminders off for your cooldowns.'),
+    'qsetframe'    : ('qsfr', 'qsetframe card frame', 'Sets the frame for the photocard. Both card and frame can be identified by id or tag.'),
+    'qsetframelast': ('qsfrl', 'qsetframe frame', 'Sets the frame for the last photocard. Frame can be identified by its id or tag.'),
+    'qremoveframe' : ('qrfr', 'qremoveframe card', 'Removes the frame from the photocard. Card can be identified by its ID or given tag.'),
+    'qframeinfo'   : ('qfi', 'qframeinfo id_or_tag', 'Shows the details for the frame. Frame can be identified by its ID or tag.')
 }
 
 SHOP_LIST = [
@@ -119,7 +124,16 @@ SHOP_LIST = [
     ('🎲', 'ROLL RESET'    , 5,    'Resets your roll cooldown.',  lambda id: db_utils.set_user_cooldown(id, 'next_roll')),
     ('🌸', 'RARE ROLL'     , 10,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
     ('💎', 'EPIC ROLL'     , 100,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
-    ('👑', 'LEGENDARY ROLL', 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1))
+    ('👑', 'LEGENDARY ROLL', 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
+    ('💕', 'HEARTS FRAME'  , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
+    ('💌', 'UAENA FRAME'     , 30,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),
+    ('🌷', 'DANDELIONS FRAME', 40,  'Dandelion stickers drawn by IU!', lambda id: db_utils.update_user_frames(id, 4, 1)),
+    ('✨', 'SHINE FRAME'     , 50,  'Add some shine effect to your photocard!', lambda id: db_utils.update_user_frames(id, 5, 1)),
+    ('💠', 'LOVEPOEM FRAME'  , 50,  'For the Love Poem lovers!', lambda id: db_utils.update_user_frames(id, 6, 1)),
+    ('🌟', 'CELEBRITY FRAME' , 50,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
+    ('🍓', 'SMOON FRAME', 80,  'Brighten the night with stars and a strawberry moon!', lambda id: db_utils.update_user_frames(id, 8, 1)),
+    ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id: db_utils.update_user_frames(id, 9, 1)),
+    ('✍️', ' SIGNED FRAME'    , 100, 'IU\'s signature, what else do you need?', lambda id: db_utils.update_user_frames(id, 1, 1)),
 ]
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
@@ -187,6 +201,7 @@ async def on_ready():
                              EVENT_DROP_INTERVAL,
                              EVENT_DROP_VALID))
     bot.add_cog(FavesCog(bot))
+    bot.add_cog(FramesCog(bot))
     print('Cogs added')
 
     print('Bot is ready')

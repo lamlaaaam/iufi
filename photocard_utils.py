@@ -1,9 +1,9 @@
-import aws_utils
 import asyncio
 import aiohttp
 import discord
 import io
 import numpy as np
+import db_utils
 from   colorthief import ColorThief
 from   PIL import Image, ImageDraw
 from   async_timeout import timeout
@@ -18,11 +18,14 @@ STARS_URL  = 'overlays/stars_smol.png'
 
 CLIENT_SESSION = None
 
-async def stitch_images(imgs_url):
+async def stitch_images(card_docs):
     try:
         async with timeout(30):
-            n             = len(imgs_url)
-            imgs          = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
+            n    = len(card_docs)
+            imgs = []
+            for doc in card_docs:
+                img = await create_photocard(doc)
+                imgs.append(img)
             none_check     = None in imgs
             if none_check:
                 return None
@@ -37,8 +40,11 @@ async def stitch_images(imgs_url):
     except asyncio.exceptions.TimeoutError:
         return None
 
-async def stitch_gallery(imgs_url, rows, cols):
-    imgs = [await create_photocard(i, border=True, fade=True) for i in imgs_url]
+async def stitch_gallery(card_docs, rows, cols):
+    imgs = []
+    for doc in card_docs:
+        img = await create_photocard(doc)
+        imgs.append(img)
 
     width, height = [img for img in imgs if img != None][0].size
     new_image     = Image.new('RGBA', (cols * width + (cols-1) * GALL_GAP, rows * height + (rows-1) * GALL_GAP), (255,255,255,0))
@@ -53,30 +59,31 @@ async def stitch_gallery(imgs_url, rows, cols):
             i += 1
     return new_image
 
-async def create_photocard(base_url, border=False, stars=False, fade=False):
-    if base_url == None:
-        return None
-    img      = await download_url(base_url)
-    #rarity, id = base_url.split('-')
-    #img      = aws_utils.get_image(rarity, id)
-    if img == None:
-        return None
-    base_img = Image.open(img).resize(CARD_SIZE).convert('RGBA')
-    col      = ColorThief(img).get_color(quality=10)
-    com      = await complement(col[0], col[1], col[2])
+async def create_frame(frame_doc):
+    if frame_doc == None:
+        return
+    frame_img = await download_url(frame_doc['url'])
+    frame_img = Image.open(frame_img).resize(CARD_SIZE)
+    return frame_img
 
-    if fade:
-        fade_img = await recolour(Image.open(FADE_URL).convert('RGBA'), col)
-        base_img.paste(fade_img, fade_img)
-    if stars:
-        stars_img = await recolour(Image.open(STARS_URL).convert('RGBA'), col)
-        base_img.paste(stars_img, stars_img)
-    base_img = await add_corners(base_img, 50)
-    if border:
-        border_img = await recolour(Image.open(BORDER_URL).convert('RGBA'), col)
-        base_img.paste(border_img, border_img)
+async def create_photocard(card_doc):
+    if card_doc == None:
+        return
+    card_img  = await download_url(card_doc['url'])
+    frame     = await db_utils.get_frame(card_doc['frame'])
+    frame_img = await download_url(frame['url'])
 
-    return base_img
+    col      = ColorThief(card_img).get_color(quality=10)
+    card_img = Image.open(card_img).resize(CARD_SIZE).convert('RGBA')
+    frame_img = Image.open(frame_img).resize(CARD_SIZE)
+
+    if frame['auto']:
+        frame_img = await recolour(frame_img, col)
+
+    card_img.paste(frame_img, frame_img)
+    card_img = await add_corners(card_img, 40)
+
+    return card_img
 
 async def recolour(img, col):
     data                          = np.array(img)

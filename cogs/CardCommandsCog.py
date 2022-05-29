@@ -16,23 +16,24 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you do not own this card.**")
 
     async def show_card_info(self, ctx, id):
-        card_doc = await db_utils.get_card(id)
+        card_doc  = await db_utils.get_card(id)
+        frame_doc = await db_utils.get_frame(card_doc['frame'])
 
         title  = "**ℹ️   Card Info**"
         id     = f"**🆔   `{card_doc['id']:04}`**\n"
         tag    = f"**🏷️   `{card_doc['tag']}`**\n"
+        frame  = f"**🖼️   `{frame_doc['tag']}`**\n"
         rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n\n"
         try:
             owner  = await self.bot.GUILD.fetch_member(card_doc['owned_by'])
             owned  = f"**Owned by:   `{owner.display_name}`**"
         except:
             owned  = "**Owned by:   nobody**"
-        desc   = id + tag + rarity + owned + '\n\n'
+        desc   = id + tag + frame + rarity + owned + '\n\n'
         desc  += "🌸 "*10 + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
-        img_url         = card_doc['url']
-        card_img        = await photocard_utils.create_photocard(img_url, border=True, fade=True)
+        card_img        = await photocard_utils.create_photocard(card_doc)
         card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
         embed.set_image(url=card_attachment)
 

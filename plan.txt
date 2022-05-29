@@ -1,16 +1,17 @@
-name frames id-name.png e.g. 001-fire.jpg
-throw cards into a card folder in s3, make frame folder
-throw frames into frame folder
-populate db with id and tag following filenames, and url, and auto color
-add user owned frames
-add card applied what frame, 0 is default
-photocard utils create takes in frame url and apply, with auto color
-shop add frames (id and tag and price)
-query frame info (like card)
-inventory shows frame count
-photocard apply frame, remove frame
-converting returns frame
-remember to change register user to add frame field and for cards too, and util for setting up frames
+name frames id-name.png e.g. 001-fire.jpg OK
+throw cards into a card folder in s3, make frame folder OK
+throw frames into frame folder OK
+populate db with id and tag following filenames, and url, and auto color OK
+add user owned frames OK
+add card applied what frame, 0 is default OK
+photocard utils create takes in frame url and apply, with auto color OK
+remember to change register user to add frame field and for cards too, and util for setting up frames OK
+qi show frame info OK
+converting returns frame OK
+inventory shows frame count OK
+photocard apply frame, remove frame OK
+shop add frames (id and tag and price) OK
+query frame info (like card) OK
 
 Rarities:
 ◆🞚🞜❖

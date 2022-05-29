@@ -39,8 +39,7 @@ class EventDropCog(commands.Cog):
         desc    += "🌸 "*10 + '\n\n'
         embed    = discord.Embed(title=title, description=desc, color=discord.Color.random())
 
-        img_url         = card_doc['url']
-        card_img        = await photocard_utils.create_photocard(img_url, border=True, fade=True)
+        card_img        = await photocard_utils.create_photocard(card_doc)
         card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
         embed.set_image(url=card_attachment)
         drop_msg = await self.bot.CHANNEL.send(embed=embed)

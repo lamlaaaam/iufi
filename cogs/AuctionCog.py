@@ -29,8 +29,9 @@ class AuctionCog(commands.Cog):
             self.auction.reset_cooldown(ctx)
             return
 
-        card_doc = await db_utils.get_card(id_tag)
-        user_doc = await db_utils.get_user(ctx.author.id)
+        card_doc  = await db_utils.get_card(id_tag)
+        frame_doc = await db_utils.get_frame(card_doc['frame'])
+        user_doc  = await db_utils.get_user(ctx.author.id)
         if card_doc == None:
             await self.card_not_found_error(ctx)
             self.auction.reset_cooldown(ctx)
@@ -47,16 +48,16 @@ class AuctionCog(commands.Cog):
         inst           = "Use `qbid amount` to participate.\n\n"
         id             = f"**🆔   `{card_doc['id']:04}`**\n"
         tag            = f"**🏷️   `{card_doc['tag']}`**\n"
+        frame          = f"**🖼️   `{frame_doc['tag']}`**\n"
         rarity         = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
         owned          = f"**Owned by:   `{ctx.author.display_name}`**\n\n"
         highest_bidder = f"**Highest bidder: `None`**\n"
         highest_bid    = f"**Amount to beat: `{min_bid} 🍬`**\n\n"
         timer          = "**Time:\n**" + '⬜ ' * 10 + '\n\n'
-        desc           = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+        desc           = inst + id + tag + frame + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
         embed          = discord.Embed(title=title, description=desc, color=discord.Color.dark_red())
 
-        img_url         = card_doc['url']
-        card_img        = await photocard_utils.create_photocard(img_url, border=True, fade=True)
+        card_img        = await photocard_utils.create_photocard(card_doc)
         card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
         embed.set_image(url=card_attachment)
         embed.set_thumbnail(url=ctx.author.avatar_url)
@@ -69,7 +70,7 @@ class AuctionCog(commands.Cog):
             highest_bidder    = f"**Highest bidder: `{self.highest_bidder.display_name if self.highest_bidder else 'None'}`**\n"
             highest_bid       = f"**Amount to beat: `{self.highest_bid} 🍬`**\n\n"
             timer             = "**Time:\n**" + '🟥 ' * (i+1) + '⬜ ' * (10-i-1) + '\n\n'
-            desc              = inst + id + tag + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+            desc              = inst + id + tag + frame + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
             embed.description = desc
             await self.auction_msg.edit(embed=embed)
         self.auction_msg    = None

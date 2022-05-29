@@ -39,8 +39,7 @@ class ProfileCog(commands.Cog):
         embed.set_thumbnail(url=user.avatar_url)
 
         if main_card_doc:
-            img_url         = main_card_doc['url']
-            card_img        = await photocard_utils.create_photocard(img_url, border=True, fade=True)
+            card_img        = await photocard_utils.create_photocard(main_card_doc)
             card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
             embed.set_image(url=card_attachment)
         await ctx.send(embed = embed)

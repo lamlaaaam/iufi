@@ -49,8 +49,7 @@ class FavesCog(commands.Cog):
         desc  = "```\n" + desc + "```\n"
         desc += "🌸 " * 13 + "\n\n"
 
-        faves_urls = [doc['url'] if doc != None else None for doc in faves_sorted]
-        img        = await photocard_utils.stitch_gallery(faves_urls, 2, 3)
+        img        = await photocard_utils.stitch_gallery(faves_sorted, 2, 3)
         attachment = await photocard_utils.pillow_to_attachment(img, self.bot.WASTELAND)
         title      = f"**❤️   {user.display_name}'s Favorite Photocards**"
         embed      = discord.Embed(title=title, description=desc, color=discord.Color.dark_green())

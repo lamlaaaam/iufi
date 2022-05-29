@@ -21,18 +21,20 @@ class ShopCog(commands.Cog):
         user_doc      = await db_utils.get_user(id)
         user_currency = user_doc['currency']
         title         = "**🛒   IUFI Shop**"
-        desc          = f"**🍬 Starcandies: `{user_currency}`\n**"
-        shop_desc     = ""
-        for emoji, name, price, _, _ in self.shop_list:
-            shop_desc += f"{emoji:<2}{name:<20}{str(price)+' 🍬':>10}\n"
-        shop_desc     = f"```{shop_desc}```"
-        desc         += shop_desc
+        desc          = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
+        desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
+        #desc          = f"**```{desc}```**"
+        #shop_desc     = ""
+        #for emoji, name, price, _, _ in self.shop_list:
+        #    shop_desc += f"{name:<20}{str(price)+' 🍬':<10}\n"
+        #shop_desc     = f"```{shop_desc}```"
+        #desc         += shop_desc
         embed         = discord.Embed(title=title, description=desc, color=discord.Color.red())
 
         embed.set_thumbnail(url=user.avatar_url)
 
-        options    = [SelectOption(emoji=emoji, label=name, value=str(i), description=desc) 
-                      for i, (emoji, name, _, desc, _) in enumerate(self.shop_list)]
+        options    = [SelectOption(emoji=emoji, label=f"{name}  ({price} 🍬)", value=str(i), description=desc) 
+                      for i, (emoji, name, price, desc, _) in enumerate(self.shop_list)]
         components = [[SelectMenu(custom_id='shop_menu', options=options, placeholder = 'Pick an item to purchase')]]
 
         shop_msg = await ctx.send(embed=embed, components=components)
@@ -50,8 +52,8 @@ class ShopCog(commands.Cog):
             else:
                 await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=3)
 
-            desc              = f"**🍬 Starcandies: `{(await db_utils.get_user(id))['currency']}`\n**"
-            desc             += shop_desc
+            desc              = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
+            desc             += f"**🍬 Starcandies: `{(await db_utils.get_user(id))['currency']}`\n**"
             embed.description = desc
             await shop_msg.edit(embed=embed)
 

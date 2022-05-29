@@ -4,6 +4,9 @@
 **🎴 Card**
 `qcardinfo qcardinfolast qconvert qconvertlast qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`
 
+**🖼️ Frames**
+`qremoveframe qsetframe qsetframelast qframeinfo`
+
 **🍬 Starcandy**
 `qgiftsc`
 

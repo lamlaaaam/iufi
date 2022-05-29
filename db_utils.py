@@ -12,45 +12,9 @@ client       = pymongo.MongoClient(MONGO_STRING)
 iufi_db      = client['IUFI_DB']
 cards_col    = iufi_db['Cards']
 players_col  = iufi_db['Players']
+frames_col   = iufi_db['Frames']
 
 # ----------------------------------------------------------------------------------------------------------
-
-#CARDS_PATH = 'data/test_cards.txt'
-DATA_PATH = 'data/'
-
-# ----------------------------------------------------------------------------------------------------------
-
-#def add_cards(path, last_id, rarity):
-#    card_docs = []
-#    id = last_id+1
-#    for url in open(path, 'r'):
-#        doc = {'id'       : id,
-#               'tag'      : None,
-#               'url'      : url.strip(),
-#               'available': True,
-#               'owned_by' : None,
-#               'rarity'   : rarity} 
-#        card_docs.append(doc)
-#        id += 1
-#    cards_col.insert_many(card_docs)
-#
-#async def setup_cards():
-#    if cards_col.count_documents({}) > 0:
-#        cards_col.drop()
-#    
-#    card_docs = []
-#    id = 1
-#    for x in range(4):
-#        for url in open(os.path.join(DATA_PATH, f"{x}.txt"), 'r'):
-#            doc = {'id'       : id,
-#                   'tag'      : None,
-#                   'url'      : url.strip(),
-#                   'available': True,
-#                   'owned_by' : None,
-#                   'rarity'   : x} 
-#            card_docs.append(doc)
-#            id += 1
-#    cards_col.insert_many(card_docs)
 
 def drop_cards(cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
@@ -68,23 +32,6 @@ def drop_players(cluster):
     if players_col.count_documents({}) > 0:
         players_col.drop()
 
-#def setup_cards(rarity, start_id, end_id, db_id, cluster):
-#    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
-#    client       = pymongo.MongoClient(MONGO_STRING)
-#    iufi_db      = client['IUFI_DB']
-#    cards_col    = iufi_db['Cards']
-#    card_docs = []
-#    for aws_id in range(start_id, end_id+1):
-#        doc = {'id'       : db_id,
-#               'tag'      : None,
-#               'url'      : f"{rarity}-{aws_id:05}",
-#               'available': True,
-#               'owned_by' : None,
-#               'rarity'   : rarity} 
-#        card_docs.append(doc)
-#        db_id += 1
-#    cards_col.insert_many(card_docs)
-
 def setup_cards(rarity, start_id, end_id, cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
     client       = pymongo.MongoClient(MONGO_STRING)
@@ -94,12 +41,32 @@ def setup_cards(rarity, start_id, end_id, cluster):
     for aws_id in range(start_id, end_id+1):
         doc = {'id'       : aws_id,
                'tag'      : None,
-               'url'      : f"{CLOUDFRONT_PREFIX}/{aws_id:05}.jpg",
+               'url'      : f"{CLOUDFRONT_PREFIX}/cards/{aws_id:05}.jpg",
                'available': True,
                'owned_by' : None,
-               'rarity'   : rarity} 
+               'rarity'   : rarity,
+               'frame'    : 0} 
         card_docs.append(doc)
     cards_col.insert_many(card_docs)
+
+def setup_frames(id, name, auto_col, cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    frames_col   = iufi_db['Frames']
+    doc = {'id'       : id,
+           'tag'      : name,
+           'url'      : f"{CLOUDFRONT_PREFIX}/frames/{id:03}-{name}.png",
+           'auto'     : auto_col}
+    frames_col.insert_one(doc)
+
+def a():
+    MONGO_STRING = os.getenv('MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    cards_col    = iufi_db['Cards']
+    cards_col.update_many({}, {'$set': {'frame': 0}})
+
 # ----------------------------------------------------------------------------------------------------------
 
 def sync_does_user_exist(q):
@@ -135,7 +102,8 @@ async def register_user(id):
                             'epic_rolls'   : 0,
                             'legend_rolls' : 0,
                             'bio'          : "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!",
-                            'reminders'    : False})
+                            'reminders'    : False,
+                            'frames'       : {}})
     return True
 
 async def add_card_to_user(user_id, card_id):
@@ -226,6 +194,14 @@ async def remove_user_bio(user_id):
 async def set_user_reminders(user_id, state):
     players_col.update_one({'discord_id': user_id}, {'$set': {'reminders': state}})
 
+async def update_user_frames(user_id, frame_id, delta):
+    user            = await get_user(user_id)
+    frame_count     = user['frames'][str(frame_id)] if str(frame_id) in user['frames'] else 0
+    new_frame_count = frame_count + delta
+    if new_frame_count < 0:
+        new_frame_count = 0
+    players_col.update_one({'discord_id': user_id}, {'$set': {f"frames.{frame_id}": new_frame_count}})
+
 # ---------------------------------------------------------------------------------------------------------
 
 async def check_pool_exists(bias):
@@ -249,6 +225,8 @@ async def get_random_cards(num, probs, bias):
                 if roll <= p:
                     rarity = r
                     break
+        if not (await check_pool_exists(rarity)):
+            rarity = 0
         card = list(cards_col.aggregate([{'$match': {'available': True, 'rarity': rarity}}, {'$sample': {'size': 1}}]))[0]
         cards.append(card)
         cards_col.update_one({'id': card['id']}, {'$set': {'available': False}})
@@ -277,17 +255,46 @@ async def set_card_owner(card_id, user_id):
 async def set_card_tag(id_tag, tag):
     try:
         cards_col.update_one({'id': int(id_tag)}, {'$set': {'tag': tag}})
-        return
     except:
         cards_col.update_one({'tag': str(id_tag)}, {'$set': {'tag': tag}})
+
+async def set_card_frame(card_id_tag, frame_id_tag=0):
+    frame_doc = await get_frame(frame_id_tag)
+    try:
+        cards_col.update_one({'id': int(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
+    except:
+        cards_col.update_one({'tag': str(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
+
+# ---------------------------------------------------------------------------------------------------------
+
+async def get_frame(id_tag):
+    try:
+        frame_by_id = frames_col.find_one({'id': int(id_tag)})
+        if frame_by_id != None:
+            return frame_by_id
+    except:
+        frame_by_tag = frames_col.find_one({'tag': str(id_tag).lower()})
+        return frame_by_tag
 
 # ---------------------------------------------------------------------------------------------------------
 
 async def convert_cards(user_id, card_ids, reward):
-    faves     = (await get_user(user_id))['faves']
+    user_doc  = await get_user(user_id)
+    card_docs = await get_cards({'id': {'$in': card_ids}})
+    faves     = user_doc['faves']
     new_faves = [f if f not in card_ids else None for f in faves]
-    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
-    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None}})
+    frames = user_doc['frames']
+    for card_doc in card_docs:
+        frame_id = card_doc['frame']
+        if frame_id == 0:
+            continue
+        if frame_id not in frames:
+            frames[str(frame_id)] = 0
+        frames[str(frame_id)] += 1
+
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}},
+        '$set': {'faves': new_faves, 'frames': frames}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0}})
     await update_user_currency(user_id, reward)
 
 async def gift_cards(giver_id, rec_id, card_ids):

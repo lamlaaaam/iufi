@@ -70,7 +70,7 @@ STREAK_REWARDS       = [
 
 AUCTION_TIME         = 60  # Seconds
 
-EVENT_DROP_INTERVAL  = 1   # Hours
+EVENT_DROP_INTERVAL  = 0.5  # Hours
 EVENT_DROP_VALID     = 120  # Seconds
 
 BIO_LIMIT            = 100 # Chars
@@ -216,7 +216,7 @@ async def on_message(msg):
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
     if is_cmd and msg.channel not in bot.CHANNELS:
-        await msg.reply(f"**This game is not playable in this channel. Go to {bot.CHANNEL.mention}**")
+        await msg.reply(f"**This game is not playable in this channel. Go to one of the IUFI channels.**")
         return
     if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
         await msg.reply(f"**You are not registered.**")

@@ -42,16 +42,17 @@ class EventDropCog(commands.Cog):
         card_img        = await photocard_utils.create_photocard(card_doc)
         card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
         embed.set_image(url=card_attachment)
-        drop_msg = await self.bot.CHANNEL.send(embed=embed)
+        event_channel   = random.choice(self.bot.CHANNELS)
+        drop_msg = await event_channel.send(embed=embed)
 
         def check(m):
-            return m.channel == self.bot.CHANNEL and m.content.lower() == code_str and db_utils.sync_does_user_exist(m.author.id)
+            return m.channel == event_channel and m.content.lower() == code_str and db_utils.sync_does_user_exist(m.author.id)
 
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
             await db_utils.set_card_owner(card_doc['id'], msg.author.id)
             await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
-            await self.bot.CHANNEL.send(f"**{msg.author.mention} has won the random card drop.**")
+            await event_channel.send(f"**{msg.author.mention} has won the random card drop.**")
         except asyncio.TimeoutError:
             await db_utils.set_card_availability(card_doc['id'], True)
         finally:

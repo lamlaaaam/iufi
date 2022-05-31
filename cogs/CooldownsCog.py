@@ -58,7 +58,7 @@ class CooldownsCog(commands.Cog):
             return
         try:
             ch = await member.create_dm()
-            await ch.send(f"**Your {type} is ready! Head over to {self.bot.CHANNEL.mention} to play!**")
+            await ch.send(f"**Your {type} is ready!**")
         except discord.Forbidden:
             print("User cannot be reached for reminders.")
 

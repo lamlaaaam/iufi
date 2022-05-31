@@ -8,7 +8,7 @@ class LevelCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, msg):
-        if msg.channel == self.bot.CHANNEL and msg.content.lower().startswith('q') and await db_utils.does_user_exist(msg.author.id):
+        if msg.channel in self.bot.CHANNELS and msg.content.lower().startswith('q') and await db_utils.does_user_exist(msg.author.id):
             user_doc      = await db_utils.get_user(msg.author.id)
             level         = user_doc['level']
             exp           = user_doc['exp']
@@ -26,7 +26,7 @@ class LevelCog(commands.Cog):
                 embed           = discord.Embed(title=title, description=desc, color=discord.Color.teal())
                 embed.set_thumbnail(url=(await self.bot.GUILD.fetch_member(user_doc['discord_id'])).avatar_url)
 
-                await self.bot.CHANNEL.send(embed=embed)
+                await msg.channel.send(embed=embed)
                 await db_utils.update_user_currency(msg.author.id, level_up_reward)
 
             await db_utils.set_user_level_exp(msg.author.id, level + levels_gained, leftover_exp)

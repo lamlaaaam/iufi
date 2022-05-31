@@ -81,7 +81,7 @@ async def create_photocard(card_doc):
         frame_img = await recolour(frame_img, col)
 
     card_img.paste(frame_img, frame_img)
-    card_img = await add_corners(card_img, 40)
+    card_img = await add_corners(card_img, 45)
 
     return card_img
 

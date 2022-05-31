@@ -31,7 +31,7 @@ from   cogs.FramesCog       import FramesCog
 
 load_dotenv()
 TOKEN        = os.getenv('DISCORD_TOKEN')
-CHANNEL_ID   = os.getenv('CHANNEL_ID')
+CHANNEL_IDS  = os.getenv('CHANNEL_IDS').split('/')
 GUILD_ID     = os.getenv('GUILD_ID')
 WASTELAND_ID = os.getenv('WASTELAND_ID')
 
@@ -158,7 +158,7 @@ async def on_ready():
 
     print('We have logged in as {0.user}'.format(bot))
 
-    bot.CHANNEL   = await bot.fetch_channel(CHANNEL_ID)
+    bot.CHANNELS  = [await bot.fetch_channel(id) for id in CHANNEL_IDS]
     bot.WASTELAND = await bot.fetch_channel(WASTELAND_ID)
     bot.GUILD     = await bot.fetch_guild(GUILD_ID)
     print('Channels fetched')
@@ -205,7 +205,7 @@ async def on_ready():
     print('Cogs added')
 
     print('Bot is ready')
-    msg = await bot.CHANNEL.send('IUFI started successfully.')
+    msg = await bot.CHANNELS[0].send('IUFI started successfully.')
     ctx = await bot.get_context(msg)
     await ctx.invoke(bot.get_command('help'))
 
@@ -215,10 +215,10 @@ async def on_message(msg):
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
-    if is_cmd and msg.channel != bot.CHANNEL:
+    if is_cmd and msg.channel not in bot.CHANNELS:
         await msg.reply(f"**This game is not playable in this channel. Go to {bot.CHANNEL.mention}**")
         return
-    if msg.channel == bot.CHANNEL and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
+    if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
         await msg.reply(f"**You are not registered.**")
         return
     await bot.process_commands(msg)

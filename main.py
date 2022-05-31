@@ -211,7 +211,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(msg):
-    if msg.author == bot.user:
+    if msg.author.bot:
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid

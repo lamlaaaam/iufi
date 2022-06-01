@@ -13,10 +13,6 @@ PC_GAP    = 50
 GALL_GAP  = 50
 CARD_SIZE = (360, 640)
 
-BORDER_URL = 'overlays/border_smol.png'
-FADE_URL   = 'overlays/fade_smol.png'
-STARS_URL  = 'overlays/stars_smol.png'
-
 CLIENT_SESSION = None
 
 async def stitch_images(card_docs):
@@ -129,7 +125,7 @@ async def pillow_to_file(img):
     file = discord.File(fp=image_binary, filename='image.png')
     return file
 
-@lru_cache(size=1024)
+@lru_cache(maxsize=1024)
 async def download_url(url):
     global CLIENT_SESSION
     if not CLIENT_SESSION:

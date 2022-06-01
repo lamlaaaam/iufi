@@ -7,7 +7,7 @@ import db_utils
 from   colorthief import ColorThief
 from   PIL import Image, ImageDraw
 from   async_timeout import timeout
-from   functools import lru_cache
+from   async_lru import alru_cache
 
 PC_GAP    = 50
 GALL_GAP  = 50
@@ -125,7 +125,7 @@ async def pillow_to_file(img):
     file = discord.File(fp=image_binary, filename='image.png')
     return file
 
-@lru_cache(maxsize=1024)
+@alru_cache(maxsize=1024)
 async def download_url(url):
     global CLIENT_SESSION
     if not CLIENT_SESSION:

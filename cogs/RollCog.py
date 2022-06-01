@@ -136,11 +136,11 @@ class RollCog(commands.Cog):
             taken += 1
             already_claimed.append(i.author.id)
             await i.message.edit(components=components)
-            await i.channel.send(f'**{i.author.mention} has claimed photocard {card_index + 1}!**')
             await db_utils.set_card_availability(roll_pc_ids[card_index], False)
             await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
             await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
             await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
+            await i.channel.send(f'**{i.author.mention} has claimed photocard {card_index + 1}!**')
 
         loading_msg = await ctx.send('**Loading...**')
 

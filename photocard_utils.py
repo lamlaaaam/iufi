@@ -125,7 +125,7 @@ async def pillow_to_file(img):
     file = discord.File(fp=image_binary, filename='image.png')
     return file
 
-@alru_cache(maxsize=1024)
+@alru_cache(maxsize=64)
 async def download_url(url):
     global CLIENT_SESSION
     if not CLIENT_SESSION:

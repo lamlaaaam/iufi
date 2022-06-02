@@ -31,24 +31,21 @@ class CooldownsCog(commands.Cog):
     @commands.command(name = 'remindon', aliases = ['ron'])
     async def remind_on(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, True)
-        await ctx.send(f"**{ctx.author.mention} you have turned on reminders.**")
+        await ctx.send(f"**{ctx.author.mention} you have turned on reminders.**", delete_after=1)
 
     @commands.command(name = 'remindoff', aliases = ['roff'])
     async def remind_off(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, False)
-        await ctx.send(f"**{ctx.author.mention} you have turned off reminders.**")
+        await ctx.send(f"**{ctx.author.mention} you have turned off reminders.**", delete_after=1)
 
     @tasks.loop(minutes=1)
     async def cd_check(self):
         now       = datetime.now()
         user_docs = list(await db_utils.get_users({'reminders':True}))
         roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll'] and (now-doc['next_roll']).seconds < 65]
-        #claim_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_claim']]
         daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily'] and (now-doc['next_daily']).seconds < 65]
         for id in roll_up:
             await self.send_dm(id, "roll")
-        #for id in claim_up:
-        #    await self.send_dm(id, "claim")
         for id in daily_up:
             await self.send_dm(id, "daily")
 

@@ -9,6 +9,6 @@ class RegisterCog(commands.Cog):
     async def register(self, ctx):
         id = ctx.author.id
         if await db_utils.register_user(id):
-            await ctx.send(f'**{ctx.author.mention} has registered successfully. Welcome to IUFI!**')
+            await ctx.send(f'**{ctx.author.mention} has registered successfully. Welcome to IUFI!**', delete_after=1)
         else:
-            await ctx.send(f'**{ctx.author.mention} is already registered.**')
+            await ctx.send(f'**{ctx.author.mention} is already registered.**', delete_after=1)

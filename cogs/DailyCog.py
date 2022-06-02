@@ -19,7 +19,7 @@ class DailyCog(commands.Cog):
     async def daily(self, ctx):
         ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_daily')
         if not ok:
-            await ctx.send(f'**{ctx.author.mention} you can claim your next daily reward in {text}.**')
+            await ctx.send(f'**{ctx.author.mention} you can claim your next daily reward in {text}.**', delete_after=1)
             return
 
         user          = await self.bot.GUILD.fetch_member(ctx.author.id)

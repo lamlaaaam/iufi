@@ -36,7 +36,6 @@ class EventDropCog(commands.Cog):
         code_str = self.gen_string(5)
         code     = f"**Enter code to claim: `{code_str}`**"
         desc     = id + tag + rarity + code + '\n\n'
-        #desc    += "🌸 "*10 + '\n\n'
         embed    = discord.Embed(title=title, description=desc, color=discord.Color.random())
 
         card_img        = await photocard_utils.create_photocard(card_doc)
@@ -52,13 +51,12 @@ class EventDropCog(commands.Cog):
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
             await db_utils.set_card_owner(card_doc['id'], msg.author.id)
             await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
-            await event_channel.send(f"**{msg.author.mention} has won the random card drop.**")
+            await event_channel.send(f"**{msg.author.mention} has won the random card drop.**", delete_after=1)
         except asyncio.TimeoutError:
             await db_utils.set_card_availability(card_doc['id'], True)
         finally:
             code              = f"*This drop has expired*"
             desc              = id + tag + rarity + code + '\n\n'
-            #desc             += "🌸 "*10 + '\n\n'
             embed.description = desc
             embed.color       = discord.Color.greyple()
             await drop_msg.edit(embed=embed)

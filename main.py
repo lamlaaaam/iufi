@@ -216,10 +216,10 @@ async def on_message(msg):
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
     if is_cmd and msg.channel not in bot.CHANNELS:
-        await msg.reply(f"**This game is not playable in this channel. Go to one of the IUFI channels.**")
+        await ctx.send(f"**This command is not usable here. Go to one of the IUFI channels.**")
         return
     if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
-        await msg.reply(f"**You are not registered.**")
+        await ctx.send(f"**You are not registered.**")
         return
     await bot.process_commands(msg)
 

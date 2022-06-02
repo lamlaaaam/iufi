@@ -23,12 +23,6 @@ class ShopCog(commands.Cog):
         title         = "**🛒   IUFI Shop**"
         desc          = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
         desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
-        #desc          = f"**```{desc}```**"
-        #shop_desc     = ""
-        #for emoji, name, price, _, _ in self.shop_list:
-        #    shop_desc += f"{name:<20}{str(price)+' 🍬':<10}\n"
-        #shop_desc     = f"```{shop_desc}```"
-        #desc         += shop_desc
         embed         = discord.Embed(title=title, description=desc, color=discord.Color.red())
 
         embed.set_thumbnail(url=user.avatar_url)
@@ -44,13 +38,13 @@ class ShopCog(commands.Cog):
 
         async def buy(i):
             nonlocal shop_msg
-            _, name, price, _, effect = self.shop_list[i]
+            emoji, name, price, _, effect = self.shop_list[i]
             if (await db_utils.get_user(id))['currency'] >= price:
                 await db_utils.update_user_currency(id, -price)
                 await effect(id)
-                await ctx.send(f"**{ctx.author.mention} you have purchased a {name}.**", delete_after=3)
+                await ctx.send(f"**{ctx.author.mention} you have purchased `{emoji} {name}`.**", delete_after=1)
             else:
-                await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=3)
+                await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=1)
 
             desc              = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
             desc             += f"**🍬 Starcandies: `{(await db_utils.get_user(id))['currency']}`\n**"

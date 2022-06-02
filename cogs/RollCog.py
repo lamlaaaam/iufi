@@ -27,7 +27,7 @@ class RollCog(commands.Cog):
         bucket = self._cd.get_bucket(ctx.message)
         retry_after = bucket.update_rate_limit()
         if retry_after:
-            await ctx.send(f"**{ctx.author.mention} you rolled a little too close to someone else, try again in {round(retry_after)} second(s).**")
+            await ctx.send(f"**{ctx.author.mention} you rolled a little too close to someone else, try again in {round(retry_after)} second(s).**", delete_after=1)
             return False
         return True
 
@@ -35,10 +35,10 @@ class RollCog(commands.Cog):
     async def roll(self, ctx):
         ok, text = await db_utils.check_cooldown(ctx.author.id, 'next_roll')
         if not ok:
-            await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**')
+            await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**', delete_after=1)
             return
         if not await db_utils.check_pool_exists(0):
-            await ctx.send(f'**{ctx.author.mention} the card pool is empty. Your roll has not been consumed.**')
+            await ctx.send(f'**{ctx.author.mention} the card pool is empty. Your roll has not been consumed.**', delete_after=1)
             return
 
         await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
@@ -53,10 +53,10 @@ class RollCog(commands.Cog):
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['rare_rolls']
         if roll_amount <= 0:
-            await ctx.send(f"**{ctx.author.mention} you do not have any rare rolls to use.**")
+            await ctx.send(f"**{ctx.author.mention} you do not have any rare rolls to use.**", delete_after=1)
             return
         if not await db_utils.check_pool_exists(1):
-            await ctx.send(f'**{ctx.author.mention} the rare card pool is empty. Your roll has not been consumed.**')
+            await ctx.send(f'**{ctx.author.mention} the rare card pool is empty. Your roll has not been consumed.**', delete_after=1)
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', -1)
@@ -70,10 +70,10 @@ class RollCog(commands.Cog):
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['epic_rolls']
         if roll_amount <= 0:
-            await ctx.send(f"**{ctx.author.mention} you do not have any epic rolls to use.**")
+            await ctx.send(f"**{ctx.author.mention} you do not have any epic rolls to use.**", delete_after=1)
             return
         if not await db_utils.check_pool_exists(2):
-            await ctx.send(f'**{ctx.author.mention} the epic card pool is empty. Your roll has not been consumed.**')
+            await ctx.send(f'**{ctx.author.mention} the epic card pool is empty. Your roll has not been consumed.**', delete_after=1)
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', -1)
@@ -87,10 +87,10 @@ class RollCog(commands.Cog):
         user_doc = await db_utils.get_user(ctx.author.id)
         roll_amount = user_doc['legend_rolls']
         if roll_amount <= 0:
-            await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**")
+            await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**", delete_after=1)
             return
         if not await db_utils.check_pool_exists(3):
-            await ctx.send(f'**{ctx.author.mention} the legendary card pool is empty. Your roll has not been consumed.**')
+            await ctx.send(f'**{ctx.author.mention} the legendary card pool is empty. Your roll has not been consumed.**', delete_after=1)
             return
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
@@ -110,20 +110,20 @@ class RollCog(commands.Cog):
         async def button_check(i: discord.ComponentInteraction, com):
             if not await db_utils.does_user_exist(i.author.id):
                 await i.channel.send(f'**{i.author.mention} you have not registered.**',
-                                     delete_after = 3)
+                                     delete_after = 1)
                 return False
             if i.author.id in already_claimed:
                 await i.channel.send(f'**{i.author.mention} you have already claimed from this roll.**',
-                                     delete_after = 3)
+                                     delete_after = 1)
                 return False
             ok, text = await db_utils.check_cooldown(i.author.id, 'next_claim')
             if not ok:
                 await i.channel.send(f'**{i.author.mention} you can claim another photocard in {text}.**', 
-                                     delete_after = 3)
+                                     delete_after = 1)
                 return False
             if roll_headstart_id != None and i.author.id != roll_headstart_id:
                 await i.channel.send(f'**{i.author.mention} the first {self.roll_headstart_time} seconds are exclusive to the roll starter!**',
-                                     delete_after = 3)
+                                     delete_after = 1)
                 return False
             return True
 
@@ -140,7 +140,11 @@ class RollCog(commands.Cog):
             await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
             await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
             await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
-            await i.channel.send(f'**{i.author.mention} has claimed photocard {card_index + 1}!**')
+            doc    = roll_pc_docs[card_index]
+            no     = card_index + 1
+            id     = doc['id']
+            rarity = self.bot.RARITY[doc['rarity']]
+            await i.channel.send(f'**{i.author.mention} has claimed `Card [{no}] 🆔 {id:04} {rarity}`**')
 
         loading_msg = await ctx.send('**Loading...**')
 
@@ -149,13 +153,13 @@ class RollCog(commands.Cog):
         print('Rolled', roll_pc_docs)
 
         if len(roll_pc_docs) == 0:
-            await ctx.send('**The pool is empty!**')
+            await ctx.send('**The pool is empty!**', delete_after=1)
             await loading_msg.delete()
             return
         stitched_img = await photocard_utils.stitch_images(roll_pc_docs)
         if stitched_img == None:
             await loading_msg.delete()
-            await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**")
+            await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**", delete_after=1)
             return False
         stitched_img = await photocard_utils.pillow_to_file(stitched_img)
 

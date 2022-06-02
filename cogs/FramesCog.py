@@ -8,16 +8,16 @@ class FramesCog(commands.Cog):
         self.bot = bot
 
     async def card_not_found_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=2)
 
     async def card_not_owned_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} you do not own this card.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you do not own this card.**", delete_after=2)
 
     async def frame_not_found_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} this frame does not exist.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} this frame does not exist.**", delete_after=2)
 
     async def frame_not_owned_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} you do not own this frame.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you do not own this frame.**", delete_after=2)
 
     async def get_last_card_id(self, user_id):
         user_doc = await db_utils.get_user(user_id)
@@ -33,7 +33,7 @@ class FramesCog(commands.Cog):
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.update_user_frames(ctx.author.id, frame_doc['id'], -1)
         await db_utils.set_card_frame(card_id_tag, frame_id_tag)
-        await ctx.send(f"**{ctx.author.mention} you have successfully set a frame.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you have successfully set a frame.**", delete_after=2)
 
     @commands.command(name = 'setframe', aliases = ['sfr'])
     async def set_frame(self, ctx, card_id_tag, frame_id_tag):
@@ -67,7 +67,7 @@ class FramesCog(commands.Cog):
         if card_doc['frame'] != 0:
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.set_card_frame(card_id_tag)
-        await ctx.send(f"**{ctx.author.mention} you have successfully removed the frame.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you have successfully removed the frame.**", delete_after=2)
 
     @commands.command(name = 'setframelast', aliases = ['sfrl'])
     async def set_frame_last(self, ctx, frame_id_tag):
@@ -75,7 +75,7 @@ class FramesCog(commands.Cog):
         frame_doc = await db_utils.get_frame(frame_id_tag)
         user_doc  = await db_utils.get_user(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=1)
+            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         if frame_doc == None:
             await self.frame_not_found_error(ctx)

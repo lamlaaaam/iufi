@@ -42,9 +42,9 @@ class ShopCog(commands.Cog):
             if (await db_utils.get_user(id))['currency'] >= price:
                 await db_utils.update_user_currency(id, -price)
                 await effect(id)
-                await ctx.send(f"**{ctx.author.mention} you have purchased `{emoji} {name}`.**", delete_after=1)
+                await ctx.send(f"**{ctx.author.mention} you have purchased `{emoji} {name}`.**", delete_after=2)
             else:
-                await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=1)
+                await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=2)
 
             desc              = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
             desc             += f"**🍬 Starcandies: `{(await db_utils.get_user(id))['currency']}`\n**"

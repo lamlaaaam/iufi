@@ -16,16 +16,16 @@ class AuctionCog(commands.Cog):
         self.auction_starter = None
 
     async def card_not_found_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=2)
 
     async def card_not_owned_error(self, ctx):
-        await ctx.send(f"**{ctx.author.mention} you do not own this card.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you do not own this card.**", delete_after=2)
 
     @commands.command(name = 'auction', aliases = ['a'])
     @commands.cooldown(1, 60, commands.BucketType.channel)
     async def auction(self, ctx, id_tag, min_bid=0):
         if self.auction_msg != None:
-            await ctx.send(f"**{ctx.author.mention} there is an ongoing auction. Please wait for it to end.**", delete_after=1)
+            await ctx.send(f"**{ctx.author.mention} there is an ongoing auction. Please wait for it to end.**", delete_after=2)
             self.auction.reset_cooldown(ctx)
             return
 
@@ -86,11 +86,11 @@ class AuctionCog(commands.Cog):
                 await db_utils.remove_card_from_user(ctx.author.id, card_doc['id'])
                 await db_utils.add_card_to_user(self.highest_bidder.id, card_doc['id'])
                 await db_utils.set_card_owner(card_doc['id'], self.highest_bidder.id)
-                await ctx.send(f"**{self.highest_bidder.mention} has won the auction with a winning bid of {self.highest_bid} starcandies.**", delete_after=1)
+                await ctx.send(f"**{self.highest_bidder.mention} has won the auction with a winning bid of {self.highest_bid} starcandies.**", delete_after=2)
             else:
-                await ctx.send(f"**The auction transaction has failed.**", delete_after=1)
+                await ctx.send(f"**The auction transaction has failed.**", delete_after=2)
         else:
-            await ctx.send(f"**{ctx.author.mention} no one bidded for your photocard.**", delete_after=1)
+            await ctx.send(f"**{ctx.author.mention} no one bidded for your photocard.**", delete_after=2)
 
         self.highest_bidder  = None
         self.highest_bid     = 0
@@ -99,20 +99,20 @@ class AuctionCog(commands.Cog):
     @commands.command(name = 'bid', aliases = ['bi'])
     async def bid(self, ctx, amt: int):
         if self.auction_msg == None:
-            await ctx.send(f'**{ctx.author.mention} there is no ongoing auction.**', delete_after=1)
+            await ctx.send(f'**{ctx.author.mention} there is no ongoing auction.**', delete_after=2)
             return
         if ctx.author == self.auction_starter:
-            await ctx.send(f'**{ctx.author.mention} you cannot bid for your own auction.**', delete_after=1)
+            await ctx.send(f'**{ctx.author.mention} you cannot bid for your own auction.**', delete_after=2)
             return
         user_doc = await db_utils.get_user(ctx.author.id)
         currency = user_doc['currency']
         if amt <= 0 or amt > currency:
-            await ctx.send(f'**{ctx.author.mention} invalid amount for bidding.**', delete_after=1)
+            await ctx.send(f'**{ctx.author.mention} invalid amount for bidding.**', delete_after=2)
             return
         if amt <= self.highest_bid:
-            await ctx.send(f'**{ctx.author.mention} you must bid higher than {self.highest_bid}.**', delete_after=1)
+            await ctx.send(f'**{ctx.author.mention} you must bid higher than {self.highest_bid}.**', delete_after=2)
             return
         
         self.highest_bidder = ctx.author
         self.highest_bid    = amt
-        await ctx.send(f'**{ctx.author.mention} you have successfully placed a bid.**', delete_after=1)
+        await ctx.send(f'**{ctx.author.mention} you have successfully placed a bid.**', delete_after=2)

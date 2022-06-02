@@ -14,7 +14,7 @@ class FavesCog(commands.Cog):
             user = await self.bot.GUILD.fetch_member(id)
         else:
             if not await db_utils.does_user_exist(user.id):
-                await ctx.send(f"**{ctx.author.mention} The user provided is not registered.**", delete_after=1)
+                await ctx.send(f"**{ctx.author.mention} The user provided is not registered.**", delete_after=2)
                 return
             id = user.id
 
@@ -22,7 +22,7 @@ class FavesCog(commands.Cog):
         faves      = user_doc['faves']
 
         if len([f for f in faves if f != None]) == 0:
-            await ctx.send(f"**{user.mention} has not set any favorites.**", delete_after=1)
+            await ctx.send(f"**{user.mention} has not set any favorites.**", delete_after=2)
             return
 
         cards_docs   = list(await db_utils.get_cards({'id': {'$in': faves}}))

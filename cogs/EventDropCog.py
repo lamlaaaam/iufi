@@ -51,7 +51,7 @@ class EventDropCog(commands.Cog):
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
             await db_utils.set_card_owner(card_doc['id'], msg.author.id)
             await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
-            await event_channel.send(f"**{msg.author.mention} has won the random card drop.**", delete_after=1)
+            await event_channel.send(f"**{msg.author.mention} has won the random card drop.**", delete_after=2)
         except asyncio.TimeoutError:
             await db_utils.set_card_availability(card_doc['id'], True)
         finally:

@@ -31,12 +31,12 @@ class CooldownsCog(commands.Cog):
     @commands.command(name = 'remindon', aliases = ['ron'])
     async def remind_on(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, True)
-        await ctx.send(f"**{ctx.author.mention} you have turned on reminders.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you have turned on reminders.**", delete_after=2)
 
     @commands.command(name = 'remindoff', aliases = ['roff'])
     async def remind_off(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, False)
-        await ctx.send(f"**{ctx.author.mention} you have turned off reminders.**", delete_after=1)
+        await ctx.send(f"**{ctx.author.mention} you have turned off reminders.**", delete_after=2)
 
     @tasks.loop(minutes=1)
     async def cd_check(self):

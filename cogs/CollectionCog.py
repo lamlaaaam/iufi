@@ -53,7 +53,7 @@ class CollectionCog(commands.Cog):
         num_pages       = len(pages)
 
         if collection_size == 0:
-            await ctx.send(f'**{user.mention} you have no photocards.**', delete_after=1)
+            await ctx.send(f'**{user.mention} you have no photocards.**', delete_after=2)
             return
 
         title = f"📖   {user.display_name}'s Photocards"

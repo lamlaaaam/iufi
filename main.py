@@ -155,7 +155,6 @@ DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
 
 @bot.event
 async def on_ready():
-
     print('We have logged in as {0.user}'.format(bot))
 
     bot.CHANNELS  = [await bot.fetch_channel(id) for id in CHANNEL_IDS]
@@ -215,11 +214,13 @@ async def on_message(msg):
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
+    if is_cmd:
+        await msg.delete()
     if is_cmd and msg.channel not in bot.CHANNELS:
-        await ctx.send(f"**This command is not usable here. Go to one of the IUFI channels.**")
+        await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
         return
     if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
-        await ctx.send(f"**You are not registered.**")
+        await ctx.send(f"**{msg.author.mention} You are not registered. Use `qregister` to start.**", delete_after=3)
         return
     await bot.process_commands(msg)
 

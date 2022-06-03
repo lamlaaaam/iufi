@@ -70,7 +70,7 @@ STREAK_REWARDS       = [
 
 AUCTION_TIME         = 60  # Seconds
 
-EVENT_DROP_INTERVAL  = 0.5  # Hours
+EVENT_DROP_INTERVAL  = 1 / len(CHANNEL_IDS)  # Hours
 EVENT_DROP_VALID     = 120  # Seconds
 
 BIO_LIMIT            = 100 # Chars

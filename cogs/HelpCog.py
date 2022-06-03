@@ -19,5 +19,6 @@ class HelpCog(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         components = [[Button(emoji='🐦', label = 'Twitter', url = 'https://twitter.com/ui8ball', style = ButtonStyle.url),
                        Button(emoji='💻', label = 'Github', url = 'https://github.com/lamlaaaam', style = ButtonStyle.url),
+                       Button(emoji='🍕', label = 'Donate', url = 'https://paypal.me/sendpizzatolam?country.x=SG&locale.x=en_GB', style = ButtonStyle.url),
                        Button(emoji='📗', label = 'Beginner Guide', url = 'https://docs.google.com/document/d/1VAD20wZQ56S_wDeMJlwIKn_jImIPuxh2lgy1fn17z0c/edit?usp=sharing', style = ButtonStyle.url)]]
         await ctx.send(embed=embed, components=components)

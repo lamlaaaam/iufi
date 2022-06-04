@@ -73,7 +73,6 @@ async def does_user_exist(q):
 async def register_user(id):
     if await does_user_exist(id):
         return False
-<<<<<<< HEAD
     players_col.insert_one({'discord_id'   : id,
                             'collection'   : [],
                             'level'        : 1, 
@@ -92,26 +91,6 @@ async def register_user(id):
                             'bio'          : "Your bio is empty.",
                             'reminders'    : False,
                             'frames'       : {}})
-=======
-    await players_col.insert_one({'discord_id'   : id,
-                                   'collection'   : [],
-                                   'level'        : 1, 
-                                   'exp'          : 0,
-                                   'currency'     : 0,
-                                   'main'         : 0,
-                                   'next_claim'   : datetime.now(),
-                                   'next_roll'    : datetime.now(),
-                                   'next_daily'   : datetime.now(),
-                                   'streak_ends'  : datetime.now(),
-                                   'streak'       : 1,
-                                   'faves'        : [],
-                                   'rare_rolls'   : 0,
-                                   'epic_rolls'   : 0,
-                                   'legend_rolls' : 0,
-                                   'bio'          : "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!",
-                                   'reminders'    : False,
-                                   'frames'       : {}})
->>>>>>> motor
     return True
 
 async def add_card_to_user(user_id, card_id):

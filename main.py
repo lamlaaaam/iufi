@@ -68,7 +68,7 @@ STREAK_REWARDS       = [
     ("1 Legendary Roll", lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1))
 ]
 
-AUCTION_TIME         = 60  # Seconds
+AUCTION_TIME         = 30  # Seconds
 
 EVENT_DROP_INTERVAL  = 1 / len(CHANNEL_IDS)  # Hours
 EVENT_DROP_VALID     = 120  # Seconds

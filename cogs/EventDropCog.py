@@ -49,7 +49,7 @@ class EventDropCog(commands.Cog):
         drop_msg = await event_channel.send(embed=embed)
 
         def check(m):
-            return m.channel == event_channel and m.content.lower() == code_str and db_utils.sync_does_user_exist(m.author.id)
+            return m.channel == event_channel and m.content.lower() == code_str
 
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)

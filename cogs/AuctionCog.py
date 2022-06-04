@@ -26,7 +26,7 @@ class AuctionCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you do not own this card.**", delete_after=2)
 
     @commands.command(name = 'auction', aliases = ['a'])
-    @commands.cooldown(1, 60, commands.BucketType.channel)
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     async def auction(self, ctx, id_tag, min_bid=0):
         if self.auction_msg != None:
             await ctx.send(f"**{ctx.author.mention} there is an ongoing auction. Please wait for it to end.**", delete_after=2)
@@ -94,7 +94,7 @@ class AuctionCog(commands.Cog):
             else:
                 await ctx.send(f"**The auction transaction has failed.**", delete_after=2)
         else:
-            await ctx.send(f"**{ctx.author.mention} no one bidded for your photocard.**", delete_after=2)
+            await ctx.send(f"**{ctx.author.mention} no one bid on your photocard.**", delete_after=2)
 
         self.highest_bidder  = None
         self.highest_bid     = 0

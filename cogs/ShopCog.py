@@ -35,10 +35,8 @@ class ShopCog(commands.Cog):
             ch = await user.create_dm()
             shop_msg = await ch.send(embed=embed, components=components)
         except discord.Forbidden:
-            await ctx.send("**{user.mention} you do not have DMs enabled. Enable it for access to the shop.**", delete_after=2)
+            await ctx.send(f"**{user.mention} you do not have DMs enabled. Enable it for access to the shop.**", delete_after=2)
             return
-
-        #shop_msg = await ctx.send(embed=embed, components=components)
 
         def check(i: discord.ComponentInteraction, com):
             return i.author == ctx.author and i.message.id == shop_msg.id
@@ -49,10 +47,8 @@ class ShopCog(commands.Cog):
             if (await db_utils.get_user(id))['currency'] >= price:
                 await db_utils.update_user_currency(id, -price)
                 await effect(id)
-                #await ctx.send(f"**{ctx.author.mention} you have purchased `{emoji} {name}`.**", delete_after=2)
                 await ch.send(f"**You have purchased `{emoji} {name}`.**", delete_after=2)
             else:
-                #await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=2)
                 await ch.send(f"**You do not have enough starcandies.**", delete_after=2)
 
             desc              = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"

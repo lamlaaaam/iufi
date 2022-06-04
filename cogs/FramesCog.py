@@ -1,3 +1,6 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 import db_utils
 import discord
 import photocard_utils
@@ -6,6 +9,8 @@ from   discord.ext import commands
 class FramesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.thread_pool = ThreadPoolExecutor()
+        self.loop        = asyncio.get_running_loop()
 
     async def card_not_found_error(self, ctx):
         await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=2)
@@ -98,8 +103,8 @@ class FramesCog(commands.Cog):
         desc   = id + tag + '\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
-        frame_img        = await photocard_utils.create_frame(frame_doc)
-        frame_attachment = await photocard_utils.pillow_to_attachment(frame_img, self.bot.WASTELAND)
+        frame_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_frame, frame_doc)))
+        frame_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, frame_img, self.bot.WASTELAND)))
         embed.set_image(url=frame_attachment)
 
         await ctx.send(embed=embed)

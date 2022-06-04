@@ -1,4 +1,6 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 import random
 import string
 import db_utils
@@ -13,6 +15,8 @@ class EventDropCog(commands.Cog):
         self.valid_time = valid_time
         self.event_drop.change_interval(hours=interval)
         self.event_drop.start()
+        self.thread_pool = ThreadPoolExecutor()
+        self.loop        = asyncio.get_running_loop()
 
     def gen_string(self, l):
         s = ''.join(random.choices(string.ascii_lowercase + string.digits, k=l))
@@ -38,8 +42,8 @@ class EventDropCog(commands.Cog):
         desc     = id + tag + rarity + code + '\n\n'
         embed    = discord.Embed(title=title, description=desc, color=discord.Color.random())
 
-        card_img        = await photocard_utils.create_photocard(card_doc)
-        card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
+        card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
+        card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
         embed.set_image(url=card_attachment)
         event_channel   = random.choice(self.bot.CHANNELS)
         drop_msg = await event_channel.send(embed=embed)

@@ -1,3 +1,6 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 import db_utils
 import photocard_utils
 import discord
@@ -6,6 +9,8 @@ from   discord.ext import commands
 class FavesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.thread_pool = ThreadPoolExecutor()
+        self.loop        = asyncio.get_running_loop()
 
     @commands.command(name = 'faves', aliases = ['f'])
     async def faves(self, ctx, user: discord.Member=None):
@@ -50,8 +55,8 @@ class FavesCog(commands.Cog):
                 desc  += f" \n"
         desc  = "```\n" + desc + "```\n"
 
-        img        = await photocard_utils.stitch_gallery(faves_sorted, 2, 3)
-        attachment = await photocard_utils.pillow_to_attachment(img, self.bot.WASTELAND)
+        img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_gallery, faves_sorted, 2, 3)))
+        attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, img, self.bot.WASTELAND)))
         title      = f"**❤️   {user.display_name}'s Favorite Photocards**"
         embed      = discord.Embed(title=title, description=desc, color=discord.Color.dark_green())
         embed.set_image(url=attachment)

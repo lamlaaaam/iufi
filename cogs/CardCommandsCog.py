@@ -1,3 +1,6 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 import re
 import db_utils
 import photocard_utils
@@ -8,6 +11,8 @@ class CardCommandsCog(commands.Cog):
     def __init__(self, bot):
         self.bot       = bot
         self.tag_limit = 10
+        self.thread_pool = ThreadPoolExecutor()
+        self.loop        = asyncio.get_running_loop()
 
     async def card_not_found_error(self, ctx):
         await ctx.send(f"**{ctx.author.mention} this card does not exist.**", delete_after=2)
@@ -32,8 +37,8 @@ class CardCommandsCog(commands.Cog):
         desc   = id + tag + frame + rarity + owned + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
-        card_img        = await photocard_utils.create_photocard(card_doc)
-        card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
+        card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
+        card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
         embed.set_image(url=card_attachment)
 
         try:

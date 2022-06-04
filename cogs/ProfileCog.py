@@ -1,3 +1,6 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 import db_utils
 import photocard_utils
 import discord
@@ -5,8 +8,10 @@ from   discord.ext import commands
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot, bio_limit):
-        self.bot       = bot
-        self.bio_limit = bio_limit
+        self.bot         = bot
+        self.bio_limit   = bio_limit
+        self.loop        = asyncio.get_running_loop()
+        self.thread_pool = ThreadPoolExecutor()
 
     @commands.command(name = 'profile', aliases = ['p'])
     async def profile(self, ctx, user: discord.Member=None):
@@ -38,8 +43,8 @@ class ProfileCog(commands.Cog):
         embed.set_thumbnail(url=user.avatar_url)
 
         if main_card_doc:
-            card_img        = await photocard_utils.create_photocard(main_card_doc)
-            card_attachment = await photocard_utils.pillow_to_attachment(card_img, self.bot.WASTELAND)
+            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, main_card_doc)))
+            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
             embed.set_image(url=card_attachment)
         await ctx.send(embed = embed)
 

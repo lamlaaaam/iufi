@@ -1,7 +1,9 @@
 import asyncio
+from functools import partial
 import discord
 import db_utils
 import photocard_utils
+import concurrent.futures
 from   discord.ext   import commands
 from   discord       import Button, ButtonStyle
 from   async_timeout import timeout
@@ -21,6 +23,8 @@ class RollCog(commands.Cog):
         self.roll_headstart_time = roll_headstart_time
         self.roll_cooldown       = roll_cooldown
         self.roll_claim_cooldown = roll_claim_cooldown
+        self.loop                = asyncio.get_running_loop()
+        self.thread_pool         = concurrent.futures.ThreadPoolExecutor()
         self._cd = commands.CooldownMapping.from_cooldown(1, roll_common_cooldown, commands.BucketType.channel)
 
     async def cog_check(self, ctx):
@@ -156,12 +160,12 @@ class RollCog(commands.Cog):
             await ctx.send('**The pool is empty!**', delete_after=2)
             await loading_msg.delete()
             return
-        stitched_img = await photocard_utils.stitch_images(roll_pc_docs)
+        stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_images, roll_pc_docs)))
         if stitched_img == None:
             await loading_msg.delete()
             await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**", delete_after=2)
             return False
-        stitched_img = await photocard_utils.pillow_to_file(stitched_img)
+        stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_file, stitched_img)))
 
         await loading_msg.delete()
 

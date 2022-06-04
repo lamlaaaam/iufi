@@ -94,7 +94,7 @@ async def register_user(id):
                             'rare_rolls'   : 0,
                             'epic_rolls'   : 0,
                             'legend_rolls' : 0,
-                            'bio'          : "Your bio is empty.\nUse qsetbio \"bio\" to let others know more about you!",
+                            'bio'          : "Your bio is empty.",
                             'reminders'    : False,
                             'frames'       : {}})
     return True

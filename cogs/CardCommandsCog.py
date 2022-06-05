@@ -30,9 +30,12 @@ class CardCommandsCog(commands.Cog):
         tag    = f"**🏷️   `{card_doc['tag']}`**\n"
         frame  = f"**🖼️   `{frame_doc['tag']}`**\n"
         rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
-        scount = card_doc['stars']
-        stars  = '⭐' * scount + '⚫' * (self.bot.STARS_MAX-scount)
-        stars  = '**✨   `' + stars + '`**\n\n'
+        if card_doc['owned_by'] != None:
+            scount = card_doc['stars']
+            stars  = '⭐' * scount + '⚫' * (self.bot.STARS_MAX-scount)
+            stars  = '**✨   `' + stars + '`**\n\n'
+        else:
+            stars = '\n'
         try:
             owner  = await self.bot.GUILD.fetch_member(card_doc['owned_by'])
             owned  = f"**Owned by:   `{owner.display_name}`**"

@@ -146,7 +146,7 @@ class RollCog(commands.Cog):
             if (await db_utils.get_card(id))['available']:
                 already_claimed.append(i.author.id)
                 taken += 1
-                stars = random.randint(1, self.bot.STARS_MAX)
+                stars = random.randint(1, self.bot.STARS_MAX // 2)
                 stars_str = '⭐' * stars + '⚫' * (self.bot.STARS_MAX-stars)
                 await db_utils.set_card_stars(roll_pc_ids[card_index], stars)
                 await db_utils.set_card_availability(roll_pc_ids[card_index], False)

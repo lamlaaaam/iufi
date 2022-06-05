@@ -51,7 +51,7 @@ class FavesCog(commands.Cog):
                 frame  = f"🖼️{f}"
                 rarity = f"{self.bot.RARITY[d['rarity']]}"
                 stars  = f"✨{d['stars']}"
-                desc  += f"{id:<6}|{tag:<12}|{frame:<4}|{stars:<4}|{rarity:<1}\n"
+                desc  += f"{id:<5}|{tag:<11}|{frame:<3}|{stars:<3}|{rarity:<1}\n"
             else:
                 desc  += f" \n"
         desc  = "```\n" + desc + "```\n"

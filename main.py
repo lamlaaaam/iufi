@@ -146,6 +146,7 @@ bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 bot.STARS_MAX   = 10
 bot.STARS_PROB  = [90, 80, 70, 60, 50, 40, 30, 20, 10] # Out of 100; Prob to get to next star
+bot.BS          = '<:blackstar:982954535632916540>'
 
 BOL      = 406986532205887488
 HAZE     = 95608676441661440

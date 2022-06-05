@@ -144,7 +144,7 @@ class CardCommandsCog(commands.Cog):
     @commands.command(name = 'convert', aliases = ['c'])
     async def convert(self, ctx, *id_tags):
         id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
-        valid_docs = list(await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]}))
+        valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]})
         success    = len(valid_docs)
         fail       = len(id_tags) - success
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
@@ -197,7 +197,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
-        valid_docs = list(await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]}))
+        valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]})
         success    = len(valid_docs)
         fail       = len(id_tags) - success
         card_ids   = [doc['id'] for doc in valid_docs]

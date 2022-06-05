@@ -42,7 +42,7 @@ class CollectionCog(commands.Cog):
         user_doc          = await db_utils.get_user(id)
         user_collection   = user_doc['collection']
         cards_docs_dict   = {}
-        cards_docs        = list(await db_utils.get_cards({'owned_by': id}))
+        cards_docs        = await db_utils.get_cards({'owned_by': id})
         cards_docs_sorted = [None] * len(cards_docs)
         for doc in cards_docs:
             cards_docs_dict[doc['id']] = doc

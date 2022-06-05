@@ -30,7 +30,7 @@ class FavesCog(commands.Cog):
             await ctx.send(f"**{user.mention} has not set any favorites.**", delete_after=2)
             return
 
-        cards_docs   = list(await db_utils.get_cards({'id': {'$in': faves}}))
+        cards_docs   = await db_utils.get_cards({'id': {'$in': faves}})
         faves_dict   = {}
         faves_sorted = [None] * 6
         for doc in cards_docs:

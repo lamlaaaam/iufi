@@ -41,7 +41,7 @@ class CooldownsCog(commands.Cog):
     @tasks.loop(minutes=1)
     async def cd_check(self):
         now       = datetime.now()
-        user_docs = list(await db_utils.get_users({'reminders':True}))
+        user_docs = await db_utils.get_users({'reminders':True})
         roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll'] and (now-doc['next_roll']).seconds < 60]
         daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily'] and (now-doc['next_daily']).seconds < 60]
         for id in roll_up:

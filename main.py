@@ -48,8 +48,8 @@ bot.TEMP_PATH = 'temp/'
 
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
-ROLL_COOLDOWN        = 0.2  # Minutes
-ROLL_CLAIM_COOLDOWN  = 0.1   # Minutes
+ROLL_COOLDOWN        = 10  # Minutes
+ROLL_CLAIM_COOLDOWN  = 3   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 3   # Seconds
 
@@ -70,7 +70,7 @@ STREAK_REWARDS       = [
 
 AUCTION_TIME         = 30  # Seconds
 
-EVENT_DROP_INTERVAL  = 1 / len(CHANNEL_IDS)  # Hours
+EVENT_DROP_INTERVAL  = 1    # Hours
 EVENT_DROP_VALID     = 120  # Seconds
 
 BIO_LIMIT            = 100 # Chars

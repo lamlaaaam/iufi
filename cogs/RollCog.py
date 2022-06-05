@@ -137,20 +137,19 @@ class RollCog(commands.Cog):
         async def handle_claim(i, button, card_index):
             nonlocal taken
             components[0][card_index].disabled = True
-            taken += 1
-            already_claimed.append(i.author.id)
-            await i.message.edit(components=components)
-            await db_utils.set_card_availability(roll_pc_ids[card_index], False)
-            await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
-            await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
-            await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
             doc    = roll_pc_docs[card_index]
             no     = card_index + 1
             id     = doc['id']
             rarity = self.bot.RARITY[doc['rarity']]
-            await i.channel.send(f'**{i.author.mention} has claimed `Card [{no}] 🆔 {id:04} {rarity}`**')
-
-        loading_msg = await ctx.send('**Loading...**')
+            await i.message.edit(components=components)
+            if (await db_utils.get_card(id))['available']:
+                already_claimed.append(i.author.id)
+                taken += 1
+                await db_utils.set_card_availability(roll_pc_ids[card_index], False)
+                await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
+                await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
+                await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
+                await i.channel.send(f'**{i.author.mention} has claimed `Card [{no}] 🆔 {id:04} {rarity}`**')
 
         roll_pc_docs = [doc for doc in await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)]
         roll_pc_ids  = [doc['id'] for doc in roll_pc_docs]
@@ -158,16 +157,12 @@ class RollCog(commands.Cog):
 
         if len(roll_pc_docs) == 0:
             await ctx.send('**The pool is empty!**', delete_after=2)
-            await loading_msg.delete()
             return
         stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_images, roll_pc_docs)))
         if stitched_img == None:
-            await loading_msg.delete()
             await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**", delete_after=2)
             return False
         stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_file, stitched_img)))
-
-        await loading_msg.delete()
 
         roll_headstart_id = ctx.author.id
 

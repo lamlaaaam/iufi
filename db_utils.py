@@ -33,6 +33,14 @@ def drop_players(cluster):
     if players_col.count_documents({}) > 0:
         players_col.drop()
 
+def drop_frames(cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    frames_col  = iufi_db['Frames']
+    if frames_col.count_documents({}) > 0:
+        frames_col.drop()
+
 def setup_cards(rarity, start_id, end_id, cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
     client       = pymongo.MongoClient(MONGO_STRING)

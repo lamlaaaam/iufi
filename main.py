@@ -138,7 +138,7 @@ SHOP_LIST = [
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
 bot.RARITY_NAME = ['Common', 'Rare', 'Epic', 'Legendary']
-bot.RARITY_SC   = [1, 5, 50, 500]
+bot.RARITY_SC   = [1, 5, 50, 300]
 bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 BOL      = 406986532205887488

@@ -197,8 +197,8 @@ def add_corners(im, rad):
 #        #print('done', i)
 #        i += 1
 
-d = 'E:\\cards\\310522\\New Legendary'
-i = 6565
+d = 'E:\\cards\\legendary_out'
+i = 6401
 for filename in os.listdir(d):
     f = os.path.join(d, filename)
     # checking if it is a file

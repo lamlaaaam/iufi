@@ -15,12 +15,14 @@ class InventoryCog(commands.Cog):
         rare_rolls       = user_doc['rare_rolls']
         epic_rolls       = user_doc['epic_rolls']
         legend_rolls     = user_doc['legend_rolls']
+        upgrades         = user_doc['upgrades']
         frames           = {(await db_utils.get_frame(int(id)))['tag']: count for id, count in user_doc['frames'].items() if count > 0}
         title            = f"**👜   {user.display_name}'s Inventory**"
         s                = f"{'🍬 Starcandies':<20}{'x'+str(currency):<5}\n"
         s               += f"{'🌸 Rare rolls':<20}{'x'+str(rare_rolls):<5}\n"
         s               += f"{'💎 Epic rolls':<20}{'x'+str(epic_rolls):<5}\n"
-        s               += f"{'👑 Legend rolls':<20}{'x'+str(legend_rolls):<5}\n\n"
+        s               += f"{'👑 Legend rolls':<20}{'x'+str(legend_rolls):<5}\n"
+        s               += f"{'🔨 Upgrades':<20}{'x'+str(upgrades):<5}\n\n"
         s               += f"{'🖼️ Frames':<20}\n"
         if len(frames) == 0:
             s += "You have no frames.\n"

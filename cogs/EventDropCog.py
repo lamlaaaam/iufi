@@ -33,14 +33,18 @@ class EventDropCog(commands.Cog):
     async def random_drop(self):
         card_doc = (await db_utils.get_random_cards(1, self.bot.RARITY_PROB, 0))[0]
         await db_utils.set_card_availability(card_doc['id'], False)
-        title    = "**🎁   Random Card Drop**"
-        id       = f"**🆔   `{card_doc['id']:04}`**\n"
-        tag      = f"**🏷️   `{card_doc['tag']}`**\n"
-        rarity   = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n\n"
-        code_str = self.gen_string(5)
-        code     = f"**Enter code to claim: `{code_str}`**"
-        desc     = id + tag + rarity + code + '\n\n'
-        embed    = discord.Embed(title=title, description=desc, color=discord.Color.random())
+        stars     = random.randint(1, self.bot.STARS_MAX)
+        await db_utils.set_card_stars(card_doc['id'], stars)
+        title     = "**🎁   Random Card Drop**"
+        id        = f"**🆔   `{card_doc['id']:04}`**\n"
+        tag       = f"**🏷️   `{card_doc['tag']}`**\n"
+        rarity    = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
+        stars_str = '⭐' * stars + '⚫' * (self.bot.STARS_MAX-stars)
+        stars_str = '**✨   `' + stars_str + '`**\n\n'
+        code_str  = self.gen_string(5)
+        code      = f"**Enter code to claim: `{code_str}`**"
+        desc      = id + tag + rarity + stars_str + code + '\n\n'
+        embed     = discord.Embed(title=title, description=desc, color=discord.Color.random())
 
         card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
         card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
@@ -60,7 +64,7 @@ class EventDropCog(commands.Cog):
             await db_utils.set_card_availability(card_doc['id'], True)
         finally:
             code              = f"*This drop has expired*"
-            desc              = id + tag + rarity + code + '\n\n'
+            desc              = id + tag + rarity + stars_str + code + '\n\n'
             embed.description = desc
             embed.color       = discord.Color.greyple()
             await drop_msg.edit(embed=embed)

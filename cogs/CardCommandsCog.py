@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+import random
 import re
 import db_utils
 import photocard_utils
@@ -28,13 +29,16 @@ class CardCommandsCog(commands.Cog):
         id     = f"**🆔   `{card_doc['id']:04}`**\n"
         tag    = f"**🏷️   `{card_doc['tag']}`**\n"
         frame  = f"**🖼️   `{frame_doc['tag']}`**\n"
-        rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n\n"
+        rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
+        scount = card_doc['stars']
+        stars  = '⭐' * scount + '⚫' * (self.bot.STARS_MAX-scount)
+        stars  = '**✨   `' + stars + '`**\n\n'
         try:
             owner  = await self.bot.GUILD.fetch_member(card_doc['owned_by'])
             owned  = f"**Owned by:   `{owner.display_name}`**"
         except:
             owned  = "**Owned by:   nobody**"
-        desc   = id + tag + frame + rarity + owned + '\n\n'
+        desc   = id + tag + frame + rarity + stars + owned + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
         card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
@@ -270,3 +274,28 @@ class CardCommandsCog(commands.Cog):
             await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(last_card))
         await self.set_fave(ctx.author.id, last_card, slot)
         await ctx.send(f'**{ctx.author.mention} you have successfully set your last photocard as a favorite in slot {slot}.**', delete_after=2)
+
+    @commands.command(name = 'upgrade', aliases = ['u'])
+    async def upgrade(self, ctx, id_tag):
+        user_doc   = await db_utils.get_user(ctx.author.id)
+        card_doc   = await db_utils.get_card(id_tag)
+        if card_doc == None:
+            await self.card_not_found_error(ctx)
+            return
+        if card_doc['id'] not in user_doc['collection']:
+            await self.card_not_owned_error(ctx)
+            return
+        if user_doc['upgrades'] <= 0:
+            await ctx.send(f"**{ctx.author.mention} you have no upgrades.**", delete_after=2)
+            return
+        if card_doc['stars'] >= self.bot.STARS_MAX:
+            await ctx.send(f"**{ctx.author.mention} the card is already at max stars.**", delete_after=2)
+            return
+        await db_utils.update_user_upgrades(ctx.author.id, -1)
+        success = random.randint(1,100) <= self.bot.STARS_PROB[card_doc['stars']-1]
+        if success:
+            await db_utils.update_card_stars(card_doc['id'], 1, self.bot.STARS_MAX)
+            await ctx.send(f"**{ctx.author.mention} the upgrade was successful.**", delete_after=2)
+        else:
+            await ctx.send(f"**{ctx.author.mention} the upgrade failed.**", delete_after=2)
+

@@ -24,12 +24,13 @@ class CollectionCog(commands.Cog):
         s = ""
         for r, d in enumerate(pages[i]):
             num    = f"{i*cpp+r+1}."
-            id     = f"🆔 {d['id']:04}"
-            tag    = f"🏷️ {d['tag']}"
-            f      = f"{d['frame']:03}" if d['frame'] != 0 else '---'
-            frame  = f"🖼️ {f}"
+            id     = f"🆔{d['id']:04}"
+            tag    = f"🏷️{d['tag'] if d['tag'] else '-'}"
+            f      = f"{d['frame']:02}" if d['frame'] != 0 else '-'
+            frame  = f"🖼️{f}"
             rarity = f"{self.bot.RARITY[d['rarity']]}"
-            s     += f"{id:<8}{tag:<15}{frame:>5}{rarity:>2}\n"
+            stars  = f"✨{d['stars']}"
+            s     += f"{id:<6}|{tag:<12}|{frame:<4}|{stars:<4}|{rarity:<1}\n"
         s = "```" + s + "```"
         return s
 

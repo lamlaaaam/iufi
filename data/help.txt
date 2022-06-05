@@ -7,6 +7,9 @@
 **🖼️ Frames**
 `qremoveframe qsetframe qsetframelast qframeinfo`
 
+**✨ Stars**
+`qupgrade`
+
 **🍬 Starcandy**
 `qgiftsc`
 
@@ -20,7 +23,7 @@
 `qregister`
 
 **🧑🏻‍💻 Developer**
-`qreset`
+`qreboot qreset`
 
 **🙏🏼 Credits**
 `Code       - 8 bol`

@@ -45,12 +45,13 @@ class FavesCog(commands.Cog):
         for r, d in enumerate(faves_sorted):
             num = f"{r+1}."
             if d != None:
-                cid    = f"🆔 {d['id']:04}"
-                tag    = f"🏷️ {d['tag']}"
-                f      = f"{d['frame']:03}" if d['frame'] != 0 else '---'
-                frame  = f"🖼️ {f}"
+                id     = f"🆔{d['id']:04}"
+                tag    = f"🏷️{d['tag'] if d['tag'] else '-'}"
+                f      = f"{d['frame']:02}" if d['frame'] != 0 else '-'
+                frame  = f"🖼️{f}"
                 rarity = f"{self.bot.RARITY[d['rarity']]}"
-                desc  += f"{cid:<8}{tag:<15}{frame:>5}{rarity:>2}\n"
+                stars  = f"✨{d['stars']}"
+                desc  += f"{id:<6}|{tag:<12}|{frame:<4}|{stars:<4}|{rarity:<1}\n"
             else:
                 desc  += f" \n"
         desc  = "```\n" + desc + "```\n"

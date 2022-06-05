@@ -1,3 +1,29 @@
+⭐⭐⭐⭐⭐☆✰✦★★☆☆☆
+add stars field to card db (initial: null) OK
+add star upgrades to player db (initial 0) OK
+add stars to all card info displays OK
+show star upgrades in inventory OK
+reset stars on convert OK
+gen stars on claim OK
+show stars on claim OK
+gen stars for event and show OK
+buy star upgrades in shop OK
+global constant probability OK
+show stars in qf and qv OK
+upgrade command (block at max stars limit) OK
+add to guide OK
+
+use case:
+1. claim a roll
+2. rando stars generated 1 to 5. (shown in claim)
+3. qil and etc shows stars
+3.5 qf qv shows stars
+4. go to shop, buy upgrade
+5. see inv, upgrade shows
+6. apply upgrade command
+7. upgrading screen -> success/fail
+8. event drop shows stars on page.
+
 On the 22nd of April 2022, a cool guy named gymshoe once said:
 "someone take all the pc's and write some script that will randomly pick 8 of them and put them into an image like this for us to gaze and debate over".
 Since it was about a week before my university finals exams, I had no time to create such a-

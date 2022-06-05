@@ -54,11 +54,13 @@ class AuctionCog(commands.Cog):
         tag            = f"**🏷️   `{card_doc['tag']}`**\n"
         frame          = f"**🖼️   `{frame_doc['tag']}`**\n"
         rarity         = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
-        owned          = f"**Owned by:   `{ctx.author.display_name}`**\n\n"
+        scount         = card_doc['stars']
+        stars          = '⭐' * scount + '⚫' * (self.bot.STARS_MAX-scount)
+        stars          = '**✨   `' + stars + '`**\n\n'
         highest_bidder = f"**Highest bidder: `None`**\n"
         highest_bid    = f"**Amount to beat: `{min_bid} 🍬`**\n\n"
         timer          = "**Time:\n**" + '⬜ ' * 10 + '\n\n'
-        desc           = inst + id + tag + frame + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+        desc           = inst + id + tag + frame + rarity + stars + highest_bidder + highest_bid + timer + '\n\n'
         embed          = discord.Embed(title=title, description=desc, color=discord.Color.dark_red())
 
         card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
@@ -74,7 +76,7 @@ class AuctionCog(commands.Cog):
             highest_bidder    = f"**Highest bidder: `{self.highest_bidder.display_name if self.highest_bidder else 'None'}`**\n"
             highest_bid       = f"**Amount to beat: `{self.highest_bid} 🍬`**\n\n"
             timer             = "**Time:\n**" + '🟥 ' * (i+1) + '⬜ ' * (10-i-1) + '\n\n'
-            desc              = inst + id + tag + frame + rarity + owned + highest_bidder + highest_bid + timer + '\n\n'
+            desc              = inst + id + tag + frame + rarity + stars + highest_bidder + highest_bid + timer + '\n\n'
             embed.description = desc
             await self.auction_msg.edit(embed=embed)
         self.auction_msg    = None

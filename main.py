@@ -48,8 +48,8 @@ bot.TEMP_PATH = 'temp/'
 
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
-ROLL_COOLDOWN        = 10  # Minutes
-ROLL_CLAIM_COOLDOWN  = 3   # Minutes
+ROLL_COOLDOWN        = 0.2  # Minutes
+ROLL_CLAIM_COOLDOWN  = 0.1   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 3   # Seconds
 
@@ -98,7 +98,8 @@ COMMAND_MAP = {
     'qroll'        : ('qr', 'qroll', 'Rolls a set of photocards for claiming.'),
     'qshop'        : ('qs', 'qshop', 'Brings up the IUFI shop'),
     'qregister'    : ('None', 'qregister', 'Registers yourself if you are a new player.'),
-    'qreset'       : ('None', 'qreset', 'Resets IUFI. Only for those with admin privileges.'),
+    'qreboot'      : ('None', 'qreset', 'Reboots IUFI. Only for those with admin privileges.'),
+    'qreset'       : ('None', 'qreset', 'WIPES ALL GAME DATA. Only for those with admin privileges.'),
     'qrareroll'    : ('qrr', 'qrareroll', 'Starts a roll with at least one rare photocard guaranteed.'),
     'qepicroll'    : ('qer', 'qepicroll', 'Starts a roll with at least one epic photocard guaranteed.'),
     'qlegendroll'  : ('qlr', 'qlegendroll', 'Starts a roll with at least one legendary photocard guaranteed.'),
@@ -113,10 +114,11 @@ COMMAND_MAP = {
     'qremovebio'   : ('qrb', 'qrb', 'Removes your profile bio.'),
     'qremindon'    : ('qron', 'qremindon', 'Turns reminders on for your cooldowns. Make sure you are not blocking DMs.'),
     'qremindoff'   : ('qroff', 'qremindoff', 'Turns reminders off for your cooldowns.'),
-    'qsetframe'    : ('qsfr', 'qsetframe card frame', 'Sets the frame for the photocard. Both card and frame can be identified by id or tag.'),
-    'qsetframelast': ('qsfrl', 'qsetframe frame', 'Sets the frame for the last photocard. Frame can be identified by its id or tag.'),
+    'qsetframe'    : ('qsfr', 'qsetframe card frame', 'Sets the frame for the photocard. Both card and frame can be identified by id or given tag.'),
+    'qsetframelast': ('qsfrl', 'qsetframe frame', 'Sets the frame for the last photocard. Frame can be identified by its id or given tag.'),
     'qremoveframe' : ('qrfr', 'qremoveframe card', 'Removes the frame from the photocard. Card can be identified by its ID or given tag.'),
-    'qframeinfo'   : ('qfi', 'qframeinfo id_or_tag', 'Shows the details for the frame. Frame can be identified by its ID or tag.')
+    'qframeinfo'   : ('qfi', 'qframeinfo id_or_tag', 'Shows the details for the frame. Frame can be identified by its ID or given tag.'),
+    'qupgrade'     : ('qu', 'qupgrade id_or_tag', 'Attempts to upgrade star level of the card. Card can be identified by its ID or given tag.')
 }
 
 SHOP_LIST = [
@@ -125,6 +127,7 @@ SHOP_LIST = [
     ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
     ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
     ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
+    ('🔨', 'STAR UPGRADE'    , 100, 'A chance to upgrade a card\'s stars.', lambda id: db_utils.update_user_upgrades(id, 1)),
     ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
     ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
     ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),
@@ -140,6 +143,9 @@ bot.RARITY      = ['🌿', '🌸', '💎', '👑']
 bot.RARITY_NAME = ['Common', 'Rare', 'Epic', 'Legendary']
 bot.RARITY_SC   = [1, 5, 50, 300]
 bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
+
+bot.STARS_MAX   = 10
+bot.STARS_PROB  = [90, 80, 70, 60, 50, 40, 30, 20, 10] # Out of 100; Prob to get to next star
 
 BOL      = 406986532205887488
 HAZE     = 95608676441661440

@@ -170,7 +170,7 @@ class RollCog(commands.Cog):
 
         roll_headstart_id = ctx.author.id
 
-        content = f'**{ctx.author.mention} has initiated a roll 🎲\n**'
+        content = f'**{ctx.author.mention} has initiated a roll\n**'
         components = [[Button(emoji=self.bot.RARITY[doc['rarity']], label = str(i+1), custom_id = f'claim {i+1}', style = ButtonStyle.green)
                       for i, doc in enumerate(roll_pc_docs)]]
         roll_msg = await ctx.send(

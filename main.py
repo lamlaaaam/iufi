@@ -127,7 +127,7 @@ SHOP_LIST = [
     ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
     ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
     ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
-    ('🔨', 'STAR UPGRADE'    , 100, 'A chance to upgrade a card\'s stars.', lambda id: db_utils.update_user_upgrades(id, 1)),
+    ('🔨', 'STAR UPGRADE'    , 50, 'A chance to upgrade a card\'s stars.', lambda id: db_utils.update_user_upgrades(id, 1)),
     ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
     ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
     ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),

@@ -151,7 +151,7 @@ async def get_user(id):
     return await players_col.find_one({'discord_id': id})
 
 async def get_users(pred):
-    return [x for x in await players_col.find(pred).to_list(1000000) if x != None]
+    return await players_col.find(pred).to_list(1000000)
 
 async def update_user_currency(id, delta):
     user         = await get_user(id)
@@ -168,7 +168,7 @@ async def set_user_level_exp(user_id, level, exp):
     await players_col.update_one({'discord_id': user_id}, {'$set': {'level': level, 'exp': exp}})
 
 async def get_all_users():
-    return [x for x in await players_col.find().to_list(1000000) if x != None]
+    return await players_col.find().to_list(1000000)
 
 async def set_user_cooldown(id, cd_key, d=0, h=0, m=0, s=0):
     now      = datetime.now()
@@ -242,9 +242,9 @@ async def update_user_upgrades(id, delta):
 
 async def check_pool_exists(bias):
     if bias > 0:
-        available = len([x for x in await cards_col.find({'rarity': bias, 'available': True}).to_list(length=1) if x != None])
+        available = len(await cards_col.find({'rarity': bias, 'available': True}).to_list(length=1))
     else:
-        available = len([x for x in await cards_col.find({'available': True}).to_list(length=1) if x != None])
+        available = len(await cards_col.find({'available': True}).to_list(length=1))
     pool_exists = available > 0
     return pool_exists
 
@@ -274,7 +274,7 @@ async def set_card_availability(card_id, val):
     await cards_col.update_one({'id': card_id}, {'$set': {'available': val}})
 
 async def get_cards(pred):
-    return [x for x in await cards_col.find(pred).to_list(1000000) if x != None]
+    return await cards_col.find(pred).to_list(1000000)
 
 async def get_card(id_tag):
     try:

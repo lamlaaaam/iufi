@@ -44,14 +44,11 @@ class CollectionCog(commands.Cog):
         cards_docs_dict   = {}
         cards_docs        = await db_utils.get_cards({'owned_by': id})
         cards_docs_sorted = [None] * len(cards_docs)
-        print('raw', cards_docs)
         for doc in cards_docs:
             cards_docs_dict[doc['id']] = doc
         for i in range(len(user_collection)):
             id                   = user_collection[i]
             cards_docs_sorted[i] = cards_docs_dict[id]
-        print('sorted', cards_docs_sorted)
-        cards_docs_sorted = [x for x in cards_docs_sorted if x != None]
         collection_size = len(cards_docs_sorted)
         pages           = [cards_docs_sorted[i:i + cards_per_page] for i in range(0, collection_size, cards_per_page)]
         num_pages       = len(pages)

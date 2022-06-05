@@ -153,7 +153,7 @@ class RollCog(commands.Cog):
                 await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
                 await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
                 await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
-                await i.channel.send(f'**{i.author.mention} has claimed `{no} | 🆔 {id:04} | {rarity} | ⭐ {stars}`**')
+                await i.channel.send(f'**{i.author.mention} has claimed ` {no} | 🆔 {id:04} | {rarity} | ⭐ {stars} `**')
 
         roll_pc_docs = [doc for doc in await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)]
         roll_pc_ids  = [doc['id'] for doc in roll_pc_docs]

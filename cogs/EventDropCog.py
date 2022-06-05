@@ -39,8 +39,9 @@ class EventDropCog(commands.Cog):
         id        = f"**🆔   `{card_doc['id']:04}`**\n"
         tag       = f"**🏷️   `{card_doc['tag']}`**\n"
         rarity    = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
-        stars_str = '⭐' * stars + self.bot.BS * (self.bot.STARS_MAX-stars)
-        stars_str = '**✨   ' + stars_str + '**\n\n'
+        #stars_str = '⭐' * stars + self.bot.BS * (self.bot.STARS_MAX-stars)
+        #stars_str = '**✨   ' + stars_str + '**\n\n'
+        stars_str = f"**⭐   `{stars}`**\n\n"
         code_str  = self.gen_string(5)
         code      = f"**Enter code to claim: `{code_str}`**"
         desc      = id + tag + rarity + stars_str + code + '\n\n'

@@ -29,7 +29,7 @@ class CollectionCog(commands.Cog):
             f      = f"{d['frame']:02}" if d['frame'] != 0 else '-'
             frame  = f"🖼️{f}"
             rarity = f"{self.bot.RARITY[d['rarity']]}"
-            stars  = f"✨{d['stars']}"
+            stars  = f"⭐{d['stars']}"
             s     += f"{id:<6} {tag:<12} {frame:<4} {stars:<4} {rarity:<1}\n"
         s = "```" + s + "```"
         return s

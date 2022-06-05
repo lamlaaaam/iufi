@@ -55,8 +55,9 @@ class AuctionCog(commands.Cog):
         frame          = f"**🖼️   `{frame_doc['tag']}`**\n"
         rarity         = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
         scount         = card_doc['stars']
-        stars          = '⭐' * scount + self.bot.BS * (self.bot.STARS_MAX-scount)
-        stars          = '**✨   ' + stars + '**\n\n'
+        #stars          = '⭐' * scount + self.bot.BS * (self.bot.STARS_MAX-scount)
+        #stars          = '**✨   ' + stars + '**\n\n'
+        stars          = f"**⭐   `{scount}`**\n\n"
         highest_bidder = f"**Highest bidder: `None`**\n"
         highest_bid    = f"**Amount to beat: `{min_bid} 🍬`**\n\n"
         timer          = "**Time:\n**" + '⬜ ' * 10 + '\n\n'

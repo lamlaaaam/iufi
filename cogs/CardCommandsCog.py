@@ -32,8 +32,9 @@ class CardCommandsCog(commands.Cog):
         rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
         if card_doc['owned_by'] != None:
             scount = card_doc['stars']
-            stars  = '⭐' * scount + self.bot.BS * (self.bot.STARS_MAX-scount)
-            stars  = '**✨   ' + stars + '**\n\n'
+            #stars  = '⭐' * scount + self.bot.BS * (self.bot.STARS_MAX-scount)
+            #stars  = '**✨   ' + stars + '**\n\n'
+            stars  = f"**⭐   `{scount}`**\n\n"
         else:
             stars = '\n'
         try:

@@ -9,9 +9,11 @@ from   discord.ext import commands
 class AuctionCog(commands.Cog):
     def __init__(self,
                  bot,
-                 auction_time):
+                 auction_time,
+                 max_bid):
         self.bot             = bot
         self.auction_time    = auction_time
+        self.max_bid         = max_bid
         self.auction_msg     = None
         self.highest_bidder  = None
         self.highest_bid     = 0
@@ -30,6 +32,15 @@ class AuctionCog(commands.Cog):
     async def auction(self, ctx, id_tag, min_bid=0):
         if self.auction_msg != None:
             await ctx.send(f"**{ctx.author.mention} there is an ongoing auction. Please wait for it to end.**", delete_after=2)
+            self.auction.reset_cooldown(ctx)
+            return
+
+        if min_bid < 0:
+            await ctx.send(f"**{ctx.author.mention} you cannot set a negative minimum bid.**", delete_after=2)
+            self.auction.reset_cooldown(ctx)
+            return
+        if min_bid > self.max_bid:
+            await ctx.send(f"**{ctx.author.mention} you cannot set a minimum bid higher than {self.max_bid}.**", delete_after=2)
             self.auction.reset_cooldown(ctx)
             return
 

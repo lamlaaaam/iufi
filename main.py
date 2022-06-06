@@ -69,6 +69,7 @@ STREAK_REWARDS       = [
 ]
 
 AUCTION_TIME         = 30  # Seconds
+AUCTION_MAX_BID      = 1000000 # SC
 
 EVENT_DROP_INTERVAL  = 1    # Hours
 EVENT_DROP_VALID     = 120  # Seconds
@@ -118,7 +119,8 @@ COMMAND_MAP = {
     'qsetframelast': ('qsfrl', 'qsetframe frame', 'Sets the frame for the last photocard. Frame can be identified by its id or given tag.'),
     'qremoveframe' : ('qrfr', 'qremoveframe card', 'Removes the frame from the photocard. Card can be identified by its ID or given tag.'),
     'qframeinfo'   : ('qfi', 'qframeinfo id_or_tag', 'Shows the details for the frame. Frame can be identified by its ID or given tag.'),
-    'qupgrade'     : ('qu', 'qupgrade id_or_tag', 'Attempts to upgrade star level of the card. Card can be identified by its ID or given tag.')
+    'qupgrade'     : ('qu', 'qupgrade id_or_tag', 'Attempts to upgrade star level of the card. Card can be identified by its ID or given tag.'),
+    'qconvertall'  : ('None', 'qconvertall', 'Converts ALL your photocards.')
 }
 
 SHOP_LIST = [
@@ -146,7 +148,6 @@ bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 bot.STARS_MAX   = 10
 bot.STARS_PROB  = [90, 80, 70, 60, 50, 40, 30, 20, 10] # Out of 100; Prob to get to next star
-bot.BS          = '<:blackstar:982954535632916540>'
 
 BOL      = 406986532205887488
 HAZE     = 95608676441661440
@@ -202,7 +203,7 @@ async def on_ready():
     bot.add_cog(CardCommandsCog(bot))
     bot.add_cog(CommandHelpCog(bot, COMMAND_MAP))
     bot.add_cog(InventoryCog(bot))
-    bot.add_cog(AuctionCog(bot, AUCTION_TIME))
+    bot.add_cog(AuctionCog(bot, AUCTION_TIME, AUCTION_MAX_BID))
     bot.add_cog(EventDropCog(bot,
                              EVENT_DROP_INTERVAL,
                              EVENT_DROP_VALID))

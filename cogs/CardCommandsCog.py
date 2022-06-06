@@ -152,7 +152,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f"**{ctx.author.mention} you converted {success} photocards into {reward} starcandies.**", delete_after=2)
 
     @commands.command(name = 'convertall')
-    async def convert(self, ctx):
+    async def convert_all(self, ctx):
         valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id})
         success    = len(valid_docs)
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])

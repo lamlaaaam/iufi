@@ -67,7 +67,7 @@ class CardCommandsCog(commands.Cog):
     async def card_info_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         await self.show_card_info(ctx, last_card)
 
@@ -114,7 +114,7 @@ class CardCommandsCog(commands.Cog):
 
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
 
         await db_utils.set_card_tag(last_card, tag)
@@ -146,17 +146,25 @@ class CardCommandsCog(commands.Cog):
         id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
         valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]})
         success    = len(valid_docs)
-        fail       = len(id_tags) - success
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
         await ctx.send(f"**{ctx.author.mention} you converted {success} photocards into {reward} starcandies.**", delete_after=2)
 
+    @commands.command(name = 'convertall')
+    async def convert(self, ctx):
+        valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id})
+        success    = len(valid_docs)
+        reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
+        card_ids   = [doc['id'] for doc in valid_docs]
+        await db_utils.convert_cards(ctx.author.id, card_ids, reward)
+        await ctx.send(f"**{ctx.author.mention} you converted all {success} photocards into {reward} starcandies.**", delete_after=2)
+
     @commands.command(name = 'convertlast', aliases = ['cl'])
     async def convert_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         reward = self.bot.RARITY_SC[(await db_utils.get_card(last_card))['rarity']]
         await db_utils.convert_cards(ctx.author.id, [last_card], reward)
@@ -182,7 +190,7 @@ class CardCommandsCog(commands.Cog):
     async def main_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         await self.main_card(ctx.author.id, last_card)
         await ctx.send(f'**{ctx.author.mention} you have set your last photocard as your main.**', delete_after=2)
@@ -206,7 +214,8 @@ class CardCommandsCog(commands.Cog):
         if success > 0:
             try:
                 ch = await rec.create_dm()
-                await ch.send(f'**you have received {success} photocards from {ctx.author.display_name}!**')
+                ids = ', '.join([str(i) for i in card_ids])
+                await ch.send(f'**you have received ` 🆔 {ids} ` from {ctx.author.display_name}**')
             except discord.Forbidden:
                 pass
 
@@ -224,14 +233,18 @@ class CardCommandsCog(commands.Cog):
 
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
-            ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
 
         await db_utils.gift_cards(ctx.author.id, rec.id, [last_card])
         await ctx.send(f'**{ctx.author.mention} you have gifted your last photocard.**', delete_after=2)
         try:
-            ch = await rec.create_dm()
-            await ch.send(f'**you have received a photocard gift from {ctx.author.display_name}!**')
+            ch     = await rec.create_dm()
+            doc    = await db_utils.get_card(last_card)
+            id     = doc['id']
+            rarity = self.bot.RARITY[doc['rarity']]
+            stars  = doc['stars']
+            await ch.send(f'**you have received ` 🆔 {id:04} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
         except discord.Forbidden:
             pass
 

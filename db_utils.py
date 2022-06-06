@@ -1,6 +1,5 @@
 import os
 import random
-import motor.motor_asyncio
 import pymongo
 from   dotenv import load_dotenv
 from   datetime import datetime, timedelta
@@ -9,7 +8,7 @@ from   datetime import datetime, timedelta
 load_dotenv()
 MONGO_STRING      = os.getenv('MONGO_STRING')
 CLOUDFRONT_PREFIX = os.getenv('CLOUDFRONT_PREFIX')
-client       = motor.motor_asyncio.AsyncIOMotorClient(MONGO_STRING)
+client       = pymongo.MongoClient(MONGO_STRING)
 iufi_db      = client['IUFI_DB']
 cards_col    = iufi_db['Cards']
 players_col  = iufi_db['Players']
@@ -99,16 +98,16 @@ def setup_frames(id, name, auto_col, cluster):
     frames_col.insert_one(doc)
 
 async def reset_game_command():
-    await cards_col.update_many({}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0, 'stars': 0}})
-    await players_col.drop()
+    cards_col.update_many({}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0, 'stars': 0}})
+    players_col.drop()
 
 # ----------------------------------------------------------------------------------------------------------
 
 async def does_user_exist(q):
     if isinstance(q, int):
-        already_exists = await players_col.count_documents({'discord_id': q}, limit = 1)
+        already_exists = players_col.count_documents({'discord_id': q}, limit = 1)
     else:
-        already_exists = await players_col.count_documents({'discord_id': q.author.id}, limit = 1)
+        already_exists = players_col.count_documents({'discord_id': q.author.id}, limit = 1)
     return already_exists
 
 async def register_user(id):
@@ -140,18 +139,18 @@ async def add_card_to_user(user_id, card_id):
     cards = user['collection']
     if card_id in cards:
         return
-    await players_col.update_one({'discord_id': user_id}, {'$push': {'collection': card_id}})
+    players_col.update_one({'discord_id': user_id}, {'$push': {'collection': card_id}})
 
 async def remove_card_from_user(user_id, card_id):
     faves     = (await get_user(user_id))['faves']
     new_faves = [f if f != card_id else None for f in faves]
-    await players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id}, '$set': {'faves': new_faves}})
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': card_id}, '$set': {'faves': new_faves}})
 
 async def get_user(id):
-    return await players_col.find_one({'discord_id': id})
+    return players_col.find_one({'discord_id': id})
 
 async def get_users(pred):
-    return await players_col.find(pred).to_list(1000000)
+    return list(players_col.find(pred))
 
 async def update_user_currency(id, delta):
     user         = await get_user(id)
@@ -159,22 +158,22 @@ async def update_user_currency(id, delta):
     new_currency = currency + delta
     if new_currency < 0:
         new_currency = 0
-    await players_col.update_one({'discord_id': id}, {'$set': {'currency': new_currency}})
+    players_col.update_one({'discord_id': id}, {'$set': {'currency': new_currency}})
 
 async def set_main(user_id, card_id):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {'main': card_id}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {'main': card_id}})
 
 async def set_user_level_exp(user_id, level, exp):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {'level': level, 'exp': exp}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {'level': level, 'exp': exp}})
 
 async def get_all_users():
-    return await players_col.find().to_list(1000000)
+    return list(players_col.find())
 
 async def set_user_cooldown(id, cd_key, d=0, h=0, m=0, s=0):
     now      = datetime.now()
     delta    = timedelta(days=d, hours=h, minutes=m, seconds=s)
     new_time = now + delta
-    await players_col.update_one({'discord_id': id}, {'$set': {cd_key: new_time}})
+    players_col.update_one({'discord_id': id}, {'$set': {cd_key: new_time}})
 
 async def check_cooldown(user_id, cd_key):
     user_doc = await get_user(user_id)
@@ -198,7 +197,7 @@ async def check_within_streak(user_id):
     return now < streak_ends
 
 async def set_user_streak(id, streak):
-    await players_col.update_one({'discord_id': id}, {'$set': {'streak': streak}})
+    players_col.update_one({'discord_id': id}, {'$set': {'streak': streak}})
 
 async def update_user_roll(id, roll, delta):
     user            = await get_user(id)
@@ -206,22 +205,22 @@ async def update_user_roll(id, roll, delta):
     new_roll_amount = roll_amount + delta
     if new_roll_amount < 0:
         new_roll_amount = 0
-    await players_col.update_one({'discord_id': id}, {'$set': {roll: new_roll_amount}})
+    players_col.update_one({'discord_id': id}, {'$set': {roll: new_roll_amount}})
 
 async def set_user_fave(user_id, card_id, slot):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': card_id}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': card_id}})
 
 async def remove_user_fave(user_id, slot):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': None}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {f'faves.{slot}': None}})
 
 async def set_user_bio(user_id, bio):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {'bio': bio}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {'bio': bio}})
 
 async def remove_user_bio(user_id):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {'bio': "Your bio is empty."}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {'bio': "Your bio is empty."}})
 
 async def set_user_reminders(user_id, state):
-    await players_col.update_one({'discord_id': user_id}, {'$set': {'reminders': state}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {'reminders': state}})
 
 async def update_user_frames(user_id, frame_id, delta):
     user            = await get_user(user_id)
@@ -229,7 +228,7 @@ async def update_user_frames(user_id, frame_id, delta):
     new_frame_count = frame_count + delta
     if new_frame_count < 0:
         new_frame_count = 0
-    await players_col.update_one({'discord_id': user_id}, {'$set': {f"frames.{frame_id}": new_frame_count}})
+    players_col.update_one({'discord_id': user_id}, {'$set': {f"frames.{frame_id}": new_frame_count}})
 
 async def update_user_upgrades(id, delta):
     user         = await get_user(id)
@@ -237,14 +236,14 @@ async def update_user_upgrades(id, delta):
     new_upgrades = upgrades + delta
     if new_upgrades < 0:
         new_upgrades = 0
-    await players_col.update_one({'discord_id': id}, {'$set': {'upgrades': new_upgrades}})
+    players_col.update_one({'discord_id': id}, {'$set': {'upgrades': new_upgrades}})
 # ---------------------------------------------------------------------------------------------------------
 
 async def check_pool_exists(bias):
     if bias > 0:
-        available = len(await cards_col.find({'rarity': bias, 'available': True}).to_list(length=1))
+        available = len(list(cards_col.find({'rarity': bias, 'available': True})))
     else:
-        available = len(await cards_col.find({'available': True}).to_list(length=1))
+        available = len(list(cards_col.find({'available': True})))
     pool_exists = available > 0
     return pool_exists
 
@@ -263,46 +262,46 @@ async def get_random_cards(num, probs, bias):
                     break
         if not (await check_pool_exists(rarity)):
             rarity = 0
-        card = (await cards_col.aggregate([{'$match': {'available': True, 'rarity': rarity}}, {'$sample': {'size': 1}}]).to_list(1000000))[0]
+        card = list(cards_col.aggregate([{'$match': {'available': True, 'rarity': rarity}}, {'$sample': {'size': 1}}]))[0]
         cards.append(card)
-        await cards_col.update_one({'id': card['id']}, {'$set': {'available': False}})
+        cards_col.update_one({'id': card['id']}, {'$set': {'available': False}})
     card_ids = [card['id'] for card in cards]
-    await cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True}})
     return cards
 
 async def set_card_availability(card_id, val):
-    await cards_col.update_one({'id': card_id}, {'$set': {'available': val}})
+    cards_col.update_one({'id': card_id}, {'$set': {'available': val}})
 
 async def get_cards(pred):
-    return await cards_col.find(pred).to_list(1000000)
+    return list(cards_col.find(pred))
 
 async def get_card(id_tag):
     try:
-        card_by_id = await cards_col.find_one({'id': int(id_tag)})
+        card_by_id = cards_col.find_one({'id': int(id_tag)})
         if card_by_id != None:
             return card_by_id
     except:
-        card_by_tag = await cards_col.find_one({'tag': str(id_tag)})
+        card_by_tag = cards_col.find_one({'tag': str(id_tag)})
         return card_by_tag
 
 async def set_card_owner(card_id, user_id):
-    await cards_col.update_one({'id': card_id}, {'$set': {'owned_by': user_id}})
+    cards_col.update_one({'id': card_id}, {'$set': {'owned_by': user_id}})
 
 async def set_card_tag(id_tag, tag):
     try:
-        await cards_col.update_one({'id': int(id_tag)}, {'$set': {'tag': tag}})
+        cards_col.update_one({'id': int(id_tag)}, {'$set': {'tag': tag}})
     except:
-        await cards_col.update_one({'tag': str(id_tag)}, {'$set': {'tag': tag}})
+        cards_col.update_one({'tag': str(id_tag)}, {'$set': {'tag': tag}})
 
 async def set_card_frame(card_id_tag, frame_id_tag=0):
     frame_doc = await get_frame(frame_id_tag)
     try:
-        await cards_col.update_one({'id': int(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
+        cards_col.update_one({'id': int(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
     except:
-        await cards_col.update_one({'tag': str(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
+        cards_col.update_one({'tag': str(card_id_tag)}, {'$set': {'frame': frame_doc['id']}})
 
 async def set_card_stars(id, stars):
-    await cards_col.update_one({'id': id}, {'$set': {'stars': stars}})
+    cards_col.update_one({'id': id}, {'$set': {'stars': stars}})
 
 async def update_card_stars(id, delta, max):
     card         = await get_card(id)
@@ -312,17 +311,17 @@ async def update_card_stars(id, delta, max):
         new_stars = 0
     if new_stars > max:
         new_stars = max
-    await cards_col.update_one({'id': id}, {'$set': {'stars': new_stars}})
+    cards_col.update_one({'id': id}, {'$set': {'stars': new_stars}})
 
 # ---------------------------------------------------------------------------------------------------------
 
 async def get_frame(id_tag):
     try:
-        frame_by_id = await frames_col.find_one({'id': int(id_tag)})
+        frame_by_id =  frames_col.find_one({'id': int(id_tag)})
         if frame_by_id != None:
             return frame_by_id
     except:
-        frame_by_tag = await frames_col.find_one({'tag': str(id_tag).lower()})
+        frame_by_tag = frames_col.find_one({'tag': str(id_tag).lower()})
         return frame_by_tag
 
 # ---------------------------------------------------------------------------------------------------------
@@ -341,14 +340,14 @@ async def convert_cards(user_id, card_ids, reward):
             frames[str(frame_id)] = 0
         frames[str(frame_id)] += 1
 
-    await players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}},
+    players_col.update_one({'discord_id': user_id}, {'$pull': {'collection': {'$in': card_ids}},
         '$set': {'faves': new_faves, 'frames': frames}})
-    await cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0, 'stars': 0}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0, 'stars': 0}})
     await update_user_currency(user_id, reward)
 
 async def gift_cards(giver_id, rec_id, card_ids):
     faves     = (await get_user(giver_id))['faves']
     new_faves = [f if f not in card_ids else None for f in faves]
-    await players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
-    await players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': {'$each': card_ids}}})
-    await cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'owned_by': rec_id}})
+    players_col.update_one({'discord_id': giver_id}, {'$pull': {'collection': {'$in': card_ids}}, '$set': {'faves': new_faves}})
+    players_col.update_one({'discord_id': rec_id}, {'$push': {'collection': {'$each': card_ids}}})
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'owned_by': rec_id}})

@@ -8,4 +8,3 @@ colorthief==0.2.1
 numpy==1.22.3
 boto3==1.22.8
 async-lru==1.0.3
-motor==3.0.0

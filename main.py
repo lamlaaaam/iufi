@@ -54,7 +54,7 @@ ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 3   # Seconds
 
 COLLECTION_TIME      = 60  # Seconds
-SHOP_TIME            = 60  # Seconds
+SHOP_TIME            = 120 # Seconds
 
 DAILY_REWARD         = 5   # Starcandies
 STREAK_END           = 30  # Days before reset

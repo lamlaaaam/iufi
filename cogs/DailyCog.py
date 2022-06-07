@@ -59,13 +59,13 @@ class DailyCog(commands.Cog):
         
         if hit_streak:
             await self.streak_rewards[reward_index][1](user.id)
-            await db_utils.set_user_cooldown(ctx.author.id, 'streak_ends', d = 2)
+            await db_utils.set_user_cooldown(ctx.author.id, 'streak_ends', h = 46)
             if streak >= self.streak_end:
                 await db_utils.set_user_cooldown(ctx.author.id, 'streak_ends')
                 streak = 1
         else:
-            await db_utils.set_user_cooldown(ctx.author.id, 'streak_ends', d = 2)
+            await db_utils.set_user_cooldown(ctx.author.id, 'streak_ends', h = 46)
 
         await db_utils.set_user_streak(ctx.author.id, streak)
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_daily', d = 1)
+        await db_utils.set_user_cooldown(ctx.author.id, 'next_daily', h = 23)
         await db_utils.update_user_currency(ctx.author.id, self.daily_reward)

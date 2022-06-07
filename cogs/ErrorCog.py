@@ -16,10 +16,12 @@ class ErrorCog(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f'**{ctx.author.mention} the command is missing arguments. Check the usage again.**', delete_after=2)
             cmd.reset_cooldown(ctx)
+            await ctx.invoke(self.bot.get_command('commandhelp'), ctx.invoked_with)
             return
         elif isinstance(error, commands.BadArgument):
             await ctx.send(f'**{ctx.author.mention} the arguments given are invalid. Check the usage again.**', delete_after=2)
             cmd.reset_cooldown(ctx)
+            await ctx.invoke(self.bot.get_command('commandhelp'), ctx.invoked_with)
             return
         else:
             pass

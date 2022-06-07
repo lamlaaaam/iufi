@@ -45,8 +45,6 @@ class AuctionCog(commands.Cog):
             return
 
         card_doc  = await db_utils.get_card(id_tag)
-        frame_doc = await db_utils.get_frame(card_doc['frame'])
-        user_doc  = await db_utils.get_user(ctx.author.id)
         if card_doc == None:
             await self.card_not_found_error(ctx)
             self.auction.reset_cooldown(ctx)
@@ -55,6 +53,9 @@ class AuctionCog(commands.Cog):
             await self.card_not_owned_error(ctx)
             self.auction.reset_cooldown(ctx)
             return
+
+        frame_doc = await db_utils.get_frame(card_doc['frame'])
+        user_doc  = await db_utils.get_user(ctx.author.id)
 
         self.highest_bid     = min_bid
         self.auction_starter = ctx.author

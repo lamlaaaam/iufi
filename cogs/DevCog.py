@@ -1,3 +1,4 @@
+import os
 import sys
 import db_utils
 from   discord.ext import commands
@@ -14,7 +15,8 @@ class DevCog(commands.Cog):
     @commands.command(name = 'reboot')
     async def reboot(self, ctx):
         await ctx.send("**IUFI is rebooting...**")
-        sys.exit()
+        os.execl(sys.executable, sys.executable, *sys.argv)
+        #sys.exit()
 
     @commands.command(name = 'reset')
     async def reset(self, ctx):

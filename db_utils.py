@@ -267,33 +267,14 @@ async def get_random_cards(num, probs, bias):
         if amt > len(pool[rarity]):
             return None
         cards.extend(random.sample(pool[rarity], amt))
-    cards_col.update_many({'id': {'$in': [doc['id'] for doc in cards]}}, {'$set': {'available': False}})
+    await set_cards_availability([doc['id'] for doc in cards], False)
     return cards
-
-#async def get_random_cards(num, probs, bias):
-#    cards   = []
-#    settled = False
-#    for i in range(num):
-#        roll = random.randint(1, 1000)
-#        if not settled and bias > 0:
-#            settled = True
-#            rarity  = bias
-#        else:
-#            for r, p in enumerate(probs):
-#                if roll <= p:
-#                    rarity = r
-#                    break
-#        if not (await check_pool_exists(rarity)):
-#            rarity = 0
-#        card = list(cards_col.aggregate([{'$match': {'available': True, 'rarity': rarity}}, {'$sample': {'size': 1}}]))[0]
-#        cards.append(card)
-#        cards_col.update_one({'id': card['id']}, {'$set': {'available': False}})
-#    card_ids = [card['id'] for card in cards]
-#    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': True}})
-#    return cards
 
 async def set_card_availability(card_id, val):
     cards_col.update_one({'id': card_id}, {'$set': {'available': val}})
+
+async def set_cards_availability(card_ids, val):
+    cards_col.update_many({'id': {'$in': card_ids}}, {'$set': {'available': val}})
 
 async def get_cards(pred):
     return list(cards_col.find(pred))

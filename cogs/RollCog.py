@@ -208,7 +208,8 @@ class RollCog(commands.Cog):
 
         await expire_msg()
         self.msg_to_event.pop(roll_msg.id, None)
-        [await db_utils.set_card_availability(roll_pc_ids[i], True) for i in range(self.roll_pc_count) if i not in index_taken]
+        not_taken_ids = [roll_pc_ids[i] for i in range(self.roll_pc_count) if i not in index_taken]
+        await db_utils.set_cards_availability(not_taken_ids, True)
         return True
 
     @commands.Cog.listener()

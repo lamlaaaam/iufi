@@ -26,6 +26,7 @@ class RollCog(commands.Cog):
         self.roll_claim_cooldown = roll_claim_cooldown
         self.loop                = asyncio.get_running_loop()
         self.thread_pool         = concurrent.futures.ThreadPoolExecutor()
+        self.msg_to_event        = {}
         self._cd = commands.CooldownMapping.from_cooldown(1, roll_common_cooldown, commands.BucketType.channel)
 
     async def cog_check(self, ctx):
@@ -42,15 +43,13 @@ class RollCog(commands.Cog):
         if not ok:
             await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**', delete_after=2)
             return
-        if not await db_utils.check_pool_exists(0):
-            await ctx.send(f'**{ctx.author.mention} the card pool is empty. Your roll has not been consumed.**', delete_after=2)
-            return
 
         await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
 
         success = await self.start_roll(ctx, 0)
         if not success:
+            await ctx.send(f'**{ctx.author.mention} the roll has failed. Your roll has not been consumed.**', delete_after=2)
             await db_utils.set_user_cooldown(ctx.author.id, 'next_roll')
 
     @commands.command(name = 'rareroll', aliases = ['rr'])
@@ -60,14 +59,13 @@ class RollCog(commands.Cog):
         if roll_amount <= 0:
             await ctx.send(f"**{ctx.author.mention} you do not have any rare rolls to use.**", delete_after=2)
             return
-        if not await db_utils.check_pool_exists(1):
-            await ctx.send(f'**{ctx.author.mention} the rare card pool is empty. Your roll has not been consumed.**', delete_after=2)
-            return
+
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', -1)
 
         success = await self.start_roll(ctx, 1)
         if not success:
+            await ctx.send(f'**{ctx.author.mention} the roll has failed. Your roll has not been consumed.**', delete_after=2)
             await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', 1)
 
     @commands.command(name = 'epicroll', aliases = ['er'])
@@ -77,14 +75,13 @@ class RollCog(commands.Cog):
         if roll_amount <= 0:
             await ctx.send(f"**{ctx.author.mention} you do not have any epic rolls to use.**", delete_after=2)
             return
-        if not await db_utils.check_pool_exists(2):
-            await ctx.send(f'**{ctx.author.mention} the epic card pool is empty. Your roll has not been consumed.**', delete_after=2)
-            return
+
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', -1)
 
         success = await self.start_roll(ctx, 2)
         if not success:
+            await ctx.send(f'**{ctx.author.mention} the roll has failed. Your roll has not been consumed.**', delete_after=2)
             await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', 1)
 
     @commands.command(name = 'legendroll', aliases = ['lr'])
@@ -94,14 +91,13 @@ class RollCog(commands.Cog):
         if roll_amount <= 0:
             await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**", delete_after=2)
             return
-        if not await db_utils.check_pool_exists(3):
-            await ctx.send(f'**{ctx.author.mention} the legendary card pool is empty. Your roll has not been consumed.**', delete_after=2)
-            return
+
         await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
 
         success = await self.start_roll(ctx, 3)
         if not success:
+            await ctx.send(f'**{ctx.author.mention} the roll has failed. Your roll has not been consumed.**', delete_after=2)
             await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', 1)
 
     async def start_roll(self, ctx, rarity_bias):
@@ -112,48 +108,49 @@ class RollCog(commands.Cog):
                 components[0][i].disabled = True
             await roll_msg.edit(content=content, components=components)
 
-        async def button_check(i: discord.ComponentInteraction, com):
-            if not await db_utils.does_user_exist(i.author.id):
-                await i.channel.send(f'**{i.author.mention} you have not registered.**',
-                                     delete_after = 1)
+        async def button_check(id):
+            if not await db_utils.does_user_exist(id):
                 return False
-            if i.author.id in already_claimed:
-                await i.channel.send(f'**{i.author.mention} you have already claimed from this roll.**',
-                                     delete_after = 1)
+            if id in already_claimed:
                 return False
-            ok, text = await db_utils.check_cooldown(i.author.id, 'next_claim')
+            ok, text = await db_utils.check_cooldown(id, 'next_claim')
             if not ok:
-                await i.channel.send(f'**{i.author.mention} you can claim another photocard in {text}.**', 
-                                     delete_after = 1)
                 return False
-            if roll_headstart_id != None and i.author.id != roll_headstart_id:
-                await i.channel.send(f'**{i.author.mention} the first {self.roll_headstart_time} seconds are exclusive to the roll starter!**',
-                                     delete_after = 1)
+            if roll_headstart_id != None and id != roll_headstart_id:
                 return False
             return True
 
         def check(i: discord.ComponentInteraction, com):
             return i.message.id == roll_msg.id
 
-        async def handle_claim(i, button, card_index):
+        async def handle_claim(uid, card_index):
             nonlocal taken
+            if card_index in index_taken:
+                return
             components[0][card_index].disabled = True
             doc    = roll_pc_docs[card_index]
             no     = card_index + 1
             id     = doc['id']
             rarity = self.bot.RARITY[doc['rarity']]
-            await i.message.edit(components=components)
-            already_claimed.append(i.author.id)
+            await roll_msg.edit(components=components)
+            already_claimed.append(uid)
             taken += 1
+            index_taken.append(card_index)
             stars = random.randint(1, self.bot.STARS_MAX // 2)
             await db_utils.set_card_stars(roll_pc_ids[card_index], stars)
-            await db_utils.set_card_availability(roll_pc_ids[card_index], False)
-            await db_utils.set_card_owner(roll_pc_ids[card_index], i.author.id)
-            await db_utils.add_card_to_user(i.author.id, roll_pc_ids[card_index])
-            await db_utils.set_user_cooldown(i.author.id, 'next_claim', m = self.roll_claim_cooldown)
-            await i.channel.send(f'**{i.author.mention} has claimed ` {no} | 🆔 {id:04} | {rarity} | ⭐ {stars} `**')
+            await db_utils.set_card_owner(roll_pc_ids[card_index], uid)
+            await db_utils.add_card_to_user(uid, roll_pc_ids[card_index])
+            await db_utils.set_user_cooldown(uid, 'next_claim', m = self.roll_claim_cooldown)
+            await roll_msg.channel.send(f'**{self.bot.get_user(uid).mention} has claimed ` {no} | 🆔 {id:04} | {rarity} | ⭐ {stars} `**')
 
-        roll_pc_docs = [doc for doc in await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)]
+        async def handle_event(event):
+            id, btn_index = event
+            if await button_check(id):
+                await handle_claim(id, btn_index)
+
+        roll_pc_docs = await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)
+        if roll_pc_docs == None:
+            return False
         roll_pc_ids  = [doc['id'] for doc in roll_pc_docs]
         print('Rolled', roll_pc_docs)
 
@@ -176,20 +173,22 @@ class RollCog(commands.Cog):
             content=content,
             components=components
         )
+        self.msg_to_event[roll_msg.id] = []
 
+        index_taken = []
         taken = 0
         already_claimed = []
 
-        try:
-            async with timeout(self.roll_headstart_time):
-                while taken < 1:
-                    interaction, button = await self.bot.wait_for('button_click', check = check)
-                    if await button_check(interaction, button):
-                        card_index = int(button.custom_id.split()[1]) - 1
-                        await handle_claim(interaction, button, card_index)
-                        break
-        except asyncio.exceptions.TimeoutError:
-            pass
+        interval = 2
+        for _ in range(self.roll_headstart_time // interval):
+            await asyncio.sleep(interval)
+            if taken >= 1:
+                break
+            i = 0
+            for event in self.msg_to_event[roll_msg.id]:
+                await handle_event(event)
+                i += 1
+            self.msg_to_event[roll_msg.id] = self.msg_to_event[roll_msg.id][i:]
 
         roll_headstart_id = None
 
@@ -197,15 +196,24 @@ class RollCog(commands.Cog):
             button.style = ButtonStyle.blurple
         await roll_msg.edit(components=components)
 
-        try:
-            async with timeout(self.roll_claim_time):
-                while taken < len(roll_pc_docs):
-                    interaction, button = await self.bot.wait_for('button_click', check = check)
-                    if await button_check(interaction, button):
-                        card_index = int(button.custom_id.split()[1]) - 1
-                        await handle_claim(interaction, button, card_index)
-        except asyncio.exceptions.TimeoutError:
-            pass
+        for _ in range(self.roll_claim_time // interval):
+            await asyncio.sleep(interval)
+            if taken >= len(roll_pc_docs):
+                break
+            i = 0
+            for event in self.msg_to_event[roll_msg.id]:
+                await handle_event(event)
+                i += 1
+            self.msg_to_event[roll_msg.id] = self.msg_to_event[roll_msg.id][i:]
 
         await expire_msg()
+        self.msg_to_event.pop(roll_msg.id, None)
+        [await db_utils.set_card_availability(roll_pc_ids[i], True) for i in range(self.roll_pc_count) if i not in index_taken]
         return True
+
+    @commands.Cog.listener()
+    async def on_button_click(self, i, b):
+        if i.channel not in self.bot.CHANNELS or i.message.id not in self.msg_to_event:
+            return
+        event = (i.author.id, int(b.custom_id.split()[1])-1)
+        self.msg_to_event[i.message.id].append(event)

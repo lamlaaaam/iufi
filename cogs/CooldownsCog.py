@@ -42,17 +42,14 @@ class CooldownsCog(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def cd_check(self):
-        print('checking')
         now       = datetime.now()
         user_docs = await db_utils.get_users({'reminders':True})
         roll_up   = []
         daily_up  = []
-        print('dict',self.prev_roll)
         for doc in user_docs:
             uid = doc['discord_id']
             roll = doc['next_roll']
             daily = doc['next_daily']
-            print('uid',uid,'roll',roll,'now',now)
             if now >= roll and (uid not in self.prev_roll or self.prev_roll[uid] != roll):
                 self.prev_roll[uid] = roll
                 roll_up.append(uid)

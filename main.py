@@ -48,7 +48,7 @@ bot.TEMP_PATH = 'temp/'
 
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
-ROLL_COOLDOWN        = 0.2  # Minutes
+ROLL_COOLDOWN        = 10  # Minutes
 ROLL_CLAIM_COOLDOWN  = 3   # Minutes
 ROLL_HEADSTART_TIME  = 10  # Seconds
 ROLL_COMMON_COOLDOWN = 3   # Seconds

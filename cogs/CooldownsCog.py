@@ -45,21 +45,17 @@ class CooldownsCog(commands.Cog):
         now       = datetime.now()
         user_docs = await db_utils.get_users({'reminders':True})
         roll_up   = []
+        daily_up  = []
         for doc in user_docs:
             uid = doc['discord_id']
-            cd  = doc['next_roll']
-            if now >= cd and (uid not in self.prev_roll or self.prev_roll[uid] != cd):
-                self.prev_roll[uid] = cd
+            roll = doc['next_roll']
+            daily = doc['next_daily']
+            if now >= roll and (uid not in self.prev_roll or self.prev_roll[uid] != roll):
+                self.prev_roll[uid] = roll
                 roll_up.append(uid)
-        daily_up = []
-        for doc in user_docs:
-            uid = doc['discord_id']
-            cd  = doc['next_daily']
-            if now >= cd and (uid not in self.prev_daily or self.prev_daily[uid] != cd):
-                self.prev_daily[uid] = cd
+            if now >= daily and (uid not in self.prev_daily or self.prev_daily[uid] != daily):
+                self.prev_daily[uid] = daily
                 daily_up.append(uid)
-        #roll_up   = [doc['discord_id'] for doc in user_docs if now >= doc['next_roll'] and (now-doc['next_roll']).seconds < 60]
-        #daily_up  = [doc['discord_id'] for doc in user_docs if now >= doc['next_daily'] and (now-doc['next_daily']).seconds < 60]
         for id in roll_up:
             await self.send_dm(id, "roll")
         for id in daily_up:

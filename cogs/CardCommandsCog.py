@@ -214,8 +214,15 @@ class CardCommandsCog(commands.Cog):
         if success > 0:
             try:
                 ch = await rec.create_dm()
-                ids = ', '.join([str(i) for i in card_ids])
-                await ch.send(f'**you have received ` 🆔 {ids} ` from {ctx.author.display_name}**')
+                ids = ', '.join([f"{i:04}" for i in card_ids])
+                if len(valid_docs) == 1:
+                    doc    = valid_docs[0]
+                    id     = doc['id']
+                    rarity = doc['rarity']
+                    stars  = doc['stars']
+                    await ch.send(f'**you have received ` 🆔 {id:04} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
+                else:
+                    await ch.send(f'**you have received ` 🆔 {ids} ` from {ctx.author.display_name}**')
             except discord.Forbidden:
                 pass
 

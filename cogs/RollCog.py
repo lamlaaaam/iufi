@@ -44,8 +44,8 @@ class RollCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} your next roll is in {text}.**', delete_after=2)
             return
 
+        #await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.set_user_cooldown(ctx.author.id, 'next_roll', m = self.roll_cooldown)
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
 
         success = await self.start_roll(ctx, 0)
         if not success:
@@ -60,7 +60,7 @@ class RollCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you do not have any rare rolls to use.**", delete_after=2)
             return
 
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        #await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'rare_rolls', -1)
 
         success = await self.start_roll(ctx, 1)
@@ -76,7 +76,7 @@ class RollCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you do not have any epic rolls to use.**", delete_after=2)
             return
 
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        #await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'epic_rolls', -1)
 
         success = await self.start_roll(ctx, 2)
@@ -92,7 +92,7 @@ class RollCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**", delete_after=2)
             return
 
-        await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
+        #await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
 
         success = await self.start_roll(ctx, 3)
@@ -108,13 +108,17 @@ class RollCog(commands.Cog):
                 components[0][i].disabled = True
             await roll_msg.edit(content=content, components=components)
 
+        fail_claim_notified = []
         async def button_check(id):
             if not await db_utils.does_user_exist(id):
                 return False
             if id in already_claimed:
                 return False
             ok, text = await db_utils.check_cooldown(id, 'next_claim')
-            if not ok:
+            if not ok and id != ctx.author.id:
+                if ctx.author.id not in fail_claim_notified:
+                    await ctx.send(f'**{ctx.author.mention} you can claim again in {text}**', delete_after=2)
+                    fail_claim_notified.append(ctx.author.id)
                 return False
             if roll_headstart_id != None and id != roll_headstart_id:
                 return False
@@ -214,7 +218,7 @@ class RollCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, i, b):
-        if i.channel not in self.bot.CHANNELS or i.message.id not in self.msg_to_event:
+        if i.message.id not in self.msg_to_event:
             return
         event = (i.author.id, int(b.custom_id.split()[1])-1)
         self.msg_to_event[i.message.id].append(event)

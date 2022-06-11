@@ -116,9 +116,10 @@ class RollCog(commands.Cog):
                 return False
             ok, text = await db_utils.check_cooldown(id, 'next_claim')
             if not ok and id != ctx.author.id:
-                if ctx.author.id not in fail_claim_notified:
-                    await ctx.send(f'**{ctx.author.mention} you can claim again in {text}**', delete_after=2)
-                    fail_claim_notified.append(ctx.author.id)
+                if id not in fail_claim_notified:
+                    user = await self.bot.fetch_user(id)
+                    await ctx.send(f'**{user.mention} you can claim again in {text}**', delete_after=2)
+                    fail_claim_notified.append(id)
                 return False
             if roll_headstart_id != None and id != roll_headstart_id:
                 return False

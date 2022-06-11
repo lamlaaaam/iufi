@@ -6,8 +6,8 @@ class BoardCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name = 'board', aliases = ['b'])
-    async def board(self, ctx):
+    @commands.command(name = 'leader', aliases = ['l'])
+    async def leader(self, ctx):
         top_user_docs = await db_utils.get_all_users()
         top_user_docs = sorted(top_user_docs, key=lambda doc: (doc['level'], doc['exp']), reverse=True)
         trophy        = '🏆'

@@ -1,9 +1,6 @@
-import asyncio
 import db_utils
 import discord
-from   async_timeout import timeout
 from   discord.ext   import commands
-from   discord       import SelectMenu, SelectOption
 
 class ShopCog(commands.Cog):
     def __init__(self,
@@ -21,47 +18,29 @@ class ShopCog(commands.Cog):
         user_doc      = await db_utils.get_user(id)
         user_currency = user_doc['currency']
         title         = "**🛒   IUFI Shop**"
-        desc          = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
-        desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
+        #desc          = f"**`Welcome to IUFI Shop! What do you need?`**\n"
+        desc          = f"```Buy using qbuy item_id quantity\n"
+        desc         += f"WARNING: DO NOT BUY MULTIPLE RESETS```\n"
+        #desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
+        shop_list     = '\n'.join([f"🆔 {i:<2} {emoji} {name:<16} {price:>4} 🍬" for i, (emoji, name, price, _, _) in enumerate(self.shop_list)])
+        desc         += '```' + shop_list + '```'
         embed         = discord.Embed(title=title, description=desc, color=discord.Color.red())
 
         embed.set_thumbnail(url=user.avatar_url)
-
-        options    = [SelectOption(emoji=emoji, label=f"{name}  ({price} 🍬)", value=str(i), description=desc) 
-                      for i, (emoji, name, price, desc, _) in enumerate(self.shop_list)]
-        components = [[SelectMenu(custom_id='shop_menu', options=options, placeholder = 'Pick an item to purchase')]]
-
-        try:
-            ch = await user.create_dm()
-            shop_msg = await ch.send(embed=embed, components=components)
-        except discord.Forbidden:
-            await ctx.send(f"**{user.mention} you do not have DMs enabled. Enable it for access to the shop.**", delete_after=2)
+        await ctx.send(embed=embed)
+    
+    @commands.command(name = 'buy', aliases = ['b'])
+    async def buy(self, ctx, item_id: int, amt: int=1):
+        if not 0 <= item_id < len(self.shop_list):
+            await ctx.send(f"**{ctx.author.mention} the item ID is invalid.**", delete_after=2)
             return
-
-        def check(i: discord.ComponentInteraction, com):
-            return i.author == ctx.author and i.message.id == shop_msg.id
-
-        async def buy(i):
-            nonlocal shop_msg
-            emoji, name, price, _, effect = self.shop_list[i]
-            if (await db_utils.get_user(id))['currency'] >= price:
-                await db_utils.update_user_currency(id, -price)
-                await effect(id)
-                await ch.send(f"**You have purchased `{emoji} {name}`.**", delete_after=2)
-            else:
-                await ch.send(f"**You do not have enough starcandies.**", delete_after=2)
-
-            desc              = f"**`Welcome to IUFI Shop! What do you need?`**\n\n"
-            desc             += f"**🍬 Starcandies: `{(await db_utils.get_user(id))['currency']}`\n**"
-            embed.description = desc
-            await shop_msg.edit(embed=embed)
-
-        try:
-            async with timeout(self.shop_time):
-                while True:
-                    interaction, select = await self.bot.wait_for('selection_select', check = check)
-                    await buy(select.values[0])
-        except asyncio.exceptions.TimeoutError:
-            pass
-
-        await shop_msg.delete()
+        if amt <= 0:
+            await ctx.send(f"**{ctx.author.mention} the amount is invalid.**", delete_after=2)
+            return
+        emoji, name, price, _, effect = self.shop_list[item_id]
+        if (await db_utils.get_user(ctx.author.id))['currency'] >= price * amt:
+            await db_utils.update_user_currency(ctx.author.id, -(price * amt))
+            await effect(ctx.author.id, amt)
+            await ctx.send(f"**{ctx.author.mention} you have purchased `{amt} {emoji} {name}`.**", delete_after=2)
+        else:
+            await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=2)

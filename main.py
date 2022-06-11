@@ -76,8 +76,10 @@ EVENT_DROP_VALID     = 120  # Seconds
 
 BIO_LIMIT            = 100 # Chars
 
+CONVERT_MODES        = ["notag", "common", "rare", "epic", "legend"]
+
 COMMAND_MAP = {
-    'qboard'       : ('qb', 'qboard', 'Shows the IUFI leaderboard.'),
+    'qleader'      : ('ql', 'qleader', 'Shows the IUFI leaderboard.'),
     'qcooldowns'   : ('qcd', 'qcooldowns', 'Shows all your cooldowns.'),
     'qcommandhelp' : ('qch', 'qcommandhelp command', 'Shows the details for a command, including aliases, usage and description.'),
     'qhelp'        : ('qh', 'qhelp', 'Shows the IUFI help screen.'),
@@ -120,25 +122,27 @@ COMMAND_MAP = {
     'qremoveframe' : ('qrfr', 'qremoveframe card', 'Removes the frame from the photocard. Card can be identified by its ID or given tag.'),
     'qframeinfo'   : ('qfi', 'qframeinfo id_or_tag', 'Shows the details for the frame. Frame can be identified by its ID or given tag.'),
     'qupgrade'     : ('qu', 'qupgrade id_or_tag', 'Attempts to upgrade star level of the card. Card can be identified by its ID or given tag.'),
-    'qconvertall'  : ('None', 'qconvertall', 'Converts ALL your photocards.')
+    'qconvertall'  : ('None', 'qconvertall', 'Converts ALL your photocards.'),
+    'qbuy'         : ('qb', 'qbuy item_id quantity', 'Buys specified amount of the given item.'),
+    'qconvertmass' : ('qcm', 'qconvertmass mode', f"Converts photocard that fit the given mode. Allowed modes: {', '.join(CONVERT_MODES)}")
 }
 
 SHOP_LIST = [
-    ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id: db_utils.set_user_cooldown(id, 'next_claim')),
-    ('🎲', 'ROLL RESET'      , 10,    'Resets your roll cooldown.',  lambda id: db_utils.set_user_cooldown(id, 'next_roll')),
-    ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
-    ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
-    ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1)),
-    ('🔨', 'STAR UPGRADE'    , 50, 'A chance to upgrade a card\'s stars.', lambda id: db_utils.update_user_upgrades(id, 1)),
-    ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id: db_utils.update_user_frames(id, 2, 1)),
-    ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id: db_utils.update_user_frames(id, 7, 1)),
-    ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id: db_utils.update_user_frames(id, 3, 1)),
-    ('🌷', 'DANDELIONS FRAME', 50,  'Dandelion stickers drawn by IU!', lambda id: db_utils.update_user_frames(id, 4, 1)),
-    ('✨', 'SHINE FRAME'     , 60,  'Add some shine effect to your photocard!', lambda id: db_utils.update_user_frames(id, 5, 1)),
-    ('💠', 'LOVEPOEM FRAME'  , 70,  'For the Love Poem lovers!', lambda id: db_utils.update_user_frames(id, 6, 1)),
-    ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id: db_utils.update_user_frames(id, 9, 1)),
-    ('🍓', 'SMOON FRAME'     , 90,  'Brighten the night with stars and a strawberry moon!', lambda id: db_utils.update_user_frames(id, 8, 1)),
-    ('✍️', ' SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id: db_utils.update_user_frames(id, 1, 1)),
+    ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id, amt: db_utils.set_user_cooldown(id, 'next_claim')),
+    ('🎲', 'ROLL RESET'      , 10,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
+    ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
+    ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
+    ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
+    ('🔨', 'STAR UPGRADE'    , 50, 'A chance to upgrade a card\'s stars.', lambda id, amt: db_utils.update_user_upgrades(id, amt)),
+    ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id, amt: db_utils.update_user_frames(id, 2, amt)),
+    ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id, amt: db_utils.update_user_frames(id, 7, amt)),
+    ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id, amt: db_utils.update_user_frames(id, 3, amt)),
+    ('🌷', 'DANDELIONS FRAME', 50,  'Dandelion stickers drawn by IU!', lambda id, amt: db_utils.update_user_frames(id, 4, amt)),
+    ('✨', 'SHINE FRAME'     , 60,  'Add some shine effect to your photocard!', lambda id, amt: db_utils.update_user_frames(id, 5, amt)),
+    ('💠', 'LOVEPOEM FRAME'  , 70,  'For the Love Poem lovers!', lambda id, amt: db_utils.update_user_frames(id, 6, amt)),
+    ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id, amt: db_utils.update_user_frames(id, 9, amt)),
+    ('🍓', 'SMOON FRAME'     , 90,  'Brighten the night with stars and a strawberry moon!', lambda id, amt: db_utils.update_user_frames(id, 8, amt)),
+    ('✍️', ' SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id, amt: db_utils.update_user_frames(id, 1, amt)),
 ]
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
@@ -200,7 +204,7 @@ async def on_ready():
     bot.add_cog(DevCog(bot, DEVS))
     bot.add_cog(LevelCog(bot))
     bot.add_cog(CollectionCog(bot, COLLECTION_TIME))
-    bot.add_cog(CardCommandsCog(bot))
+    bot.add_cog(CardCommandsCog(bot, CONVERT_MODES))
     bot.add_cog(CommandHelpCog(bot, COMMAND_MAP))
     bot.add_cog(InventoryCog(bot))
     bot.add_cog(AuctionCog(bot, AUCTION_TIME, AUCTION_MAX_BID))

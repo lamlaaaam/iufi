@@ -9,9 +9,10 @@ import discord
 from   discord.ext import commands
 
 class CardCommandsCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, modes):
         self.bot       = bot
         self.tag_limit = 10
+        self.modes     = modes
         self.thread_pool = ThreadPoolExecutor()
         self.loop        = asyncio.get_running_loop()
 
@@ -160,6 +161,27 @@ class CardCommandsCog(commands.Cog):
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
         await ctx.send(f"**{ctx.author.mention} you converted all {success} photocards into {reward} starcandies.**", delete_after=2)
 
+    @commands.command(name = 'convertmass', aliases=['cm'])
+    async def convert_mass(self, ctx, mode):
+        mode = mode.lower()
+        if mode not in self.modes:
+            raise commands.BadArgument
+        if mode == 'notag':
+            valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, 'tag': None})
+        if mode == 'common':
+            valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, 'rarity': 0})
+        if mode == 'rare':
+            valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, 'rarity': 1})
+        if mode == 'epic':
+            valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, 'rarity': 2})
+        if mode == 'legend':
+            valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, 'rarity': 3})
+        success    = len(valid_docs)
+        reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
+        card_ids   = [doc['id'] for doc in valid_docs]
+        await db_utils.convert_cards(ctx.author.id, card_ids, reward)
+        await ctx.send(f"**{ctx.author.mention} you converted {success} {mode} photocards into {reward} starcandies.**", delete_after=2)
+
     @commands.command(name = 'convertlast', aliases = ['cl'])
     async def convert_last(self, ctx):
         last_card = await self.get_last_card_id(ctx.author.id)
@@ -207,7 +229,6 @@ class CardCommandsCog(commands.Cog):
         id_tags    = [int(it) if it.isnumeric() else it for it in id_tags]
         valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]})
         success    = len(valid_docs)
-        fail       = len(id_tags) - success
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
         await ctx.send(f'**{ctx.author.mention} you gifted {success} photocards.**', delete_after=2)
@@ -218,7 +239,7 @@ class CardCommandsCog(commands.Cog):
                 if len(valid_docs) == 1:
                     doc    = valid_docs[0]
                     id     = doc['id']
-                    rarity = doc['rarity']
+                    rarity = self.bot.RARITY[doc['rarity']]
                     stars  = doc['stars']
                     await ch.send(f'**you have received ` 🆔 {id:04} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
                 else:

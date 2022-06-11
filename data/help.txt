@@ -1,8 +1,8 @@
 **ℹ️ Info**
-`qboard qcooldowns qcommandhelp qhelp qinventory qprofile qremovebio qsetbio`
+`qcooldowns qcommandhelp qhelp qinventory qleader qprofile qremovebio qsetbio`
 
 **🎴 Card**
-`qcardinfo qcardinfolast qconvert qconvertall qconvertlast qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`
+`qcardinfo qcardinfolast qconvert qconvertall qconvertlast qconvertmass qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`
 
 **🖼️ Frames**
 `qremoveframe qsetframe qsetframelast qframeinfo`
@@ -14,7 +14,7 @@
 `qgiftsc`
 
 **🎮 Gameplay**
-`qauction qbid qdaily qepicroll qlegendroll qrareroll qroll qshop`
+`qauction qbid qbuy qdaily qepicroll qlegendroll qrareroll qroll qshop`
 
 **🔔 Reminders**
 `qremindoff qremindon`

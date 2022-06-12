@@ -46,8 +46,12 @@ class CardCommandsCog(commands.Cog):
         desc   = id + tag + frame + rarity + stars + owned + '\n\n'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.dark_grey())
 
-        card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
-        card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+        if card_doc['stars'] < self.bot.STARS_MAX:
+            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
+            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+        else:
+            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_gif_photocard, card_doc)))
+            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND, True)))
         embed.set_image(url=card_attachment)
 
         try:

@@ -2,7 +2,7 @@
 `qcooldowns qcommandhelp qhelp qinventory qleader qprofile qremovebio qsetbio`
 
 **🎴 Card**
-`qcardinfo qcardinfolast qconvert qconvertall qconvertlast qconvertmass qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves setfaveslast qsettag qsettaglast qview`
+`qcardinfo qcardinfolast qconvert qconvertall qconvertlast qconvertmass qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves qsetfaveslast qsettag qsettaglast qview`
 
 **🖼️ Frames**
 `qremoveframe qsetframe qsetframelast qframeinfo`

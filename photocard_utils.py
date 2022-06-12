@@ -63,6 +63,48 @@ async def create_frame(frame_doc):
     frame_img = Image.open(frame_img).resize(CARD_SIZE)
     return frame_img
 
+from PIL import ImageEnhance
+import gif_utils as gu
+async def image_shiny(im):
+    frames = []
+    #enhancer = ImageEnhance.Color(im)
+    enhancer = ImageEnhance.Brightness(im)
+    base_frame = im
+    frames.extend([base_frame] * 10)
+
+    for f in range(1, 5, 2):
+        factor = 1.0 + 0.1*f
+        #factor = f
+        bright = enhancer.enhance(factor)
+        frames.extend([bright])
+    for f in range(5, -1, -1):
+        factor = 1.0 + 0.1*f
+        #factor = f
+        bright = enhancer.enhance(factor)
+        frames.extend([bright])
+    return frames
+
+async def create_gif_photocard(card_doc):
+    if card_doc == None:
+        return
+    card_img  = await download_url(card_doc['url'])
+    frame     = await db_utils.get_frame(card_doc['frame'])
+    frame_img = await download_url(frame['url'])
+
+    col      = ColorThief(card_img).get_color(quality=10)
+
+    card_img = Image.open(card_img).convert('RGBA')
+    frame_img = Image.open(frame_img)
+
+    if frame['auto']:
+        frame_img = await recolour(frame_img, col)
+
+    card_img.paste(frame_img, frame_img)
+    card_img = await add_corners(card_img, 45)
+
+    frames = await image_shiny(card_img)
+    return frames
+
 async def create_photocard(card_doc):
     if card_doc == None:
         return
@@ -71,8 +113,9 @@ async def create_photocard(card_doc):
     frame_img = await download_url(frame['url'])
 
     col      = ColorThief(card_img).get_color(quality=10)
-    card_img = Image.open(card_img).resize(CARD_SIZE).convert('RGBA')
-    frame_img = Image.open(frame_img).resize(CARD_SIZE)
+
+    card_img = Image.open(card_img).convert('RGBA')
+    frame_img = Image.open(frame_img)
 
     if frame['auto']:
         frame_img = await recolour(frame_img, col)
@@ -113,16 +156,21 @@ async def complement(r, g, b):
     k = await hilo(r, g, b)
     return tuple(k - u for u in (r, g, b))
 
-async def pillow_to_attachment(img, channel):
-    file       = await pillow_to_file(img)
+async def pillow_to_attachment(img, channel, gif=False):
+    file       = await pillow_to_file(img, gif)
     attachment = (await channel.send(file = file)).attachments[0].url
     return attachment
 
-async def pillow_to_file(img):
+async def pillow_to_file(img, gif=False):
     image_binary = io.BytesIO()
-    img.save(image_binary, 'PNG')
-    image_binary.seek(0)
-    file = discord.File(fp=image_binary, filename='image.png')
+    if gif:
+        gu.save_transparent_gif(img, 80, image_binary)
+        image_binary.seek(0)
+        file = discord.File(fp=image_binary, filename=f"image.gif")
+    else:
+        img.save(image_binary, 'PNG')
+        image_binary.seek(0)
+        file = discord.File(fp=image_binary, filename=f"image.png")
     return file
 
 @alru_cache(maxsize=64)

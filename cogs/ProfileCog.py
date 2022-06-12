@@ -43,8 +43,12 @@ class ProfileCog(commands.Cog):
         embed.set_thumbnail(url=user.avatar_url)
 
         if main_card_doc:
-            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, main_card_doc)))
-            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+            if main_card_doc['stars'] < self.bot.STARS_MAX:
+                card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, main_card_doc)))
+                card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+            else:
+                card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_gif_photocard, main_card_doc)))
+                card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND, True)))
             embed.set_image(url=card_attachment)
         await ctx.send(embed = embed)
 

@@ -76,8 +76,12 @@ class AuctionCog(commands.Cog):
         desc           = inst + id + tag + frame + rarity + stars + highest_bidder + highest_bid + timer + '\n\n'
         embed          = discord.Embed(title=title, description=desc, color=discord.Color.dark_red())
 
-        card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
-        card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+        if card_doc['stars'] < self.bot.STARS_MAX:
+            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_photocard, card_doc)))
+            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND)))
+        else:
+            card_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.create_gif_photocard, card_doc)))
+            card_attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, card_img, self.bot.WASTELAND, True)))
         embed.set_image(url=card_attachment)
         embed.set_thumbnail(url=ctx.author.avatar_url)
 

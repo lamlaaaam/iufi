@@ -124,7 +124,7 @@ COMMAND_MAP = {
     'qupgrade'     : ('qu', 'qupgrade id_or_tag', 'Attempts to upgrade star level of the card. Card can be identified by its ID or given tag.'),
     'qconvertall'  : ('None', 'qconvertall', 'Converts ALL your photocards.'),
     'qbuy'         : ('qb', 'qbuy item_id quantity', 'Buys specified amount of the given item.'),
-    'qconvertmass' : ('qcm', 'qconvertmass mode', f"Converts photocard that fit the given mode. Allowed modes: {', '.join(CONVERT_MODES)}")
+    'qconvertmass' : ('qcm', 'qconvertmass mode', f"Converts photocards that fit the given mode. Allowed modes: {', '.join(CONVERT_MODES)}")
 }
 
 SHOP_LIST = [

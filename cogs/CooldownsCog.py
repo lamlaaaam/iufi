@@ -1,3 +1,4 @@
+import asyncio
 import db_utils
 import discord
 from   discord.ext import commands, tasks
@@ -60,6 +61,10 @@ class CooldownsCog(commands.Cog):
             await self.send_dm(id, "roll")
         for id in daily_up:
             await self.send_dm(id, "daily")
+
+    @cd_check.before_loop
+    async def before_cd_check(self):
+        await asyncio.sleep(60)
 
     async def send_dm(self, id, type):
         try:

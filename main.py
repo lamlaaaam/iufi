@@ -6,26 +6,27 @@ from   discord.ext          import commands
 
 import db_utils
 
-from   cogs.HelpCog         import HelpCog
-from   cogs.RegisterCog     import RegisterCog
-from   cogs.RollCog         import RollCog
-from   cogs.ProfileCog      import ProfileCog
-from   cogs.GiftSCCog       import GiftSCCog
-from   cogs.BoardCog        import BoardCog
-from   cogs.CooldownsCog    import CooldownsCog
-from   cogs.DailyCog        import DailyCog
-from   cogs.ShopCog         import ShopCog
-from   cogs.ErrorCog        import ErrorCog
-from   cogs.DevCog          import DevCog
-from   cogs.LevelCog        import LevelCog
-from   cogs.CollectionCog   import CollectionCog
-from   cogs.CardCommandsCog import CardCommandsCog
-from   cogs.CommandHelpCog  import CommandHelpCog
-from   cogs.InventoryCog    import InventoryCog
-from   cogs.AuctionCog      import AuctionCog
-from   cogs.EventDropCog    import EventDropCog
-from   cogs.FavesCog        import FavesCog
-from   cogs.FramesCog       import FramesCog
+from   cogs.HelpCog          import HelpCog
+from   cogs.RegisterCog      import RegisterCog
+from   cogs.RollCog          import RollCog
+from   cogs.ProfileCog       import ProfileCog
+from   cogs.GiftSCCog        import GiftSCCog
+from   cogs.BoardCog         import BoardCog
+from   cogs.CooldownsCog     import CooldownsCog
+from   cogs.DailyCog         import DailyCog
+from   cogs.ShopCog          import ShopCog
+from   cogs.ErrorCog         import ErrorCog
+from   cogs.DevCog           import DevCog
+from   cogs.LevelCog         import LevelCog
+from   cogs.CollectionCog    import CollectionCog
+from   cogs.CardCommandsCog  import CardCommandsCog
+from   cogs.CommandHelpCog   import CommandHelpCog
+from   cogs.InventoryCog     import InventoryCog
+from   cogs.AuctionCog       import AuctionCog
+from   cogs.EventDropCog     import EventDropCog
+from   cogs.FavesCog         import FavesCog
+from   cogs.FramesCog        import FramesCog
+from   cogs.SurpriseEventCog import SurpriseEventCog
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -142,7 +143,7 @@ SHOP_LIST = [
     ('💠', 'LOVEPOEM FRAME'  , 70,  'For the Love Poem lovers!', lambda id, amt: db_utils.update_user_frames(id, 6, amt)),
     ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id, amt: db_utils.update_user_frames(id, 9, amt)),
     ('🍓', 'SMOON FRAME'     , 90,  'Brighten the night with stars and a strawberry moon!', lambda id, amt: db_utils.update_user_frames(id, 8, amt)),
-    ('✍️', ' SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id, amt: db_utils.update_user_frames(id, 1, amt)),
+    ('✍️', 'SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id, amt: db_utils.update_user_frames(id, 1, amt)),
 ]
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
@@ -151,7 +152,7 @@ bot.RARITY_SC   = [1, 5, 50, 300]
 bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 bot.STARS_MAX   = 10
-bot.STARS_PROB  = [90, 80, 70, 60, 50, 40, 30, 20, 10] # Out of 100; Prob to get to next star
+bot.STARS_PROB  = [91, 82, 73, 64, 55, 47, 38, 29, 20] # Out of 100; Prob to get to next star
 
 BOL      = 406986532205887488
 HAZE     = 95608676441661440
@@ -213,6 +214,7 @@ async def on_ready():
                              EVENT_DROP_VALID))
     bot.add_cog(FavesCog(bot))
     bot.add_cog(FramesCog(bot))
+    bot.add_cog(SurpriseEventCog(bot))
     print('Cogs added')
 
     print('Bot is ready')
@@ -228,7 +230,7 @@ async def on_message(msg):
     is_cmd = ctx.valid
     #if is_cmd:
     #    await msg.delete()
-    if is_cmd and msg.channel not in bot.CHANNELS:
+    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != 406986532205887488:
         await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
         return
     if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':

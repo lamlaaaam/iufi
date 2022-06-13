@@ -118,7 +118,7 @@ class RollCog(commands.Cog):
             if not ok and id != ctx.author.id:
                 if id not in fail_claim_notified:
                     user = await self.bot.fetch_user(id)
-                    await ctx.send(f'**{user.mention} you can claim again in {text}**', delete_after=2)
+                    await ctx.send(f'**{user.mention} you can claim again in {text}**')
                     fail_claim_notified.append(id)
                 return False
             if roll_headstart_id != None and id != roll_headstart_id:
@@ -164,7 +164,7 @@ class RollCog(commands.Cog):
             return
         stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_images, roll_pc_docs)))
         if stitched_img == None:
-            await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**", delete_after=2)
+            await ctx.send("**The roll could not load due to server error. And no don't ping 8 bol he can't do shit it's the image hosting site giving up. Try again later.**")
             return False
         stitched_img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_file, stitched_img)))
 

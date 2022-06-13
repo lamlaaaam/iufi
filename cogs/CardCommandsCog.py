@@ -100,7 +100,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} there is already a card with this tag.**", delete_after=2)
             return
         await db_utils.set_card_tag(id_tag, tag)
-        await ctx.send(f"**{ctx.author.mention} you have set the tag.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have set the tag.**")
         
     @commands.command(name = 'settaglast', aliases = ['stl'])
     async def set_tag_last(self, ctx, tag):
@@ -123,7 +123,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(last_card, tag)
-        await ctx.send(f"**{ctx.author.mention} you have set the tag.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have set the tag.**")
 
     @commands.command(name = 'removetag', aliases = ['rt'])
     async def remove_tag(self, ctx, id_tag):
@@ -137,7 +137,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(id_tag, None)
-        await ctx.send(f"**{ctx.author.mention} you have removed the tag.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have removed the tag.**")
 
     async def get_last_card_id(self, user_id):
         user_doc = await db_utils.get_user(user_id)
@@ -154,7 +154,7 @@ class CardCommandsCog(commands.Cog):
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        await ctx.send(f"**{ctx.author.mention} you converted {success} photocards into {reward} starcandies.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you converted {success} photocards into {reward} starcandies.**")
 
     @commands.command(name = 'convertall')
     async def convert_all(self, ctx):
@@ -163,7 +163,7 @@ class CardCommandsCog(commands.Cog):
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        await ctx.send(f"**{ctx.author.mention} you converted all {success} photocards into {reward} starcandies.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you converted all {success} photocards into {reward} starcandies.**")
 
     @commands.command(name = 'convertmass', aliases=['cm'])
     async def convert_mass(self, ctx, mode):
@@ -184,7 +184,7 @@ class CardCommandsCog(commands.Cog):
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        await ctx.send(f"**{ctx.author.mention} you converted {success} {mode} photocards into {reward} starcandies.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you converted {success} {mode} photocards into {reward} starcandies.**")
 
     @commands.command(name = 'convertlast', aliases = ['cl'])
     async def convert_last(self, ctx):
@@ -194,7 +194,7 @@ class CardCommandsCog(commands.Cog):
             return
         reward = self.bot.RARITY_SC[(await db_utils.get_card(last_card))['rarity']]
         await db_utils.convert_cards(ctx.author.id, [last_card], reward)
-        await ctx.send(f'**{ctx.author.mention} you converted your last photocard into {reward} starcandies.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you converted your last photocard into {reward} starcandies.**')
 
     async def main_card(self, user_id, card_id):
         await db_utils.set_main(user_id, card_id)
@@ -210,7 +210,7 @@ class CardCommandsCog(commands.Cog):
             await self.card_not_owned_error(ctx)
             return
         await self.main_card(ctx.author.id, card_doc['id'])
-        await ctx.send(f'**{ctx.author.mention} you have set a main photocard.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have set a main photocard.**')
 
     @commands.command(name = 'mainlast', aliases = ['ml'])
     async def main_last(self, ctx):
@@ -219,7 +219,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         await self.main_card(ctx.author.id, last_card)
-        await ctx.send(f'**{ctx.author.mention} you have set your last photocard as your main.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have set your last photocard as your main.**')
 
     @commands.command(name = 'giftpc', aliases = ['gpc'])
     async def gift_pc(self, ctx, rec: discord.Member, *id_tags):
@@ -235,7 +235,7 @@ class CardCommandsCog(commands.Cog):
         success    = len(valid_docs)
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
-        await ctx.send(f'**{ctx.author.mention} you gifted {success} photocards.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you gifted {success} photocards.**')
         if success > 0:
             try:
                 ch = await rec.create_dm()
@@ -243,9 +243,10 @@ class CardCommandsCog(commands.Cog):
                 if len(valid_docs) == 1:
                     doc    = valid_docs[0]
                     id     = doc['id']
+                    tag    = doc['tag']
                     rarity = self.bot.RARITY[doc['rarity']]
                     stars  = doc['stars']
-                    await ch.send(f'**you have received ` 🆔 {id:04} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
+                    await ch.send(f'**you have received ` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
                 else:
                     await ch.send(f'**you have received ` 🆔 {ids} ` from {ctx.author.display_name}**')
             except discord.Forbidden:
@@ -269,14 +270,15 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.gift_cards(ctx.author.id, rec.id, [last_card])
-        await ctx.send(f'**{ctx.author.mention} you have gifted your last photocard.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have gifted your last photocard.**')
         try:
             ch     = await rec.create_dm()
             doc    = await db_utils.get_card(last_card)
+            tag    = doc['tag']
             id     = doc['id']
             rarity = self.bot.RARITY[doc['rarity']]
             stars  = doc['stars']
-            await ch.send(f'**you have received ` 🆔 {id:04} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
+            await ch.send(f'**you have received ` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
         except discord.Forbidden:
             pass
 
@@ -289,7 +291,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**", delete_after=2)
             return
         await db_utils.remove_user_fave(ctx.author.id, slot-1)
-        await ctx.send(f'**{ctx.author.mention} you have removed the favorite photocard in slot {slot}.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have removed the favorite photocard in slot {slot}.**')
 
     @commands.command(name = 'setfaves', aliases = ['sf'])
     async def set_faves(self, ctx, slot: int, id_tag):
@@ -307,7 +309,7 @@ class CardCommandsCog(commands.Cog):
         if card_doc['id'] in user_doc['faves']:
             await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(card_doc['id']))
         await self.set_fave(ctx.author.id, card_doc['id'], slot)
-        await ctx.send(f'**{ctx.author.mention} you have set a favorite photocard in slot {slot}.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have set a favorite photocard in slot {slot}.**')
 
     @commands.command(name = 'setfaveslast', aliases = ['sfl'])
     async def set_faves_last(self, ctx, slot: int):
@@ -322,7 +324,7 @@ class CardCommandsCog(commands.Cog):
         if last_card in user_doc['faves']:
             await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(last_card))
         await self.set_fave(ctx.author.id, last_card, slot)
-        await ctx.send(f'**{ctx.author.mention} you have set your last photocard as a favorite in slot {slot}.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have set your last photocard as a favorite in slot {slot}.**')
 
     @commands.command(name = 'upgrade', aliases = ['u'])
     async def upgrade(self, ctx, id_tag):
@@ -344,7 +346,7 @@ class CardCommandsCog(commands.Cog):
         success = random.randint(1,100) <= self.bot.STARS_PROB[card_doc['stars']-1]
         if success:
             await db_utils.update_card_stars(card_doc['id'], 1, self.bot.STARS_MAX)
-            await ctx.send(f"**{ctx.author.mention} the upgrade was successful.**", delete_after=2)
+            await ctx.send(f"**{ctx.author.mention} the upgrade was successful.**")
         else:
-            await ctx.send(f"**{ctx.author.mention} the upgrade failed.**", delete_after=2)
+            await ctx.send(f"**{ctx.author.mention} the upgrade failed.**")
 

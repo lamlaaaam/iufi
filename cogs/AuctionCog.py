@@ -109,11 +109,11 @@ class AuctionCog(commands.Cog):
                 await db_utils.remove_card_from_user(ctx.author.id, card_doc['id'])
                 await db_utils.add_card_to_user(self.highest_bidder.id, card_doc['id'])
                 await db_utils.set_card_owner(card_doc['id'], self.highest_bidder.id)
-                await ctx.send(f"**{self.highest_bidder.mention} has won the auction with a winning bid of {self.highest_bid} starcandies.**", delete_after=2)
+                await ctx.send(f"**{self.highest_bidder.mention} has won the auction with a winning bid of {self.highest_bid} starcandies.**")
             else:
-                await ctx.send(f"**The auction transaction has failed.**", delete_after=2)
+                await ctx.send(f"**The auction transaction has failed.**")
         else:
-            await ctx.send(f"**{ctx.author.mention} no one bid on your photocard.**", delete_after=2)
+            await ctx.send(f"**{ctx.author.mention} no one bid on your photocard.**")
 
         self.highest_bidder  = None
         self.highest_bid     = 0

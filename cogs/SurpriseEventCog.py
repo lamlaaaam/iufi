@@ -1,0 +1,89 @@
+import asyncio
+import db_utils
+import discord
+from   discord.ext import commands
+
+class SurpriseEventCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.answer = None
+        self.prize_type = None
+        self.prize_arg = None
+        self.prize_name = None
+        self.desc = None
+        self.hint1 = None
+        self.hint2 = None
+        self.hint3 = None
+        self.event_msg = None
+        self.pizza_master_id = 982571914516131892
+        self.ch = None
+
+    async def cog_check(self, ctx):
+        return self.pizza_master_id in [r.id for r in ctx.author.roles]
+
+    @commands.command(name = 'eventconfig')
+    async def event_config(self, ctx, answer, prize_type, prize_arg, prize_name, desc, hint1, hint2, hint3):
+        self.answer = answer
+        self.prize_type = prize_type
+        self.prize_arg = prize_arg
+        self.prize_name = prize_name
+        self.desc = desc
+        self.hint1 = hint1
+        self.hint2 = hint2
+        self.hint3 = hint3
+        await ctx.send("configured.")
+
+    @commands.command(name = 'eventtrigger')
+    async def event_trigger(self, ctx, ch:discord.TextChannel):
+        self.ch = ch
+        title = "**🎉    Surprise Event!**"
+        body = '```' + self.desc + '```'
+        hint1 = '`Hint 1:          hidden          `'
+        hint2 = '`Hint 2:          hidden          `'
+        hint3 = '`Hint 3:          hidden          `'
+        desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
+        embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        self.event_msg = await ch.send(content='@here', embed=embed)
+
+        def check(m):
+            return m.channel in self.bot.CHANNELS and m.content == self.answer and db_utils.does_user_exist_sync(m.author.id)
+
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=86400)
+            await self.handle_win(ctx, msg)
+        except asyncio.TimeoutError:
+            end   = '` This event has ended. `'
+            embed.description = self.event_msg.embeds[0].description + '\n\n' + end
+            await self.event_msg.edit(embed=embed)
+
+    async def handle_win(self, ctx, win_msg):
+        await db_utils.set_card_owner(int(self.prize_arg), win_msg.author.id)
+        await db_utils.add_card_to_user(win_msg.author.id, int(self.prize_arg))
+
+        title = "**🎉    Winner!**"
+        desc   = f'` {win_msg.author.display_name} has won the event, congratulations! `'
+        embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
+        embed.set_thumbnail(url=win_msg.author.avatar_url)
+        await self.ch.send(content='@here', embed=embed)
+
+    @commands.command(name = 'eventhint')
+    async def event_hint(self, ctx, num: int):
+        title = "**🎉    Surprise Event!**"
+        body = '```' + self.desc + '```'
+        hint1 = '`Hint 1:          hidden          `'
+        hint2 = '`Hint 2:          hidden          `'
+        hint3 = '`Hint 3:          hidden          `'
+        if num == 1:
+            hint1 = f'`Hint 1: {self.hint1}`'
+        if num == 2:
+            hint1 = f'`Hint 1: {self.hint1}`'
+            hint2 = f'`Hint 2: {self.hint2}`'
+        if num == 3:
+            hint1 = f'`Hint 1: {self.hint1}`'
+            hint2 = f'`Hint 2: {self.hint2}`'
+            hint3 = f'`Hint 3: {self.hint3}`'
+        desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
+        embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        await self.event_msg.edit(content='@here', embed=embed)

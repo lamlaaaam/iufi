@@ -102,6 +102,12 @@ async def reset_game_command():
     players_col.drop()
 
 # ----------------------------------------------------------------------------------------------------------
+def does_user_exist_sync(q):
+    if isinstance(q, int):
+        already_exists = players_col.count_documents({'discord_id': q}, limit = 1)
+    else:
+        already_exists = players_col.count_documents({'discord_id': q.author.id}, limit = 1)
+    return already_exists
 
 async def does_user_exist(q):
     if isinstance(q, int):

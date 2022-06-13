@@ -27,7 +27,7 @@ class GiftSCCog(commands.Cog):
 
         await db_utils.update_user_currency(ctx.author.id, -amt)
         await db_utils.update_user_currency(rec.id, amt)
-        await ctx.send(f'**{ctx.author.mention} you have gifted {amt} starcandies.**', delete_after=2)
+        await ctx.send(f'**{ctx.author.mention} you have gifted {amt} starcandies.**')
         try:
             ch = await rec.create_dm()
             await ch.send(f'**you have received {amt} starcandies from {ctx.author.display_name}**')

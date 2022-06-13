@@ -41,6 +41,6 @@ class ShopCog(commands.Cog):
         if (await db_utils.get_user(ctx.author.id))['currency'] >= price * amt:
             await db_utils.update_user_currency(ctx.author.id, -(price * amt))
             await effect(ctx.author.id, amt)
-            await ctx.send(f"**{ctx.author.mention} you have purchased `{amt} {emoji} {name}`.**", delete_after=2)
+            await ctx.send(f"**{ctx.author.mention} you have purchased `{amt} {emoji} {name}`.**")
         else:
             await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=2)

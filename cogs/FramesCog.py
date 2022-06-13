@@ -38,7 +38,7 @@ class FramesCog(commands.Cog):
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.update_user_frames(ctx.author.id, frame_doc['id'], -1)
         await db_utils.set_card_frame(card_id_tag, frame_id_tag)
-        await ctx.send(f"**{ctx.author.mention} you have successfully set a frame.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have successfully set a frame.**")
 
     @commands.command(name = 'setframe', aliases = ['sfr'])
     async def set_frame(self, ctx, card_id_tag, frame_id_tag):

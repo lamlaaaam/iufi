@@ -58,9 +58,9 @@ class ProfileCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} your bio cannot exceed {self.bio_limit} characters.**", delete_after=2)
             return
         await db_utils.set_user_bio(ctx.author.id, bio)
-        await ctx.send(f"**{ctx.author.mention} you have successfully set your bio.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have successfully set your bio.**")
 
     @commands.command(name = 'removebio', aliases = ['rb'])
     async def remove_bio(self, ctx):
         await db_utils.remove_user_bio(ctx.author.id)
-        await ctx.send(f"**{ctx.author.mention} you have successfully removed your bio.**", delete_after=2)
+        await ctx.send(f"**{ctx.author.mention} you have successfully removed your bio.**")

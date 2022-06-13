@@ -1,11 +1,14 @@
 **ℹ️ Info**
-`qcooldowns qcommandhelp qhelp qinventory qleader qprofile qremovebio qsetbio`
+`qregister qhelp qcommandhelp qleader`
+
+**👤 Profile**
+`qprofile qsetbio qremovebio qmain qmainlast qfaves qsetfaves qremovefaves qcooldowns qview qinventory`
 
 **🎴 Card**
-`qcardinfo qcardinfolast qconvert qconvertall qconvertlast qconvertmass qfaves qgiftpc qgiftpclast qmain qmainlast qremovefaves qremovetag qsetfaves qsetfaveslast qsettag qsettaglast qview`
+`qcardinfo qcardinfolast qsettag qsettaglast qremovetag qconvert qconvertall qconvertlast qconvertmass qgiftpc qgiftpclast`
 
 **🖼️ Frames**
-`qremoveframe qsetframe qsetframelast qframeinfo`
+`qframeinfo qsetframe qsetframelast qremoveframe`
 
 **✨ Stars**
 `qupgrade`
@@ -14,18 +17,19 @@
 `qgiftsc`
 
 **🎮 Gameplay**
-`qauction qbid qbuy qdaily qepicroll qlegendroll qrareroll qroll qshop`
+`qauction qbid qshop qbuy qdaily qroll qrareroll qepicroll qlegendroll`
 
 **🔔 Reminders**
-`qremindoff qremindon`
-
-**👨‍💼 Admin**
-`qregister`
+`qremindon qremindoff`
 
 **🧑🏻‍💻 Developer**
 `qreboot qreset`
 
-**🙏🏼 Credits**
-`Code       - 8 bol`
-`Photocards - 8 bol, Mods, CMs`
-`Playtest   - Mods, CMs, Quaena, Blue, Mochi, Bendy`
+**🙏🏼 Appreciation**
+```
+Nocti for painstakingly curating 7000 photocards.
+gymshoe for writing the beginner guide.
+
+All kind donators:
+Albi, Blue, Lama, gymshoe, Haze, Keenan, nv
+```

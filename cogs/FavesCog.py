@@ -56,8 +56,13 @@ class FavesCog(commands.Cog):
                 desc  += f" \n"
         desc  = "```\n" + desc + "```\n"
 
-        img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_gallery, faves_sorted, 2, 3)))
-        attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, img, self.bot.WASTELAND)))
+        gif_faves = len([1 for doc in faves_sorted if doc != None and doc['stars'] == self.bot.STARS_MAX]) == 6
+        if gif_faves:
+            img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_gallery, faves_sorted, 2, 3, True)))
+            attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, img, self.bot.WASTELAND, True)))
+        else:
+            img = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.stitch_gallery, faves_sorted, 2, 3)))
+            attachment = await (await self.loop.run_in_executor(self.thread_pool, partial(photocard_utils.pillow_to_attachment, img, self.bot.WASTELAND)))
         title      = f"**❤️   {user.display_name}'s Favorite Photocards**"
         embed      = discord.Embed(title=title, description=desc, color=discord.Color.dark_green())
         embed.set_image(url=attachment)

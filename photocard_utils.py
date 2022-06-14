@@ -37,7 +37,7 @@ async def stitch_images(card_docs):
     except asyncio.exceptions.TimeoutError:
         return None
 
-async def stitch_gallery(card_docs, rows, cols):
+async def stitch_gallery(card_docs, rows, cols, gif=False):
     imgs = []
     for doc in card_docs:
         img = await create_photocard(doc)
@@ -54,6 +54,9 @@ async def stitch_gallery(card_docs, rows, cols):
             if imgs[i] != None:
                 new_image.paste(imgs[i], ((width + GALL_GAP) * c, (height + GALL_GAP) * r))
             i += 1
+
+    if gif:
+        return await image_shiny(new_image)
     return new_image
 
 async def create_frame(frame_doc):
@@ -70,14 +73,14 @@ async def image_shiny(im):
     #enhancer = ImageEnhance.Color(im)
     enhancer = ImageEnhance.Brightness(im)
     base_frame = im
-    frames.extend([base_frame] * 10)
+    frames.extend([base_frame] * 7)
 
-    for f in range(1, 5, 2):
+    for f in range(1, 11, 3):
         factor = 1.0 + 0.1*f
         #factor = f
         bright = enhancer.enhance(factor)
         frames.extend([bright])
-    for f in range(5, -1, -1):
+    for f in range(10, -1, -3):
         factor = 1.0 + 0.1*f
         #factor = f
         bright = enhancer.enhance(factor)

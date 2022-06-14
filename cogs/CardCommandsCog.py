@@ -33,8 +33,6 @@ class CardCommandsCog(commands.Cog):
         rarity = f"**{self.bot.RARITY[card_doc['rarity']]}   `{self.bot.RARITY_NAME[card_doc['rarity']]}`**\n"
         if card_doc['owned_by'] != None:
             scount = card_doc['stars']
-            #stars  = '⭐' * scount + self.bot.BS * (self.bot.STARS_MAX-scount)
-            #stars  = '**✨   ' + stars + '**\n\n'
             stars  = f"**⭐   `{scount}`**\n\n"
         else:
             stars = '\n'
@@ -327,6 +325,7 @@ class CardCommandsCog(commands.Cog):
         await ctx.send(f'**{ctx.author.mention} you have set your last photocard as a favorite in slot {slot}.**')
 
     @commands.command(name = 'upgrade', aliases = ['u'])
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def upgrade(self, ctx, id_tag):
         user_doc   = await db_utils.get_user(ctx.author.id)
         card_doc   = await db_utils.get_card(id_tag)
@@ -342,11 +341,34 @@ class CardCommandsCog(commands.Cog):
         if card_doc['stars'] >= self.bot.STARS_MAX:
             await ctx.send(f"**{ctx.author.mention} the card is already at max stars.**", delete_after=2)
             return
+
         await db_utils.update_user_upgrades(ctx.author.id, -1)
         success = random.randint(1,100) <= self.bot.STARS_PROB[card_doc['stars']-1]
         if success:
             await db_utils.update_card_stars(card_doc['id'], 1, self.bot.STARS_MAX)
-            await ctx.send(f"**{ctx.author.mention} the upgrade was successful.**")
+        title  = f"🔨 {ctx.author.display_name}'s Upgrade"
+        id     = f"🆔 {card_doc['id']:04}"
+        tag    = f"🏷️ {card_doc['tag']}"
+        rarity = f"{self.bot.RARITY[card_doc['rarity']]} {self.bot.RARITY_NAME[card_doc['rarity']]}"
+        body   = f"⭐ {card_doc['stars']} ⚫ ⚫ ⚫        "
+        desc   = f"```{id}\n{tag}\n{rarity}\n\n{body}```"
+        embed  = discord.Embed(title=title, description=desc)
+        embed.set_thumbnail(url=ctx.author.avatar_url)
+        upgrade_msg = await ctx.send(embed=embed)
+
+        for i in range(1, 4):
+            await asyncio.sleep(1)
+            body = f"⭐ {card_doc['stars']} {'🟡 '*i}{'⚫ '*(3-i)}       "
+            desc = f"```{id}\n{tag}\n{rarity}\n\n{body}```"
+            embed.description = desc
+            await upgrade_msg.edit(embed=embed)
+        await asyncio.sleep(1)
+
+        if success:
+            body = f"⭐ {card_doc['stars']+1} 🟢 🟢 🟢 SUCCESS"
         else:
-            await ctx.send(f"**{ctx.author.mention} the upgrade failed.**")
+            body = f"⭐ {card_doc['stars']} 🔴 🔴 🔴 FAILED "
+        desc = f"```{id}\n{tag}\n{rarity}\n\n{body}```"
+        embed.description = desc
+        await upgrade_msg.edit(embed=embed)
 

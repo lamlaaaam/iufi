@@ -39,6 +39,7 @@ WASTELAND_ID = os.getenv('WASTELAND_ID')
 intents           = discord.Intents.default()
 intents.members   = True
 intents.presences = True
+intents.message_content = True
 
 bot = commands.Bot(command_prefix=['q', 'Q'], intents=intents, help_command=None, case_insensitive=True)
 
@@ -131,19 +132,19 @@ COMMAND_MAP = {
 SHOP_LIST = [
     ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id, amt: db_utils.set_user_cooldown(id, 'next_claim')),
     ('🎲', 'ROLL RESET'      , 10,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
-    ('🌸', 'RARE ROLL'       , 30,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
-    ('💎', 'EPIC ROLL'       , 200,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
-    ('👑', 'LEGENDARY ROLL'  , 1000, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
-    ('🔨', 'STAR UPGRADE'    , 50, 'A chance to upgrade a card\'s stars.', lambda id, amt: db_utils.update_user_upgrades(id, amt)),
-    ('💕', 'HEARTS FRAME'    , 20,   'Simple hearts and ribbons!', lambda id, amt: db_utils.update_user_frames(id, 2, amt)),
-    ('🌟', 'CELEBRITY FRAME' , 30,  'For the Celebrity lovers!', lambda id, amt: db_utils.update_user_frames(id, 7, amt)),
-    ('💌', 'UAENA FRAME'     , 40,  'Show off your Uaena love!', lambda id, amt: db_utils.update_user_frames(id, 3, amt)),
-    ('🌷', 'DANDELIONS FRAME', 50,  'Dandelion stickers drawn by IU!', lambda id, amt: db_utils.update_user_frames(id, 4, amt)),
-    ('✨', 'SHINE FRAME'     , 60,  'Add some shine effect to your photocard!', lambda id, amt: db_utils.update_user_frames(id, 5, amt)),
-    ('💠', 'LOVEPOEM FRAME'  , 70,  'For the Love Poem lovers!', lambda id, amt: db_utils.update_user_frames(id, 6, amt)),
-    ('🎤', 'CHEER FRAME'     , 80,  'Show your support for concerts!', lambda id, amt: db_utils.update_user_frames(id, 9, amt)),
-    ('🍓', 'SMOON FRAME'     , 90,  'Brighten the night with stars and a strawberry moon!', lambda id, amt: db_utils.update_user_frames(id, 8, amt)),
-    ('✍️', 'SIGNED FRAME'   , 100, 'IU\'s signature, what else do you need?', lambda id, amt: db_utils.update_user_frames(id, 1, amt)),
+    ('🌸', 'RARE ROLL'       , 20,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
+    ('💎', 'EPIC ROLL'       , 150,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
+    ('👑', 'LEGENDARY ROLL'  , 800, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
+    ('🔨', 'STAR UPGRADE'    , 40, 'A chance to upgrade a card\'s stars.', lambda id, amt: db_utils.update_user_upgrades(id, amt)),
+    ('💕', 'HEARTS FRAME'    , 10,   'Simple hearts and ribbons!', lambda id, amt: db_utils.update_user_frames(id, 2, amt)),
+    ('🌟', 'CELEBRITY FRAME' , 20,  'For the Celebrity lovers!', lambda id, amt: db_utils.update_user_frames(id, 7, amt)),
+    ('💌', 'UAENA FRAME'     , 30,  'Show off your Uaena love!', lambda id, amt: db_utils.update_user_frames(id, 3, amt)),
+    ('🌷', 'DANDELIONS FRAME', 40,  'Dandelion stickers drawn by IU!', lambda id, amt: db_utils.update_user_frames(id, 4, amt)),
+    ('✨', 'SHINE FRAME'     , 50,  'Add some shine effect to your photocard!', lambda id, amt: db_utils.update_user_frames(id, 5, amt)),
+    ('💠', 'LOVEPOEM FRAME'  , 60,  'For the Love Poem lovers!', lambda id, amt: db_utils.update_user_frames(id, 6, amt)),
+    ('🎤', 'CHEER FRAME'     , 70,  'Show your support for concerts!', lambda id, amt: db_utils.update_user_frames(id, 9, amt)),
+    ('🍓', 'SMOON FRAME'     , 80,  'Brighten the night with stars and a strawberry moon!', lambda id, amt: db_utils.update_user_frames(id, 8, amt)),
+    ('✍️', 'SIGNED FRAME'   , 90, 'IU\'s signature, what else do you need?', lambda id, amt: db_utils.update_user_frames(id, 1, amt)),
 ]
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
@@ -228,8 +229,6 @@ async def on_message(msg):
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
-    #if is_cmd:
-    #    await msg.delete()
     if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != 406986532205887488:
         await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
         return

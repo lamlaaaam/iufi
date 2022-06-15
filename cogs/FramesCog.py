@@ -38,7 +38,6 @@ class FramesCog(commands.Cog):
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.update_user_frames(ctx.author.id, frame_doc['id'], -1)
         await db_utils.set_card_frame(card_id_tag, frame_id_tag)
-        await ctx.send(f"**{ctx.author.mention} you have successfully set a frame.**")
 
     @commands.command(name = 'setframe', aliases = ['sfr'])
     async def set_frame(self, ctx, card_id_tag, frame_id_tag):
@@ -58,6 +57,8 @@ class FramesCog(commands.Cog):
             await self.frame_not_owned_error(ctx)
             return
         await self.set_card_frame(ctx, card_id_tag, frame_id_tag)
+        embed = discord.Embed(title="🖼️ Set Frame Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
+        await ctx.reply(embed=embed)
 
     @commands.command(name = 'removeframe', aliases = ['rfr'])
     async def remove_frame(self, ctx, card_id_tag):
@@ -72,7 +73,8 @@ class FramesCog(commands.Cog):
         if card_doc['frame'] != 0:
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.set_card_frame(card_id_tag)
-        await ctx.send(f"**{ctx.author.mention} you have successfully removed the frame.**", delete_after=2)
+        embed = discord.Embed(title="🖼️ Remove Frame Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` - `**", color=discord.Color.random())
+        await ctx.reply(embed=embed)
 
     @commands.command(name = 'setframelast', aliases = ['sfrl'])
     async def set_frame_last(self, ctx, frame_id_tag):
@@ -89,6 +91,8 @@ class FramesCog(commands.Cog):
             await self.frame_not_owned_error(ctx)
             return
         await self.set_card_frame(ctx, last_card, frame_id_tag)
+        embed = discord.Embed(title="🖼️ Set Frame Last Result", description=f"**🆔 Card ` {last_card:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
+        await ctx.reply(embed=embed)
 
     @commands.command(name = 'frameinfo', aliases = ['fi'])
     async def frame_info(self, ctx, id_tag):

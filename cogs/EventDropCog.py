@@ -32,7 +32,6 @@ class EventDropCog(commands.Cog):
 
     async def random_drop(self):
         card_doc = (await db_utils.get_random_cards(1, self.bot.RARITY_PROB, 0))[0]
-        await db_utils.set_card_availability(card_doc['id'], False)
         stars     = random.randint(1, self.bot.STARS_MAX // 2)
         await db_utils.set_card_stars(card_doc['id'], stars)
         title     = "**🎁   Random Card Drop**"

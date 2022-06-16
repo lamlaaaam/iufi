@@ -31,6 +31,7 @@ class GiftSCCog(commands.Cog):
         await ctx.reply(embed=embed)
         try:
             ch = await rec.create_dm()
-            await ch.send(f'**you have received {amt} starcandies from {ctx.author.display_name}**')
+            embed = discord.Embed(title="🎁 You received starcandies!", description=f"**🍬 Gifted ` {amt} `\n👤 From ` {ctx.author.display_name} `**", color=discord.Color.random())
+            await ch.send(embed=embed)
         except discord.Forbidden:
             pass

@@ -98,7 +98,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} there is already a card with this tag.**", delete_after=2)
             return
         await db_utils.set_card_tag(id_tag, tag)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 ` {card_doc['id']:04} `\n🏷️ ` {tag} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
         
     @commands.command(name = 'settaglast', aliases = ['stl'])
@@ -122,7 +122,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(last_card, tag)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 ` {last_card:04} `\n🏷️ ` {tag} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {last_card:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'removetag', aliases = ['rt'])
@@ -137,7 +137,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(id_tag, None)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 ` {card_doc['id']:04} `\n🏷️ ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` - `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     async def get_last_card_id(self, user_id):
@@ -257,9 +257,12 @@ class CardCommandsCog(commands.Cog):
                     tag    = doc['tag']
                     rarity = self.bot.RARITY[doc['rarity']]
                     stars  = doc['stars']
-                    await ch.send(f'**you have received ` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
+                    embed = discord.Embed(title="🎁 You received a card!", description=f"**` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} `\n👤 From ` {ctx.author.display_name} `**", color=discord.Color.random())
+                    await ch.send(embed=embed)
                 else:
                     await ch.send(f'**you have received ` 🆔 {ids} ` from {ctx.author.display_name}**')
+                    embed = discord.Embed(title="🎁 You received cards!", description=f"**🆔 Received ` {ids} `\n👤 From ` {ctx.author.display_name} `**", color=discord.Color.random())
+                    await ch.send(embed=embed)
             except discord.Forbidden:
                 pass
 
@@ -290,7 +293,8 @@ class CardCommandsCog(commands.Cog):
             id     = doc['id']
             rarity = self.bot.RARITY[doc['rarity']]
             stars  = doc['stars']
-            await ch.send(f'**you have received ` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} ` from {ctx.author.display_name}**')
+            embed = discord.Embed(title="🎁 You received a card!", description=f"**` 🆔 {id:04} | 🏷️ {tag} | {rarity} | ⭐ {stars} `\n👤 From ` {ctx.author.display_name} `**", color=discord.Color.random())
+            await ch.send(embed=embed)
         except discord.Forbidden:
             pass
 

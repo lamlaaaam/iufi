@@ -50,7 +50,7 @@ class DailyCog(commands.Cog):
             total -= self.streak_interval
             if total < 0:
                 total = 0
-            desc += f"{(cols[r]+'')*squares+'⬜'*(self.streak_interval-squares):<5} {self.streak_rewards[r][0]:>16} {'✅' if squares == self.streak_interval else '⬛':>1}\n"
+            desc += f"{(cols[r]+'')*squares+'⬜'*(self.streak_interval-squares):<5} {self.streak_rewards[r][0] + ' ' + ('✅' if squares == self.streak_interval else '⬛'):>8}\n"
         desc += "```"
 
         embed = discord.Embed(title=title, description=desc, color=discord.Color.magenta())

@@ -109,7 +109,7 @@ class AuctionCog(commands.Cog):
                 await db_utils.remove_card_from_user(ctx.author.id, card_doc['id'])
                 await db_utils.add_card_to_user(self.highest_bidder.id, card_doc['id'])
                 await db_utils.set_card_owner(card_doc['id'], self.highest_bidder.id)
-                embed = discord.Embed(title="🤝 Auction Result", description=f"**{self.highest_bidder.display_name} has won the auction with a winning bid of {self.highest_bid} starcandies.**", color=discord.Color.random())
+                embed = discord.Embed(title="🤝 Auction Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🍬 Bid ` {self.highest_bid} `\n👤 Winner ` {self.highest_bidder.display_name} `**", color=discord.Color.random())
                 await local_msg.reply(embed=embed)
             else:
                 await ctx.send(f"**The auction transaction has failed.**")

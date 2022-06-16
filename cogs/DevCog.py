@@ -7,10 +7,11 @@ class DevCog(commands.Cog):
     def __init__(self, bot, devs):
         self.bot  = bot
         self.devs = devs
-        self.pizza_master_id = 982571914516131892
+        #self.pizza_master_id = 982571914516131892
 
     async def cog_check(self, ctx):
-        return self.pizza_master_id in [r.id for r in ctx.author.roles]
+        return ctx.author.id in self.devs
+        #return self.pizza_master_id in [r.id for r in ctx.author.roles]
 
     @commands.command(name = 'reboot')
     async def reboot(self, ctx):

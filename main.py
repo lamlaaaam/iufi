@@ -62,12 +62,12 @@ DAILY_REWARD         = 5   # Starcandies
 STREAK_END           = 30  # Days before reset
 STREAK_INTERVAL      = 5   # Days before big reward
 STREAK_REWARDS       = [
-    ("50 Starcandies",   lambda id: db_utils.update_user_currency(id, 50)),
-    ("1 Rare Roll",      lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
-    ("100 Starcandies",  lambda id: db_utils.update_user_currency(id, 100)),
-    ("1 Epic Roll",      lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
-    ("500 Starcandies",  lambda id: db_utils.update_user_currency(id, 500)),
-    ("1 Legendary Roll", lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1))
+    ("50 🍬",   lambda id: db_utils.update_user_currency(id, 50)),
+    ("1 🌸",      lambda id: db_utils.update_user_roll(id, 'rare_rolls', 1)),
+    ("100 🍬",  lambda id: db_utils.update_user_currency(id, 100)),
+    ("1 💎",      lambda id: db_utils.update_user_roll(id, 'epic_rolls', 1)),
+    ("500 🍬",  lambda id: db_utils.update_user_currency(id, 500)),
+    ("1 👑", lambda id: db_utils.update_user_roll(id, 'legend_rolls', 1))
 ]
 
 AUCTION_TIME         = 30  # Seconds
@@ -163,7 +163,8 @@ NOCT     = 122062302865391616
 NEFFY    = 286513574191431682
 REVIVE   = 140889208783896576
 ALY      = 773162600380891156
-DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
+#DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
+DEVS     = [BOL]
 
 # ----------------------------------------------------------------------------------------------------------
 
@@ -215,7 +216,7 @@ async def on_ready():
                              EVENT_DROP_VALID))
     bot.add_cog(FavesCog(bot))
     bot.add_cog(FramesCog(bot))
-    bot.add_cog(SurpriseEventCog(bot))
+    bot.add_cog(SurpriseEventCog(bot, DEVS))
     print('Cogs added')
 
     print('Bot is ready')
@@ -229,7 +230,7 @@ async def on_message(msg):
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
-    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != 406986532205887488:
+    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != BOL:
         await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
         return
     if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':

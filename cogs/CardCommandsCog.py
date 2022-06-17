@@ -98,7 +98,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} there is already a card with this tag.**", delete_after=2)
             return
         await db_utils.set_card_tag(id_tag, tag)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
         
     @commands.command(name = 'settaglast', aliases = ['stl'])
@@ -122,7 +122,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(last_card, tag)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {last_card:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag Last", description=f"**🆔 Card ` {last_card:04} `\n🏷️ Tag ` {tag} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'removetag', aliases = ['rt'])
@@ -137,7 +137,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(id_tag, None)
-        embed = discord.Embed(title="🏷️ Set Tag Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` - `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     async def get_last_card_id(self, user_id):
@@ -156,7 +156,7 @@ class CardCommandsCog(commands.Cog):
         card_ids   = [doc['id'] for doc in valid_docs]
         card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        embed = discord.Embed(title="✨ Convert Result", description=f"**🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
+        embed = discord.Embed(title="✨ Convert", description=f"**🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'convertall')
@@ -166,7 +166,7 @@ class CardCommandsCog(commands.Cog):
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        embed = discord.Embed(title="✨ Convert All Result", description=f"**🃏 Converted ` {success} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
+        embed = discord.Embed(title="✨ Convert All", description=f"**🃏 Converted ` {success} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'convertmass', aliases=['cm'])
@@ -189,7 +189,7 @@ class CardCommandsCog(commands.Cog):
         card_ids   = [doc['id'] for doc in valid_docs]
         card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
-        embed = discord.Embed(title="✨ Convert Mass Result", description=f"**⚙️ Mode ` {mode} `\n🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
+        embed = discord.Embed(title="✨ Convert Mass", description=f"**⚙️ Mode ` {mode} `\n🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'convertlast', aliases = ['cl'])
@@ -200,7 +200,7 @@ class CardCommandsCog(commands.Cog):
             return
         reward = self.bot.RARITY_SC[(await db_utils.get_card(last_card))['rarity']]
         await db_utils.convert_cards(ctx.author.id, [last_card], reward)
-        embed = discord.Embed(title="✨ Convert Last Result", description=f"**🆔 Converted ` {last_card:04} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
+        embed = discord.Embed(title="✨ Convert Last", description=f"**🆔 Converted ` {last_card:04} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     async def main_card(self, user_id, card_id):
@@ -217,7 +217,7 @@ class CardCommandsCog(commands.Cog):
             await self.card_not_owned_error(ctx)
             return
         await self.main_card(ctx.author.id, card_doc['id'])
-        embed = discord.Embed(title="👤 Set Main Result", description=f"**🆔 ` {card_doc['id']:04} ` has been set as profile card.**", color=discord.Color.random())
+        embed = discord.Embed(title="👤 Set Main", description=f"**🆔 ` {card_doc['id']:04} ` has been set as profile card.**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'mainlast', aliases = ['ml'])
@@ -227,7 +227,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
             return
         await self.main_card(ctx.author.id, last_card)
-        embed = discord.Embed(title="👤 Set Main Result", description=f"**🆔 ` {last_card:04} ` has been set as profile card.**", color=discord.Color.random())
+        embed = discord.Embed(title="👤 Set Main", description=f"**🆔 ` {last_card:04} ` has been set as profile card.**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'giftpc', aliases = ['gpc'])
@@ -245,7 +245,7 @@ class CardCommandsCog(commands.Cog):
         card_ids   = [doc['id'] for doc in valid_docs]
         card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
         await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
-        embed = discord.Embed(title="🎁 Gift Card Result", description=f"**🆔 Gifted ` {card_ids_str} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🎁 Gift Card", description=f"**🆔 Gifted ` {card_ids_str} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
         if success > 0:
             try:
@@ -284,7 +284,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.gift_cards(ctx.author.id, rec.id, [last_card])
-        embed = discord.Embed(title="🎁 Gift Card Last Result", description=f"**🆔 Gifted ` {last_card:04} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🎁 Gift Card Last", description=f"**🆔 Gifted ` {last_card:04} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
         try:
             ch     = await rec.create_dm()
@@ -307,7 +307,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**", delete_after=2)
             return
         await db_utils.remove_user_fave(ctx.author.id, slot-1)
-        embed = discord.Embed(title="💕 Faves Remove Result", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="💕 Faves Remove", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` - `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'setfaves', aliases = ['sf'])
@@ -326,7 +326,7 @@ class CardCommandsCog(commands.Cog):
         if card_doc['id'] in user_doc['faves']:
             await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(card_doc['id']))
         await self.set_fave(ctx.author.id, card_doc['id'], slot)
-        embed = discord.Embed(title="💕 Faves Set Result", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` {card_doc['id']:04} `**", color=discord.Color.random())
+        embed = discord.Embed(title="💕 Faves Set", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` {card_doc['id']:04} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'setfaveslast', aliases = ['sfl'])
@@ -342,7 +342,7 @@ class CardCommandsCog(commands.Cog):
         if last_card in user_doc['faves']:
             await db_utils.remove_user_fave(ctx.author.id, user_doc['faves'].index(last_card))
         await self.set_fave(ctx.author.id, last_card, slot)
-        embed = discord.Embed(title="💕 Faves Set Last Result", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` {last_card:04} `**", color=discord.Color.random())
+        embed = discord.Embed(title="💕 Faves Set Last", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` {last_card:04} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'upgrade', aliases = ['u'])

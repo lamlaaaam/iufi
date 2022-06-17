@@ -58,11 +58,11 @@ class ProfileCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} your bio cannot exceed {self.bio_limit} characters.**", delete_after=2)
             return
         await db_utils.set_user_bio(ctx.author.id, bio)
-        embed = discord.Embed(title="📝 Set Bio Result", description=f"**Bio has been set to\n```{bio}```**", color=discord.Color.random())
+        embed = discord.Embed(title="📝 Set Bio", description=f"**Bio has been set to\n```{bio}```**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'removebio', aliases = ['rb'])
     async def remove_bio(self, ctx):
         await db_utils.remove_user_bio(ctx.author.id)
-        embed = discord.Embed(title="📝 Remove Bio Result", description=f"**Bio has been removed.**", color=discord.Color.random())
+        embed = discord.Embed(title="📝 Remove Bio", description=f"**Bio has been removed.**", color=discord.Color.random())
         await ctx.reply(embed=embed)

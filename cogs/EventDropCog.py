@@ -59,7 +59,7 @@ class EventDropCog(commands.Cog):
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
             await db_utils.set_card_owner(card_doc['id'], msg.author.id)
             await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
-            embed_win = discord.Embed(title="🎊 Random Drop Result", description=f"**{msg.author.display_name} has won the random drop!**", color=discord.Color.random())
+            embed_win = discord.Embed(title="🎊 Random Drop", description=f"**{msg.author.display_name} has won the random drop!**", color=discord.Color.random())
             await drop_msg.reply(embed=embed_win)
         except asyncio.TimeoutError:
             await db_utils.set_card_availability(card_doc['id'], True)

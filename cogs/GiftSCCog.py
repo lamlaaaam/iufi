@@ -27,7 +27,7 @@ class GiftSCCog(commands.Cog):
 
         await db_utils.update_user_currency(ctx.author.id, -amt)
         await db_utils.update_user_currency(rec.id, amt)
-        embed = discord.Embed(title="🎁 Gift Starcandies Result", description=f"**🍬 Received ` {amt} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🎁 Gift Starcandies", description=f"**🍬 Received ` {amt} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
         try:
             ch = await rec.create_dm()

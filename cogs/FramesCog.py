@@ -57,7 +57,7 @@ class FramesCog(commands.Cog):
             await self.frame_not_owned_error(ctx)
             return
         await self.set_card_frame(ctx, card_id_tag, frame_id_tag)
-        embed = discord.Embed(title="🖼️ Set Frame Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🖼️ Set Frame", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'removeframe', aliases = ['rfr'])
@@ -73,7 +73,7 @@ class FramesCog(commands.Cog):
         if card_doc['frame'] != 0:
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.set_card_frame(card_id_tag)
-        embed = discord.Embed(title="🖼️ Remove Frame Result", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="🖼️ Remove Frame", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` - `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'setframelast', aliases = ['sfrl'])
@@ -91,7 +91,7 @@ class FramesCog(commands.Cog):
             await self.frame_not_owned_error(ctx)
             return
         await self.set_card_frame(ctx, last_card, frame_id_tag)
-        embed = discord.Embed(title="🖼️ Set Frame Last Result", description=f"**🆔 Card ` {last_card:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
+        embed = discord.Embed(title="🖼️ Set Frame Last", description=f"**🆔 Card ` {last_card:04} `\n🖼️ Frame ` {frame_doc['tag']} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'frameinfo', aliases = ['fi'])

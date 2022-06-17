@@ -44,7 +44,7 @@ class SurpriseEventCog(commands.Cog):
         desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        self.event_msg = await ch.send(content='@everyone', embed=embed)
+        self.event_msg = await ch.send(content='', embed=embed)
 
         def check(m):
             return m.channel in self.bot.CHANNELS and m.content == self.answer and db_utils.does_user_exist_sync(m.author.id)
@@ -73,7 +73,7 @@ class SurpriseEventCog(commands.Cog):
         desc   = f'` {win_msg.author.display_name} has won the event, congratulations! `'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=win_msg.author.avatar_url)
-        await self.ch.send(content='@everyone', embed=embed)
+        await self.ch.send(content='', embed=embed)
 
     @commands.command(name = 'eventhint')
     async def event_hint(self, ctx, num: int):
@@ -94,4 +94,4 @@ class SurpriseEventCog(commands.Cog):
         desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        await self.event_msg.edit(content='@everyone', embed=embed)
+        await self.event_msg.edit(content='', embed=embed)

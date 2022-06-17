@@ -34,13 +34,13 @@ class CooldownsCog(commands.Cog):
     @commands.command(name = 'remindon', aliases = ['ron'])
     async def remind_on(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, True)
-        embed = discord.Embed(title="🔔 Reminders On Result", description=f"**Reminders have been turned on.**", color=discord.Color.random())
+        embed = discord.Embed(title="🔔 Reminders On", description=f"**Reminders have been turned on.**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'remindoff', aliases = ['roff'])
     async def remind_off(self, ctx):
         await db_utils.set_user_reminders(ctx.author.id, False)
-        embed = discord.Embed(title="🔔 Reminders Off Result", description=f"**Reminders have been turned off.**", color=discord.Color.random())
+        embed = discord.Embed(title="🔔 Reminders Off", description=f"**Reminders have been turned off.**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @tasks.loop(minutes=1)

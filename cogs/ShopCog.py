@@ -41,7 +41,7 @@ class ShopCog(commands.Cog):
         if (await db_utils.get_user(ctx.author.id))['currency'] >= price * amt:
             await db_utils.update_user_currency(ctx.author.id, -(price * amt))
             await effect(ctx.author.id, amt)
-            embed = discord.Embed(title="🛒 Shop Purchase Result", description=f"**{emoji} {name} ` {amt} `**", color=discord.Color.random())
+            embed = discord.Embed(title="🛒 Shop Purchase", description=f"**{emoji} {name} ` {amt} `**", color=discord.Color.random())
             await ctx.reply(embed=embed)
         else:
             await ctx.send(f"**{ctx.author.mention} you do not have enough starcandies.**", delete_after=2)

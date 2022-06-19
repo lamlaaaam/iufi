@@ -14,13 +14,11 @@ class SurpriseEventCog(commands.Cog):
         self.hint2 = None
         self.hint3 = None
         self.event_msg = None
-        #self.pizza_master_id = 982571914516131892
         self.devs = devs
         self.ch = None
 
     async def cog_check(self, ctx):
         return ctx.author.id in self.devs
-        #return self.pizza_master_id in [r.id for r in ctx.author.roles]
 
     @commands.command(name = 'eventconfig')
     async def event_config(self, ctx, answer, prize_type, prize_arg, desc, hint1, hint2, hint3):
@@ -37,14 +35,14 @@ class SurpriseEventCog(commands.Cog):
     async def event_trigger(self, ctx, ch:discord.TextChannel):
         self.ch = ch
         title = "**🎉    Surprise Event!**"
-        body = '```' + self.desc + '```'
+        body  = '```' + self.desc + '```'
         hint1 = '`Hint 1:          hidden          `'
         hint2 = '`Hint 2:          hidden          `'
         hint3 = '`Hint 3:          hidden          `'
         desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        self.event_msg = await ch.send(content='', embed=embed)
+        self.event_msg = await ch.send(content=f"{self.bot.IUFI_ROLE.mention}", embed=embed)
 
         def check(m):
             return m.channel in self.bot.CHANNELS and m.content == self.answer and db_utils.does_user_exist_sync(m.author.id)
@@ -56,6 +54,18 @@ class SurpriseEventCog(commands.Cog):
             end   = '` This event has ended. `'
             embed.description = self.event_msg.embeds[0].description + '\n\n' + end
             await self.event_msg.edit(embed=embed)
+
+    @commands.command(name = 'eventpreview')
+    async def event_preview(self, ctx, ch:discord.TextChannel):
+        title = "**🎉    Surprise Event!**"
+        body  = '```' + self.desc + '```'
+        hint1 = f'`Hint 1: {self.hint1}`'
+        hint2 = f'`Hint 2: {self.hint2}`'
+        hint3 = f'`Hint 3: {self.hint3}`'
+        desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
+        embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        await ch.send(content=f"", embed=embed)
 
     async def handle_win(self, ctx, win_msg):
         if self.prize_type == 'card':
@@ -73,7 +83,7 @@ class SurpriseEventCog(commands.Cog):
         desc   = f'` {win_msg.author.display_name} has won the event, congratulations! `'
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=win_msg.author.avatar_url)
-        await self.ch.send(content='', embed=embed)
+        await self.ch.send(content=f"{self.bot.IUFI_ROLE.mention}", embed=embed)
 
     @commands.command(name = 'eventhint')
     async def event_hint(self, ctx, num: int):
@@ -94,4 +104,4 @@ class SurpriseEventCog(commands.Cog):
         desc  = f"{body}\n{hint1}\n{hint2}\n{hint3}\n"
         embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
         embed.set_thumbnail(url=self.bot.user.avatar_url)
-        await self.event_msg.edit(content='', embed=embed)
+        await self.event_msg.edit(content=f"{self.bot.IUFI_ROLE.mention}", embed=embed)

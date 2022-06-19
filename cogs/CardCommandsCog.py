@@ -154,7 +154,7 @@ class CardCommandsCog(commands.Cog):
         success    = len(valid_docs)
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
-        card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
+        card_ids_str = ', '.join([f"{id:04}" for id in card_ids]) if len(card_ids) > 0 else "none"
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
         embed = discord.Embed(title="✨ Convert", description=f"**🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
@@ -167,6 +167,14 @@ class CardCommandsCog(commands.Cog):
         card_ids   = [doc['id'] for doc in valid_docs]
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
         embed = discord.Embed(title="✨ Convert All", description=f"**🃏 Converted ` {success} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
+        await ctx.reply(embed=embed)
+
+    @commands.command(name = 'convertaii', aliases = ['convertail', 'convertali'])
+    async def convert_all_troll(self, ctx):
+        valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id})
+        success    = len(valid_docs)
+        reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
+        embed = discord.Embed(title="✨ Convert All Oopsie", description=f"**🃏 Converted ` {success} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'convertmass', aliases=['cm'])
@@ -187,7 +195,7 @@ class CardCommandsCog(commands.Cog):
         success    = len(valid_docs)
         reward     = sum([self.bot.RARITY_SC[doc['rarity']] for doc in valid_docs])
         card_ids   = [doc['id'] for doc in valid_docs]
-        card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
+        card_ids_str = ', '.join([f"{id:04}" for id in card_ids]) if len(card_ids) > 0 else "none"
         await db_utils.convert_cards(ctx.author.id, card_ids, reward)
         embed = discord.Embed(title="✨ Convert Mass", description=f"**⚙️ Mode ` {mode} `\n🆔 Converted ` {card_ids_str} `\n🍬 Gained ` {reward} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
@@ -243,7 +251,7 @@ class CardCommandsCog(commands.Cog):
         valid_docs = await db_utils.get_cards({'owned_by': ctx.author.id, '$or': [{'id': {'$in': id_tags}}, {'tag': {'$in': id_tags}}]})
         success    = len(valid_docs)
         card_ids   = [doc['id'] for doc in valid_docs]
-        card_ids_str = ', '.join([f"{id:04}" for id in card_ids])
+        card_ids_str = ', '.join([f"{id:04}" for id in card_ids]) if len(card_ids) > 0 else "none"
         await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
         embed = discord.Embed(title="🎁 Gift Card", description=f"**🆔 Gifted ` {card_ids_str} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)

@@ -2,6 +2,7 @@ import asyncio
 from functools import partial
 import random
 import discord
+from cogs.LevelCog import LevelCog
 import db_utils
 import photocard_utils
 import concurrent.futures
@@ -92,7 +93,6 @@ class RollCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you do not have any legendary rolls to use.**", delete_after=2)
             return
 
-        #await db_utils.set_user_cooldown(ctx.author.id, 'next_claim')
         await db_utils.update_user_roll(ctx.author.id, 'legend_rolls', -1)
 
         success = await self.start_roll(ctx, 3)
@@ -125,13 +125,11 @@ class RollCog(commands.Cog):
                 return False
             return True
 
-        def check(i: discord.ComponentInteraction, com):
-            return i.message.id == roll_msg.id
-
         async def handle_claim(uid, card_index):
             nonlocal taken
             if card_index in index_taken:
                 return
+            await db_utils.set_user_cooldown(uid, 'next_claim', m = self.roll_claim_cooldown)
             components[0][card_index].disabled = True
             doc    = roll_pc_docs[card_index]
             no     = card_index + 1
@@ -145,13 +143,14 @@ class RollCog(commands.Cog):
             await db_utils.set_card_stars(roll_pc_ids[card_index], stars)
             await db_utils.set_card_owner(roll_pc_ids[card_index], uid)
             await db_utils.add_card_to_user(uid, roll_pc_ids[card_index])
-            await db_utils.set_user_cooldown(uid, 'next_claim', m = self.roll_claim_cooldown)
             await roll_msg.channel.send(f'**{self.bot.get_user(uid).mention} has claimed ` {no} | 🆔 {id:04} | {rarity} | ⭐ {stars} `**')
 
         async def handle_event(event):
             id, btn_index = event
             if await button_check(id):
                 await handle_claim(id, btn_index)
+
+        await LevelCog.level_up_check(ctx)
 
         roll_pc_docs = await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)
         if roll_pc_docs == None:

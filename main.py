@@ -166,6 +166,8 @@ ALY      = 773162600380891156
 #DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
 DEVS     = [BOL]
 
+IUFI_ROLE = 987356604926136370
+
 # ----------------------------------------------------------------------------------------------------------
 
 @bot.event
@@ -175,6 +177,7 @@ async def on_ready():
     bot.CHANNELS  = [await bot.fetch_channel(id) for id in CHANNEL_IDS]
     bot.WASTELAND = await bot.fetch_channel(WASTELAND_ID)
     bot.GUILD     = await bot.fetch_guild(GUILD_ID)
+    bot.IUFI_ROLE = bot.GUILD.get_role(IUFI_ROLE)
     print('Channels fetched')
 
     help_msg_file = os.path.join(bot.DATA_PATH, 'help.txt')

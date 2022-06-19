@@ -23,7 +23,7 @@ class LevelCog(commands.Cog):
             desc           += f"🍬:  {user_doc['currency']}  ->  {user_doc['currency'] + level_up_reward}\n"
             desc           += "You gained some starcandies for leveling up!```"
             embed           = discord.Embed(title=title, description=desc, color=discord.Color.teal())
-            embed.set_thumbnail(url=(await ctx.author.avatar_url))
+            embed.set_thumbnail(url=ctx.author.avatar_url)
 
             await ctx.send(embed=embed)
             await db_utils.update_user_currency(ctx.author.id, level_up_reward)

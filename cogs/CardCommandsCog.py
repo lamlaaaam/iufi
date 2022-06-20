@@ -137,7 +137,7 @@ class CardCommandsCog(commands.Cog):
             return
 
         await db_utils.set_card_tag(id_tag, None)
-        embed = discord.Embed(title="🏷️ Set Tag", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="🏷️ Set Tag", description=f"**🆔 Card ` {card_doc['id']:04} `\n🏷️ Tag ` none `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     async def get_last_card_id(self, user_id):
@@ -315,7 +315,7 @@ class CardCommandsCog(commands.Cog):
             await ctx.send(f"**{ctx.author.mention} you have selected an invalid slot.**", delete_after=2)
             return
         await db_utils.remove_user_fave(ctx.author.id, slot-1)
-        embed = discord.Embed(title="💕 Faves Remove", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="💕 Faves Remove", description=f"**🎰 Slot ` {slot} `\n🆔 Card ` none `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'setfaves', aliases = ['sf'])

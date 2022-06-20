@@ -131,11 +131,11 @@ COMMAND_MAP = {
 
 SHOP_LIST = [
     ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id, amt: db_utils.set_user_cooldown(id, 'next_claim')),
-    ('🎲', 'ROLL RESET'      , 10,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
-    ('🌸', 'RARE ROLL'       , 20,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
-    ('💎', 'EPIC ROLL'       , 150,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
-    ('👑', 'LEGENDARY ROLL'  , 800, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
-    ('🔨', 'STAR UPGRADE'    , 40, 'A chance to upgrade a card\'s stars.', lambda id, amt: db_utils.update_user_upgrades(id, amt)),
+    ('🎲', 'ROLL RESET'      , 25,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
+    ('🌸', 'RARE ROLL'       , 50,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
+    ('💎', 'EPIC ROLL'       , 100,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
+    ('👑', 'LEGENDARY ROLL'  , 500, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
+    ('🔨', 'STAR UPGRADE'    , 30, 'A chance to upgrade a card\'s stars.', lambda id, amt: db_utils.update_user_upgrades(id, amt)),
     ('💕', 'HEARTS FRAME'    , 10,   'Simple hearts and ribbons!', lambda id, amt: db_utils.update_user_frames(id, 2, amt)),
     ('🌟', 'CELEBRITY FRAME' , 20,  'For the Celebrity lovers!', lambda id, amt: db_utils.update_user_frames(id, 7, amt)),
     ('💌', 'UAENA FRAME'     , 30,  'Show off your Uaena love!', lambda id, amt: db_utils.update_user_frames(id, 3, amt)),
@@ -149,7 +149,7 @@ SHOP_LIST = [
 
 bot.RARITY      = ['🌿', '🌸', '💎', '👑']
 bot.RARITY_NAME = ['Common', 'Rare', 'Epic', 'Legendary']
-bot.RARITY_SC   = [1, 5, 50, 300]
+bot.RARITY_SC   = [1, 10, 40, 200]
 bot.RARITY_PROB = [887, 987, 997, 1000] # Out of 1000
 
 bot.STARS_MAX   = 10

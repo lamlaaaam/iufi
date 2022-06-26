@@ -101,6 +101,17 @@ async def reset_game_command():
     cards_col.update_many({}, {'$set': {'available': True, 'tag': None, 'owned_by': None, 'frame': 0, 'stars': 0}})
     players_col.drop()
 
+async def purge(cluster, limit):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    players_col  = iufi_db['Players']
+    all_players = list(players_col.find({}))
+    for player in all_players:
+        if len(player['collection']) > limit:
+            ids = player['collection'][limit:]
+            await convert_cards(player['discord_id'], ids, 0)
+
 # ----------------------------------------------------------------------------------------------------------
 def does_user_exist_sync(q):
     if isinstance(q, int):

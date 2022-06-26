@@ -101,9 +101,11 @@ class AuctionCog(commands.Cog):
         await local_msg.edit(embed=embed)
 
         if self.highest_bidder != None:
-            amount_ok = (await db_utils.get_user(self.highest_bidder.id))['currency'] >= self.highest_bid
+            user_doc  = await db_utils.get_user(self.highest_bidder.id)
+            amount_ok = user_doc['currency'] >= self.highest_bid
+            space_ok  = len(user_doc['collection']) < self.bot.INVENTORY_LIMIT
             card_ok   = card_doc['id'] in (await db_utils.get_user(ctx.author.id))['collection']
-            if amount_ok and card_ok:
+            if amount_ok and card_ok and space_ok:
                 await db_utils.update_user_currency(self.highest_bidder.id, -self.highest_bid)
                 await db_utils.update_user_currency(ctx.author.id, self.highest_bid)
                 await db_utils.remove_card_from_user(ctx.author.id, card_doc['id'])
@@ -112,7 +114,7 @@ class AuctionCog(commands.Cog):
                 embed = discord.Embed(title="🤝 Auction", description=f"**🆔 Card ` {card_doc['id']:04} `\n🍬 Bid ` {self.highest_bid} `\n👤 Winner ` {self.highest_bidder.display_name} `**", color=discord.Color.random())
                 await local_msg.reply(embed=embed)
             else:
-                await ctx.send(f"**The auction transaction has failed.**")
+                await ctx.send(f"**The auction transaction has failed. The card might have become unavailable during the auction, or the winner has no inventory space.**")
         else:
             embed = discord.Embed(title="🤝 Auction", description=f"**The auction ended with no winner.**", color=discord.Color.random())
             await local_msg.reply(embed=embed)

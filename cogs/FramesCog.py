@@ -73,7 +73,7 @@ class FramesCog(commands.Cog):
         if card_doc['frame'] != 0:
             await db_utils.update_user_frames(ctx.author.id, card_doc['frame'], 1)
         await db_utils.set_card_frame(card_id_tag)
-        embed = discord.Embed(title="🖼️ Remove Frame", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` - `**", color=discord.Color.random())
+        embed = discord.Embed(title="🖼️ Remove Frame", description=f"**🆔 Card ` {card_doc['id']:04} `\n🖼️ Frame ` none `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
 
     @commands.command(name = 'setframelast', aliases = ['sfrl'])

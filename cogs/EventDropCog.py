@@ -57,10 +57,16 @@ class EventDropCog(commands.Cog):
 
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=self.valid_time)
-            await db_utils.set_card_owner(card_doc['id'], msg.author.id)
-            await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
-            embed_win = discord.Embed(title="🎊 Random Drop", description=f"**{msg.author.display_name} has won the random drop!**", color=discord.Color.random())
-            await drop_msg.reply(embed=embed_win)
+            user_doc  = await db_utils.get_user(msg.author.id)
+            space_ok  = len(user_doc['collection']) < self.bot.INVENTORY_LIMIT
+            if space_ok:
+                await db_utils.set_card_owner(card_doc['id'], msg.author.id)
+                await db_utils.add_card_to_user(msg.author.id, card_doc['id'])
+                embed_win = discord.Embed(title="🎊 Random Drop", description=f"**{msg.author.display_name} has won the random drop!**", color=discord.Color.random())
+                await drop_msg.reply(embed=embed_win)
+            else:
+                embed_win = discord.Embed(title="🎊 Random Drop", description=f"**{msg.author.display_name} has won the random drop, but has no inventory space...**", color=discord.Color.random())
+                await drop_msg.reply(embed=embed_win)
         except asyncio.TimeoutError:
             await db_utils.set_card_availability(card_doc['id'], True)
         finally:

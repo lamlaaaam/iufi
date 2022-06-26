@@ -19,9 +19,9 @@ class ShopCog(commands.Cog):
         user_currency = user_doc['currency']
         title         = "**🛒   IUFI Shop**"
         #desc          = f"**`Welcome to IUFI Shop! What do you need?`**\n"
-        desc          = f"```Buy using qbuy item_id quantity\n"
-        desc         += f"WARNING: DO NOT BUY MULTIPLE RESETS```\n"
-        #desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
+        desc          = f"Buy using `qbuy item_id quantity`\n\n"
+        #desc         += f"WARNING: DO NOT BUY MULTIPLE RESETS```\n"
+        desc         += f"**🍬 Starcandies: `{user_currency}`**\n"
         shop_list     = '\n'.join([f"🆔 {i:<2} {emoji} {name:<16} {price:>4} 🍬" for i, (emoji, name, price, _, _) in enumerate(self.shop_list)])
         desc         += '```' + shop_list + '```'
         embed         = discord.Embed(title=title, description=desc, color=discord.Color.red())

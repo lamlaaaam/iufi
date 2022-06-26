@@ -32,6 +32,7 @@ from   cogs.SurpriseEventCog import SurpriseEventCog
 
 load_dotenv()
 TOKEN        = os.getenv('DISCORD_TOKEN')
+MARKET_ID    = os.getenv('MARKET_ID')
 CHANNEL_IDS  = os.getenv('CHANNEL_IDS').split('/')
 GUILD_ID     = os.getenv('GUILD_ID')
 WASTELAND_ID = os.getenv('WASTELAND_ID')
@@ -47,6 +48,8 @@ bot.DATA_PATH = 'data/'
 bot.TEMP_PATH = 'temp/'
 
 # ----------------------------------------------------------------------------------------------------------
+
+bot.INVENTORY_LIMIT  = 50  # Cards
 
 ROLL_PC_COUNT        = 3
 ROLL_CLAIM_TIME      = 30  # Seconds
@@ -129,9 +132,11 @@ COMMAND_MAP = {
     'qconvertmass' : ('qcm', 'qconvertmass mode', f"Converts photocards that fit the given mode. Allowed modes: {', '.join(CONVERT_MODES)}")
 }
 
+MARKET_COMMANDS = ['auction', 'cardinfo', 'cardinfolast', 'giftpc', 'giftpclast', 'view', 'giftsc', 'inventory', 'bid', 'faves', 'frameinfo']
+
 SHOP_LIST = [
-    ('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id, amt: db_utils.set_user_cooldown(id, 'next_claim')),
-    ('🎲', 'ROLL RESET'      , 25,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
+    #('🃏', 'CLAIM RESET'     , 5,    'Resets your claim cooldown.', lambda id, amt: db_utils.set_user_cooldown(id, 'next_claim')),
+    #('🎲', 'ROLL RESET'      , 25,    'Resets your roll cooldown.',  lambda id, amt: db_utils.set_user_cooldown(id, 'next_roll')),
     ('🌸', 'RARE ROLL'       , 50,   'A roll with at least one rare card.', lambda id, amt: db_utils.update_user_roll(id, 'rare_rolls', amt)),
     ('💎', 'EPIC ROLL'       , 100,  'A roll with at least one epic card.', lambda id, amt: db_utils.update_user_roll(id, 'epic_rolls', amt)),
     ('👑', 'LEGENDARY ROLL'  , 500, 'A roll with at least one legendary card.', lambda id, amt: db_utils.update_user_roll(id, 'legend_rolls', amt)),
@@ -174,6 +179,7 @@ IUFI_ROLE = 987356604926136370
 async def on_ready():
     print('We have logged in as {0.user}'.format(bot))
 
+    bot.MARKET    = await bot.fetch_channel(MARKET_ID)
     bot.CHANNELS  = [await bot.fetch_channel(id) for id in CHANNEL_IDS]
     bot.WASTELAND = await bot.fetch_channel(WASTELAND_ID)
     bot.GUILD     = await bot.fetch_guild(GUILD_ID)
@@ -233,11 +239,14 @@ async def on_message(msg):
         return
     ctx    = await bot.get_context(msg)
     is_cmd = ctx.valid
-    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != BOL:
-        await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
-        return
-    if msg.channel in bot.CHANNELS and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
+    if (msg.channel in bot.CHANNELS or msg.channel == bot.MARKET) and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
         await ctx.send(f"**{msg.author.mention} You are not registered. Use `qregister` to start.**", delete_after=3)
+        return
+    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != BOL:
+        if ctx.command.name in MARKET_COMMANDS and msg.channel == bot.MARKET:
+            await bot.process_commands(msg)
+            return
+        await ctx.send(f"**{msg.author.mention} This command is not usable here. Go to one of the IUFI channels.**", delete_after=2)
         return
     await bot.process_commands(msg)
 

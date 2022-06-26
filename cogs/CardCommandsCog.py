@@ -252,6 +252,12 @@ class CardCommandsCog(commands.Cog):
         success    = len(valid_docs)
         card_ids   = [doc['id'] for doc in valid_docs]
         card_ids_str = ', '.join([f"{id:04}" for id in card_ids]) if len(card_ids) > 0 else "none"
+
+        rec_doc  = await db_utils.get_user(rec.id)
+        space_ok  = len(rec_doc['collection']) + success <= self.bot.INVENTORY_LIMIT
+        if not space_ok:
+            await ctx.send(f'**{ctx.author.mention} the recipient has no inventory space.**', delete_after=2)
+            return
         await db_utils.gift_cards(ctx.author.id, rec.id, card_ids)
         embed = discord.Embed(title="🎁 Gift Card", description=f"**🆔 Gifted ` {card_ids_str} `\n👤 Recipient ` {rec.display_name} `**", color=discord.Color.random())
         await ctx.reply(embed=embed)
@@ -289,6 +295,12 @@ class CardCommandsCog(commands.Cog):
         last_card = await self.get_last_card_id(ctx.author.id)
         if last_card == None:
             await ctx.send(f'**{ctx.author.mention} you have no photocards.**', delete_after=2)
+            return
+
+        rec_doc  = await db_utils.get_user(rec.id)
+        space_ok  = len(rec_doc['collection']) < self.bot.INVENTORY_LIMIT
+        if not space_ok:
+            await ctx.send(f'**{ctx.author.mention} the recipient has no inventory space.**', delete_after=2)
             return
 
         await db_utils.gift_cards(ctx.author.id, rec.id, [last_card])

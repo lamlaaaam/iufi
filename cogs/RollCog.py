@@ -123,6 +123,14 @@ class RollCog(commands.Cog):
                 return False
             if roll_headstart_id != None and id != roll_headstart_id:
                 return False
+            user_doc  = await db_utils.get_user(id)
+            space_ok  = len(user_doc['collection']) < self.bot.INVENTORY_LIMIT
+            if not space_ok:
+                if id not in fail_claim_notified:
+                    user = await self.bot.fetch_user(id)
+                    await ctx.send(f'**{user.mention} you have no inventory space.**')
+                    fail_claim_notified.append(id)
+                return False
             return True
 
         async def handle_claim(uid, card_index):
@@ -149,8 +157,6 @@ class RollCog(commands.Cog):
             id, btn_index = event
             if await button_check(id):
                 await handle_claim(id, btn_index)
-
-        await LevelCog.level_up_check(ctx)
 
         roll_pc_docs = await db_utils.get_random_cards(self.roll_pc_count, self.bot.RARITY_PROB, rarity_bias)
         if roll_pc_docs == None:
@@ -214,6 +220,9 @@ class RollCog(commands.Cog):
         self.msg_to_event.pop(roll_msg.id, None)
         not_taken_ids = [roll_pc_ids[i] for i in range(self.roll_pc_count) if i not in index_taken]
         await db_utils.set_cards_availability(not_taken_ids, True)
+
+        await LevelCog.level_up_check(ctx)
+
         return True
 
     @commands.Cog.listener()

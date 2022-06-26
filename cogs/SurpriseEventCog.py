@@ -69,9 +69,19 @@ class SurpriseEventCog(commands.Cog):
 
     async def handle_win(self, ctx, win_msg):
         if self.prize_type == 'card':
-            await db_utils.set_card_stars(self.prize_arg, 5)
-            await db_utils.set_card_owner(self.prize_arg, win_msg.author.id)
-            await db_utils.add_card_to_user(win_msg.author.id, self.prize_arg)
+            user_doc  = await db_utils.get_user(win_msg.author.id)
+            space_ok  = len(user_doc['collection']) < self.bot.INVENTORY_LIMIT
+            if space_ok:
+                await db_utils.set_card_stars(self.prize_arg, 5)
+                await db_utils.set_card_owner(self.prize_arg, win_msg.author.id)
+                await db_utils.add_card_to_user(win_msg.author.id, self.prize_arg)
+            else:
+                title = "**🎉    Winner!**"
+                desc   = f'` {win_msg.author.display_name} has won the event, but has no inventory space... That\'s unlucky...`'
+                embed = discord.Embed(title=title, description=desc, color=discord.Color.purple())
+                embed.set_thumbnail(url=win_msg.author.avatar_url)
+                await self.ch.send(content=f"{self.bot.IUFI_ROLE.mention}", embed=embed)
+                return
         elif self.prize_type == 'sc':
             await db_utils.update_user_currency(win_msg.author.id, int(self.prize_arg))
         elif self.prize_type == 'frame':

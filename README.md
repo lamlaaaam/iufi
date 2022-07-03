@@ -23,6 +23,7 @@ IUFI is a Discord bot game that lets fans of [IU](https://www.youtube.com/watch?
 
 # ok but where the game
 the bot has been deployed in the main [IU fan discord server](https://discord.gg/b4Dzpnpg5D) with over 10k members (*ok there's actually only 200 registered players but*). overall the game has been pretty successful but don't take my word for it, have a look at what the players themselves have to say:
+
 ![image](https://user-images.githubusercontent.com/57550403/177022783-8255aef5-f834-4eba-be3b-1eed07e8dcc7.png)
 ![image](https://user-images.githubusercontent.com/57550403/177022789-663ac520-03e2-4028-9f8e-5e525b3ad714.png)
 ![image](https://user-images.githubusercontent.com/57550403/177022804-98e7b25b-f9a1-45e3-bac8-7149b7708f53.png)
@@ -31,6 +32,7 @@ the bot has been deployed in the main [IU fan discord server](https://discord.gg
 
 # ok in all seriousness
 this project took over a month and i'm glad to be able to put out a game that fellow fans can enjoy ~~and lose sleep over~~ 
+
 ![image](https://user-images.githubusercontent.com/57550403/177022927-ce9825ae-3327-4c23-ac37-c7571a2f9e43.png)
 ![image](https://user-images.githubusercontent.com/57550403/177022950-2776ad51-1abf-42e4-87d6-9e95ef96b0c3.png)
 

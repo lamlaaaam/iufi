@@ -34,7 +34,8 @@ the bot has been deployed in the main [IU fan discord server](https://discord.gg
 this project took over a month and i'm glad to be able to put out a game that fellow fans can enjoy ~~and lose sleep over~~ 
 
 ![image](https://user-images.githubusercontent.com/57550403/177022927-ce9825ae-3327-4c23-ac37-c7571a2f9e43.png)
-![image](https://user-images.githubusercontent.com/57550403/177022950-2776ad51-1abf-42e4-87d6-9e95ef96b0c3.png)
+![image](https://user-images.githubusercontent.com/57550403/177023136-dd9d1274-41fd-4664-bfd6-71e19ebe981a.png)
+
 
 ## goodbye!
 

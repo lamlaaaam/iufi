@@ -16,11 +16,7 @@ frames_col   = iufi_db['Frames']
 
 # ----------------------------------------------------------------------------------------------------------
 
-def fix(cluster):
-    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
-    client       = pymongo.MongoClient(MONGO_STRING)
-    iufi_db      = client['IUFI_DB']
-    cards_col    = iufi_db['Cards']
+def fix_stuck_cards():
     cards_col.update_many({'available':False, 'owned_by':None}, {'$set': {'available':True}})
 
 def drop_cards(cluster):
@@ -46,24 +42,6 @@ def drop_frames(cluster):
     frames_col  = iufi_db['Frames']
     if frames_col.count_documents({}) > 0:
         frames_col.drop()
-
-#def setup_cards(rarity, start_id, end_id, cluster):
-#    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
-#    client       = pymongo.MongoClient(MONGO_STRING)
-#    iufi_db      = client['IUFI_DB']
-#    cards_col    = iufi_db['Cards']
-#    card_docs = []
-#    for aws_id in range(start_id, end_id+1):
-#        doc = {'id'       : aws_id,
-#               'tag'      : None,
-#               'url'      : f"{CLOUDFRONT_PREFIX}/cards/{aws_id:05}.jpg",
-#               'available': True,
-#               'owned_by' : None,
-#               'rarity'   : rarity,
-#               'frame'    : 0,
-#               'stars'    : 0} 
-#        card_docs.append(doc)
-#    cards_col.insert_many(card_docs)
 
 def setup_cards(ids, cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')

@@ -228,6 +228,9 @@ async def on_ready():
     bot.add_cog(SurpriseEventCog(bot, DEVS))
     print('Cogs added')
 
+    db_utils.fix_stuck_cards()
+    print('Cards unstucked')
+
     print('Bot is ready')
     msg = await bot.CHANNELS[0].send('IUFI started successfully.')
     ctx = await bot.get_context(msg)

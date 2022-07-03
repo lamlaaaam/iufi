@@ -22,7 +22,7 @@ IUFI is a Discord bot game that lets fans of [IU](https://www.youtube.com/watch?
 ~~i held a random Discord user at gunpoint~~ a fellow fan helped to create a comprehensive [beginner's guide](https://docs.google.com/document/d/1VAD20wZQ56S_wDeMJlwIKn_jImIPuxh2lgy1fn17z0c/edit) so have a look there for more details about the game.
 
 # ok but where the game
-the bot has been deployed in the main IU fan discord server with over 10k members (*ok there's actually only 200 registered players but*). overall the game has been pretty successful but don't take my word for it, have a look at what the players themselves have to say:
+the bot has been deployed in the main [IU fan discord server](https://discord.gg/b4Dzpnpg5D) with over 10k members (*ok there's actually only 200 registered players but*). overall the game has been pretty successful but don't take my word for it, have a look at what the players themselves have to say:
 
 ![image](https://user-images.githubusercontent.com/57550403/177022783-8255aef5-f834-4eba-be3b-1eed07e8dcc7.png)
 ![image](https://user-images.githubusercontent.com/57550403/177022789-663ac520-03e2-4028-9f8e-5e525b3ad714.png)

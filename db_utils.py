@@ -16,6 +16,13 @@ frames_col   = iufi_db['Frames']
 
 # ----------------------------------------------------------------------------------------------------------
 
+def fix(cluster):
+    MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
+    client       = pymongo.MongoClient(MONGO_STRING)
+    iufi_db      = client['IUFI_DB']
+    cards_col    = iufi_db['Cards']
+    cards_col.update_many({'available':False, 'owned_by':None}, {'$set': {'available':True}})
+
 def drop_cards(cluster):
     MONGO_STRING = os.getenv('MONGO_STRING' if cluster == 'SG' else 'MONGO_STRING_US')
     client       = pymongo.MongoClient(MONGO_STRING)

@@ -162,7 +162,7 @@ class RollCog(commands.Cog):
         if roll_pc_docs == None:
             return False
         roll_pc_ids  = [doc['id'] for doc in roll_pc_docs]
-        print('Rolled', roll_pc_docs)
+        print('Rolled ids', roll_pc_ids)
 
         if len(roll_pc_docs) == 0:
             await ctx.send('**The pool is empty!**', delete_after=2)

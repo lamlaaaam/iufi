@@ -169,7 +169,7 @@ NEFFY    = 286513574191431682
 REVIVE   = 140889208783896576
 ALY      = 773162600380891156
 #DEVS     = [BOL, HAZE, HOPE, AYAX, NOCT, NEFFY, REVIVE, ALY]
-DEVS     = [BOL]
+DEVS     = [BOL, NOCT, AYAX]
 
 IUFI_ROLE = 987356604926136370
 
@@ -245,7 +245,7 @@ async def on_message(msg):
     if (msg.channel in bot.CHANNELS or msg.channel == bot.MARKET) and not await db_utils.does_user_exist(msg.author.id) and ctx.invoked_with != 'register':
         await ctx.send(f"**{msg.author.mention} You are not registered. Use `qregister` to start.**", delete_after=3)
         return
-    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id != BOL:
+    if is_cmd and msg.channel not in bot.CHANNELS and msg.author.id not in DEVS:
         if ctx.command.name in MARKET_COMMANDS and msg.channel == bot.MARKET:
             await bot.process_commands(msg)
             return
